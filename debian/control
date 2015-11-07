@@ -1,0 +1,22 @@
+Source: kodi-pvr-hdhomerun
+Priority: extra
+Maintainer: Nobody <nobody@kodi.tv>
+Build-Depends: debhelper (>= 9.0.0), cmake, kodi-pvr-dev,
+               libkodiplatform-dev (>= 16.0.0), kodi-addon-dev
+Standards-Version: 3.9.2
+Section: libs
+
+Package: kodi-pvr-hdhomerun
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: HDHomeRun PVR for Kodi
+ HDHomeRun PVR for Kodi
+
+Package: kodi-pvr-hdhomerun-dbg
+Section: debug
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: debug symbols for HDHomeRun PVR for Kodi
+ debug symbols for HDHomeRun PVR for Kodi
+
