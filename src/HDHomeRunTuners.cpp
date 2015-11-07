@@ -1,4 +1,7 @@
 /*
+ *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
+ *      https://github.com/zcsizmadia/pvr.hdhomerun
+ *
  *      Copyright (C) 2011 Pulse-Eight
  *      http://www.pulse-eight.com/
  *
@@ -39,8 +42,6 @@ bool HDHomeRunTuners::Update(int nMode)
 
   m_LastUpdate = PLATFORM::GetTimeMs();
 
-  XBMC->Log(LOG_DEBUG, "HDHomeRunTuners::Update(%I64d)", m_LastUpdate);
-
   //
   // Discover
   //
@@ -60,7 +61,7 @@ bool HDHomeRunTuners::Update(int nMode)
   for (nIndex = 0; nIndex < nCount; nIndex++)
   {
 	  CStdString strUrl, strJson;
-	  Tuner* pTuner;
+	  Tuner* pTuner = NULL;
 
 	  if (nMode & UpdateDiscover)
 	  {
@@ -134,9 +135,6 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 	unsigned int nChannelNumber = 1;
 	PVR_CHANNEL pvrChannel;
 
-	if (PLATFORM::GetTimeMs() - m_LastUpdate >= 60000) //3600000)
-		Update(UpdateLineUp | UpdateGuide);
-
 	if (bRadio)
 		return PVR_ERROR_NO_ERROR;
 
@@ -172,6 +170,9 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 	Json::Value::const_iterator iter, iterChannel, iterGuide;
 	int nAddBroadcastId = 0;
 	EPG_TAG tag;
+
+	if (PLATFORM::GetTimeMs() - m_LastUpdate >= 30 * 60 * 1000)
+		Update(UpdateLineUp | UpdateGuide);
 
 	AutoLock l(this);
 

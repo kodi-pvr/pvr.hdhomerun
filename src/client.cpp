@@ -1,4 +1,7 @@
-﻿/*
+/*
+ *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
+ *      https://github.com/zcsizmadia/pvr.hdhomerun
+ *
  *      Copyright (C) 2011 Pulse-Eight
  *      http://www.pulse-eight.com/
  *
@@ -83,7 +86,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   ADDON_ReadSettings();
 
   theTuners.Update();
-
+  
   m_CurStatus = ADDON_STATUS_OK;
   m_bCreated = true;
 
