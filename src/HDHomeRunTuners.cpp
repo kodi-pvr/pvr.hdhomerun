@@ -202,7 +202,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 					strSynopsis((*iterGuide)["Synopsis"].asString()),
 					strImageURL((*iterGuide)["ImageURL"].asString()),
 					strEpisodeNumber((*iterGuide)["EpisodeNumber"].asString()),
-					strGenreDescription((*iterGuide)["Filter"][(size_t)0].asString());
+					strGenreDescription((*iterGuide)["Filter"][(unsigned int)0].asString());
 					
 				tag.iUniqueBroadcastId = nBroadcastId++;
 				tag.strTitle = strTitle.c_str();
