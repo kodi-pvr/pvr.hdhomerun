@@ -8,9 +8,7 @@ set(SOURCES hdhomerun_channels.c
             hdhomerun_debug.c
             hdhomerun_device.c
             hdhomerun_discover.c
-            hdhomerun_os_windows.c
             hdhomerun_pkt.c
-            hdhomerun_sock_windows.c
             hdhomerun_video.c)
 
 set(HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun.h
@@ -25,9 +23,17 @@ set(HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun.h
             ${PROJECT_SOURCE_DIR}/hdhomerun_sock.h
             ${PROJECT_SOURCE_DIR}/hdhomerun_types.h
             ${PROJECT_SOURCE_DIR}/hdhomerun_os.h
-            ${PROJECT_SOURCE_DIR}/hdhomerun_os_posix.h
-            ${PROJECT_SOURCE_DIR}/hdhomerun_os_windows.h
             ${PROJECT_SOURCE_DIR}/hdhomerun_video.h)
+
+if(WIN32)
+  LIST(APPEND SOURCES hdhomerun_os_windows.c)
+  LIST(APPEND SOURCES hdhomerun_sock_windows.c)
+  LIST(APPEND HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun_os_windows.h)
+else()
+  LIST(APPEND SOURCES hdhomerun_os_posix.c)
+  LIST(APPEND SOURCES hdhomerun_sock_posix.c)
+  LIST(APPEND HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun_os_posix.h)
+endif()
 
 if(MSVC)
   set_source_files_properties( ${SOURCES} PROPERTIES LANGUAGE "CXX" )
