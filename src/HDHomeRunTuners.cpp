@@ -168,7 +168,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
 	Json::Value::const_iterator iter, iterChannel, iterGuide;
-	int nAddBroadcastId = 0;
+	int nBroadcastId = 1;
 	EPG_TAG tag;
 
 	if (PLATFORM::GetTimeMs() - m_LastUpdate >= 30 * 60 * 1000)
@@ -204,9 +204,9 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 					strEpisodeNumber((*iterGuide)["EpisodeNumber"].asString()),
 					strGenreDescription((*iterGuide)["Filter"][(size_t)0].asString());
 					
-				tag.iUniqueBroadcastId = nAddBroadcastId;
+				tag.iUniqueBroadcastId = nBroadcastId++;
 				tag.strTitle = strTitle.c_str();
-				tag.iChannelNumber = channel.iChannelNumber;
+				tag.iChannelNumber = channel.iUniqueId;
 				tag.startTime = (time_t)(*iterGuide)["StartTime"].asUInt();
 				tag.endTime = (time_t)(*iterGuide)["EndTime"].asUInt();
 				tag.firstAired = (time_t)(*iterGuide)["OriginalAirdate"].asUInt();
