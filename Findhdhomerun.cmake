@@ -4,8 +4,8 @@ if(PKG_CONFIG_FOUND)
 endif()
 
 if(NOT HDHOMERUN_FOUND)
-  find_path(HDHOMERUN_INCLUDE_DIRS hdhomerun/hdhomerun.h
-            PATH_SUFFIXES hdhomerun)
+  find_path(HDHOMERUN_INCLUDE_DIRS hdhomerun.h
+            PATH_SUFFIXES hdhomerun libhdhomerun)            
   find_library(HDHOMERUN_LIBRARIES hdhomerun)
 endif()
 
