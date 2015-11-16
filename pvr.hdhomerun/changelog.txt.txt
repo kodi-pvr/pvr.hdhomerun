@@ -1,0 +1,10 @@
+v1.0.3
+- Added icon
+- Added setting: Mark new show
+- Added setting: Hide protected channels
+- Added setting: Hide duplicate channels
+- Added setting: Debug
+- Added EPG_TAG categories
+
+v1.0.0
+- Initial version
