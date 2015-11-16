@@ -22,31 +22,66 @@
  *
  */
 
+#include "client.h"
 #include "Utils.h"
 
-int GetFileContents(const CStdString& url, CStdString& strContent)
+#if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
+int DbgPrintf(const char* szFormat, ...)
+{
+	static bool g_bDebugConsole = false;
+	char szBuffer[4096];
+	int nLen;
+	va_list args;
+	DWORD dwWritten;
+	
+	if (!g_bDebugConsole)
+	{
+		::AllocConsole();
+		g_bDebugConsole = true;
+	}
+
+	va_start(args, szFormat);
+	nLen = vsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, args);
+	::WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), szBuffer, nLen, &dwWritten, 0);
+	va_end(args);
+
+	return nLen;
+}
+#endif
+
+bool GetFileContents(const String& url, String& strContent)
 {
 	char buffer[1024];
-	void* fileHandle = XBMC->OpenFile(url.c_str(), 0);
-
-	if (fileHandle == NULL)
-		return -1;
-
+	void* fileHandle;
+	
 	strContent.clear();
 
-	while (int bytesRead = XBMC->ReadFile(fileHandle, buffer, sizeof(buffer)))
+	fileHandle = g.XBMC->OpenFile(url, 0);
+
+	if (fileHandle == NULL)
+	{
+		KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
+		return false;
+	}
+	
+	for (;;)
+	{
+		int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+		if (bytesRead <= 0)
+			break;
 		strContent.append(buffer, bytesRead);
+	}
 
-	XBMC->CloseFile(fileHandle);
+	g.XBMC->CloseFile(fileHandle);
 
-	return strContent.length();
+	return true;
 }
 
-CStdString EncodeURL(const CStdString& strUrl)
+String EncodeURL(const String& strUrl)
 {
-	CStdString str, strEsc;
+	String str, strEsc;
 
-	for (CStdString::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
+	for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
 	{
 		char c = *iter;
 
@@ -54,9 +89,9 @@ CStdString EncodeURL(const CStdString& strUrl)
 			str += c;
 		else
 		{
-			char strEsc[5];
-			snprintf(strEsc, sizeof(strEsc), "%%%02X", (int)c);
-			str += strEsc;
+			String strPercent;
+			strPercent.Format("%%%02X", (int)c);
+			str += strPercent;
 		}
 	}
 

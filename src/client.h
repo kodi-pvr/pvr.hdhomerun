@@ -27,8 +27,49 @@
 #include <kodi/libXBMC_pvr.h>
 #include <platform/util/StdString.h>
 
-extern bool m_bCreated;
-extern CStdString g_strUserPath;
-extern CStdString g_strClientPath;
-extern ADDON::CHelper_libXBMC_addon* XBMC;
-extern CHelper_libXBMC_pvr* PVR;
+typedef CStdString String;
+
+class HDHomeRunTuners;
+
+struct SettingsType
+{
+	SettingsType()
+	{
+		bHideProtected = true;
+		bHideDuplicateChannels = true;
+		bDebug = false;
+		bMarkNew = false;
+	}
+
+	bool bHideProtected;
+	bool bHideDuplicateChannels;
+	bool bDebug;
+	bool bMarkNew;
+};
+
+struct GlobalsType
+{
+	GlobalsType()
+	{
+		bCreated = false;
+		currentStatus = ADDON_STATUS_UNKNOWN;
+		iCurrentChannelUniqueId = 0;
+		XBMC = NULL;
+		PVR = NULL;
+		Tuners = NULL;
+	}
+
+	bool bCreated;
+	ADDON_STATUS currentStatus;
+	unsigned int iCurrentChannelUniqueId;
+	String strUserPath;
+	String strClientPath;
+	ADDON::CHelper_libXBMC_addon* XBMC;
+	CHelper_libXBMC_pvr* PVR;
+
+	HDHomeRunTuners* Tuners;
+
+	SettingsType Settings;
+};
+
+extern GlobalsType g;

@@ -25,7 +25,7 @@
 
 #include "client.h"
 #include <platform/threads/mutex.h>
-#include <hdhomerun/hdhomerun.h>
+#include <hdhomerun.h>
 #include <json/json.h>
 
 class HDHomeRunTuners
@@ -71,10 +71,14 @@ public:
 
 public:
 	PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
+	int PvrGetChannelsAmount();
 	PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd);
-
+	int PvrGetChannelGroupsAmount(void);
+	PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
+	PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+	
 protected:
-	unsigned int CalculateChannelUniqueId(Json::Value::const_iterator iter);
+	unsigned int PvrCalculateUniqueId(const String& str);
 
 public:
 	void Lock() { m_Lock.Lock(); }
@@ -83,6 +87,4 @@ public:
 protected:
 	Tuners m_Tuners;
 	PLATFORM::CMutex m_Lock;
-
-	int64_t m_LastUpdate;
 };

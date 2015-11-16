@@ -26,33 +26,53 @@
 #include <kodi/xbmc_pvr_dll.h>
 #include <kodi/libKODI_guilib.h>
 #include <platform/util/util.h>
+#include <platform/threads/threads.h>
 #include "HDHomeRunTuners.h"
+#include "Utils.h"
 
 using namespace ADDON;
 
-#ifdef TARGET_WINDOWS
-#define snprintf _snprintf
-#endif
+GlobalsType g;
 
-bool m_bCreated = false;
-ADDON_STATUS m_CurStatus = ADDON_STATUS_UNKNOWN;
+class UpdateThread : public PLATFORM::CThread
+{
+public:
+	void *Process()
+	{
+		for (;;)
+		{
+			for (int i = 0; i < 60*60; i++)
+				if (PLATFORM::CThread::Sleep(1000))
+					break;
+			
+			if (IsStopped())
+				break;
 
-/* User adjustable settings are saved here.
- * Default values are defined inside client.h
- * and exported to the other source files.
- */
-CStdString g_strUserPath = "";
-CStdString g_strClientPath = "";
+			if (g.Tuners)
+			{
+				g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+				g.PVR->TriggerChannelUpdate();
+			}
+		}
+		return NULL;
+	}
+};
 
-CHelper_libXBMC_addon* XBMC = NULL;
-CHelper_libXBMC_pvr* PVR = NULL;
-
-unsigned int m_iCurrentChannelUniqueId = 0;
-
-HDHomeRunTuners theTuners;
+UpdateThread g_UpdateThread;
 
 void ADDON_ReadSettings(void)
 {
+	if (!g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected))
+		g.Settings.bHideProtected = true;
+
+	if (!g.XBMC->GetSetting("hide_duplicate", &g.Settings.bHideDuplicateChannels))
+		g.Settings.bHideDuplicateChannels = true;
+
+	if (!g.XBMC->GetSetting("mark_new", &g.Settings.bMarkNew))
+		g.Settings.bMarkNew = true;
+
+	if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
+		g.Settings.bDebug = false;
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -62,46 +82,56 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 
   PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
 
-  XBMC = new CHelper_libXBMC_addon;
-  if (!XBMC->RegisterMe(hdl))
+  g.XBMC = new CHelper_libXBMC_addon;
+  if (!g.XBMC->RegisterMe(hdl))
   {
-    SAFE_DELETE(XBMC);
+	SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
-  PVR = new CHelper_libXBMC_pvr;
-  if (!PVR->RegisterMe(hdl))
+  g.PVR = new CHelper_libXBMC_pvr;
+  if (!g.PVR->RegisterMe(hdl))
   {
-    SAFE_DELETE(PVR);
-    SAFE_DELETE(XBMC);
+	SAFE_DELETE(g.PVR);
+	SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
-  XBMC->Log(LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
+  KODI_LOG(LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
 
-  m_CurStatus = ADDON_STATUS_UNKNOWN;
-  g_strUserPath = pvrprops->strUserPath;
-  g_strClientPath = pvrprops->strClientPath;
+  g.currentStatus = ADDON_STATUS_UNKNOWN;
+  g.strUserPath = pvrprops->strUserPath;
+  g.strClientPath = pvrprops->strClientPath;
 
+  g.Tuners = new HDHomeRunTuners;
+  if (g.Tuners == NULL)
+  	  return ADDON_STATUS_PERMANENT_FAILURE;
+  
   ADDON_ReadSettings();
 
-  theTuners.Update();
+  if (g.Tuners)
+  {
+	  g.Tuners->Update();
+	  g_UpdateThread.CreateThread(false);
+  }
   
-  m_CurStatus = ADDON_STATUS_OK;
-  m_bCreated = true;
+  g.currentStatus = ADDON_STATUS_OK;
+  g.bCreated = true;
 
   return ADDON_STATUS_OK;
 }
 
 ADDON_STATUS ADDON_GetStatus()
 {
-  return m_CurStatus;
+  return g.currentStatus;
 }
 
 void ADDON_Destroy()
 {
-  m_bCreated = false;
-  m_CurStatus = ADDON_STATUS_UNKNOWN;
+  g_UpdateThread.StopThread();
+
+  g.bCreated = false;
+  g.currentStatus = ADDON_STATUS_UNKNOWN;
 }
 
 bool ADDON_HasSettings()
@@ -116,6 +146,18 @@ unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
 
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
+	if (strcmp(settingName, "hide_protected") == 0)
+		g.Settings.bHideProtected = *(bool*)settingValue;
+	else
+	if (strcmp(settingName, "hide_duplicate") == 0)
+		g.Settings.bHideDuplicateChannels = *(bool*)settingValue;
+	else
+	if (strcmp(settingName, "mark_new") == 0)
+		g.Settings.bMarkNew = *(bool*)settingValue;
+	else
+	if (strcmp(settingName, "debug") == 0)
+		g.Settings.bDebug = *(bool*)settingValue;
+
   return ADDON_STATUS_OK;
 }
 
@@ -129,6 +171,20 @@ void ADDON_FreeSettings()
 
 void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data)
 {
+	if (g.Tuners == NULL)
+		return;
+
+	if (strcmp("xbmc", sender) == 0)
+	{
+		if (strcmp("System", flag) == 0)
+		{
+			if (strcmp("OnWake", message) == 0)
+			{
+				g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+				g.PVR->TriggerChannelUpdate();
+			}
+		}
+	}
 }
 
 /***********************************************************
@@ -165,7 +221,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
   pCapabilities->bSupportsChannelGroups = true;
   pCapabilities->bSupportsRecordings = false;
   pCapabilities->bSupportsRecordingsUndelete = false;
-  pCapabilities->bSupportsTimers = true;
+  pCapabilities->bSupportsTimers = false;
 
   return PVR_ERROR_NO_ERROR;
 }
@@ -178,14 +234,14 @@ const char *GetBackendName(void)
 
 const char *GetBackendVersion(void)
 {
-  static CStdString strBackendVersion = "0.1";
-  return strBackendVersion.c_str();
+  static const char *strBackendVersion = "0.1";
+  return strBackendVersion;
 }
 
 const char *GetConnectionString(void)
 {
-  static CStdString strConnectionString = "connected";
-  return strConnectionString.c_str();
+  static const char *strConnectionString = "connected";
+  return strConnectionString;
 }
 
 const char *GetBackendHostname(void)
@@ -202,36 +258,51 @@ PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
 
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
-	return theTuners.PvrGetEPGForChannel(handle, channel, iStart, iEnd);
+	return g.Tuners ? g.Tuners->PvrGetEPGForChannel(handle, channel, iStart, iEnd) : PVR_ERROR_SERVER_ERROR;
 }
 
 int GetChannelsAmount(void)
 {
-  return -1;
+  return g.Tuners ? g.Tuners->PvrGetChannelsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
 {
-	return theTuners.PvrGetChannels(handle, bRadio);
+  return g.Tuners ? g.Tuners->PvrGetChannels(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
+}
+
+int GetChannelGroupsAmount(void) 
+{ 
+	return g.Tuners ? g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
+}
+
+PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) 
+{ 
+	return g.Tuners ? g.Tuners->PvrGetChannelGroups(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
+}
+
+PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group) 
+{ 
+	return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
 }
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
   CloseLiveStream();
 
-  m_iCurrentChannelUniqueId = channel.iUniqueId;
+  g.iCurrentChannelUniqueId = channel.iUniqueId;
 
   return true;
 }
 
 void CloseLiveStream(void)
 {
-  m_iCurrentChannelUniqueId = 0;
+  g.iCurrentChannelUniqueId = 0;
 }
 
 int GetCurrentClientChannel(void)
 {
-	return m_iCurrentChannelUniqueId;
+	return g.iCurrentChannelUniqueId;
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)
@@ -243,23 +314,30 @@ bool SwitchChannel(const PVR_CHANNEL &channel)
 
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 {
-  snprintf(signalStatus.strAdapterName, sizeof(signalStatus.strAdapterName), "PVR HDHomeRun Adapter 1");
-  snprintf(signalStatus.strAdapterStatus, sizeof(signalStatus.strAdapterStatus), "OK");
-
+  PVR_STRCPY(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1");
+  PVR_STRCPY(signalStatus.strAdapterStatus, "OK");
+  
   return PVR_ERROR_NO_ERROR;
 }
 
+bool CanPauseStream(void) 
+{ 
+	return true; 
+}
+
+bool CanSeekStream(void) 
+{ 
+	return true; 
+}
+
 /* UNUSED API FUNCTIONS */
+PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
 int GetRecordingsAmount(bool deleted) { return -1; }
 PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted) { return PVR_ERROR_NOT_IMPLEMENTED; }
 int GetTimersAmount(void) { return -1; }
 PVR_ERROR GetTimers(ADDON_HANDLE handle) { return PVR_ERROR_NOT_IMPLEMENTED; }
-int GetChannelGroupsAmount(void) { return -1; }
-PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) { return PVR_ERROR_SERVER_ERROR; }
-PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group) { return PVR_ERROR_SERVER_ERROR; }
 PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR RenameChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR MoveChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -291,8 +369,6 @@ void DemuxAbort(void) {}
 DemuxPacket* DemuxRead(void) { return NULL; }
 unsigned int GetChannelSwitchDelay(void) { return 0; }
 void PauseStream(bool bPaused) {}
-bool CanPauseStream(void) { return false; }
-bool CanSeekStream(void) { return false; }
 bool SeekTime(int,bool,double*) { return false; }
 void SetSpeed(int) {};
 time_t GetPlayingTime() { return 0; }

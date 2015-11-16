@@ -28,3 +28,7 @@ msgstr ""
 msgctxt "#32004"
 msgid "Hide duplicate channels"
 msgstr ""
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr ""
