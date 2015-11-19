@@ -6,15 +6,11 @@
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>
     <c-pluff version="0.1"/>
-    <import addon="xbmc.pvr" version="1.9.6"/>
+    <import addon="xbmc.pvr" version="4.1.0"/>
   </requires>
   <extension
     point="xbmc.pvrclient"
-    library_linux="pvr.hdhomerun.so"
-    library_osx="pvr.hdhomerun.dylib"
-    library_freebsd="pvr.hdhomerun.so"
-    library_windx="pvr.hdhomerun.dll"
-    library_android="libpvr.hdhomerun.so" />
+    library_@PLATFORM@="@LIBRARY_FILENAME@"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="en_AU">HDHomeRun PVR Client</summary>
     <summary lang="en_GB">HDHomeRun PVR Client</summary>
@@ -28,6 +24,6 @@
     <disclaimer lang="en_GB"></disclaimer>
     <disclaimer lang="en_NZ"></disclaimer>
     <disclaimer lang="en_US"></disclaimer>
-    <platform>all</platform>
+    <platform>@PLATFORM@</platform>
   </extension>
 </addon>
