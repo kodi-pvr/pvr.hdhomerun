@@ -37,42 +37,47 @@ GlobalsType g;
 class UpdateThread : public PLATFORM::CThread
 {
 public:
-	void *Process()
-	{
-		for (;;)
-		{
-			for (int i = 0; i < 60*60; i++)
-				if (PLATFORM::CThread::Sleep(1000))
-					break;
-			
-			if (IsStopped())
-				break;
+  void *Process()
+  {
+    for (;;)
+    {
+      for (int i = 0; i < 60*60; i++)
+        if (PLATFORM::CThread::Sleep(1000))
+          break;
+      
+      if (IsStopped())
+        break;
 
-			if (g.Tuners)
-			{
-				g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
-				g.PVR->TriggerChannelUpdate();
-			}
-		}
-		return NULL;
-	}
+      if (g.Tuners)
+      {
+        g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+        g.PVR->TriggerChannelUpdate();
+      }
+    }
+    return NULL;
+  }
 };
 
 UpdateThread g_UpdateThread;
 
+extern "C" {
+
 void ADDON_ReadSettings(void)
 {
-	if (!g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected))
-		g.Settings.bHideProtected = true;
+  if (g.XBMC == NULL)
+    return;
 
-	if (!g.XBMC->GetSetting("hide_duplicate", &g.Settings.bHideDuplicateChannels))
-		g.Settings.bHideDuplicateChannels = true;
+  if (!g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected))
+    g.Settings.bHideProtected = true;
 
-	if (!g.XBMC->GetSetting("mark_new", &g.Settings.bMarkNew))
-		g.Settings.bMarkNew = true;
+  if (!g.XBMC->GetSetting("hide_duplicate", &g.Settings.bHideDuplicateChannels))
+    g.Settings.bHideDuplicateChannels = true;
 
-	if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
-		g.Settings.bDebug = false;
+  if (!g.XBMC->GetSetting("mark_new", &g.Settings.bMarkNew))
+    g.Settings.bMarkNew = true;
+
+  if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
+    g.Settings.bDebug = false;
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -85,15 +90,15 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   g.XBMC = new CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
-	SAFE_DELETE(g.XBMC);
+  SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
   g.PVR = new CHelper_libXBMC_pvr;
   if (!g.PVR->RegisterMe(hdl))
   {
-	SAFE_DELETE(g.PVR);
-	SAFE_DELETE(g.XBMC);
+  SAFE_DELETE(g.PVR);
+  SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
@@ -105,14 +110,14 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 
   g.Tuners = new HDHomeRunTuners;
   if (g.Tuners == NULL)
-  	  return ADDON_STATUS_PERMANENT_FAILURE;
+      return ADDON_STATUS_PERMANENT_FAILURE;
   
   ADDON_ReadSettings();
 
   if (g.Tuners)
   {
-	  g.Tuners->Update();
-	  g_UpdateThread.CreateThread(false);
+    g.Tuners->Update();
+    g_UpdateThread.CreateThread(false);
   }
   
   g.currentStatus = ADDON_STATUS_OK;
@@ -130,6 +135,10 @@ void ADDON_Destroy()
 {
   g_UpdateThread.StopThread();
 
+  SAFE_DELETE(g.Tuners);
+  SAFE_DELETE(g.PVR);
+  SAFE_DELETE(g.XBMC);
+
   g.bCreated = false;
   g.currentStatus = ADDON_STATUS_UNKNOWN;
 }
@@ -146,17 +155,26 @@ unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
 
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
-	if (strcmp(settingName, "hide_protected") == 0)
-		g.Settings.bHideProtected = *(bool*)settingValue;
-	else
-	if (strcmp(settingName, "hide_duplicate") == 0)
-		g.Settings.bHideDuplicateChannels = *(bool*)settingValue;
-	else
-	if (strcmp(settingName, "mark_new") == 0)
-		g.Settings.bMarkNew = *(bool*)settingValue;
-	else
-	if (strcmp(settingName, "debug") == 0)
-		g.Settings.bDebug = *(bool*)settingValue;
+  if (g.Tuners == NULL)
+    return ADDON_STATUS_OK;
+
+  if (strcmp(settingName, "hide_protected") == 0)
+  {
+    g.Settings.bHideProtected = *(bool*)settingValue;
+    return ADDON_STATUS_NEED_RESTART;
+  }
+  else
+  if (strcmp(settingName, "hide_duplicate") == 0)
+  {
+    g.Settings.bHideDuplicateChannels = *(bool*)settingValue;
+    return ADDON_STATUS_NEED_RESTART;
+  }
+  else
+  if (strcmp(settingName, "mark_new") == 0)
+    g.Settings.bMarkNew = *(bool*)settingValue;
+  else
+  if (strcmp(settingName, "debug") == 0)
+    g.Settings.bDebug = *(bool*)settingValue;
 
   return ADDON_STATUS_OK;
 }
@@ -171,20 +189,20 @@ void ADDON_FreeSettings()
 
 void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data)
 {
-	if (g.Tuners == NULL)
-		return;
+  if (g.Tuners == NULL)
+    return;
 
-	if (strcmp("xbmc", sender) == 0)
-	{
-		if (strcmp("System", flag) == 0)
-		{
-			if (strcmp("OnWake", message) == 0)
-			{
-				g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
-				g.PVR->TriggerChannelUpdate();
-			}
-		}
-	}
+  if (strcmp("xbmc", sender) == 0)
+  {
+    if (strcmp("System", flag) == 0)
+    {
+      if (strcmp("OnWake", message) == 0)
+      {
+        g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+        g.PVR->TriggerChannelUpdate();
+      }
+    }
+  }
 }
 
 /***********************************************************
@@ -258,7 +276,7 @@ PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
 
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
-	return g.Tuners ? g.Tuners->PvrGetEPGForChannel(handle, channel, iStart, iEnd) : PVR_ERROR_SERVER_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetEPGForChannel(handle, channel, iStart, iEnd) : PVR_ERROR_SERVER_ERROR;
 }
 
 int GetChannelsAmount(void)
@@ -273,17 +291,17 @@ PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
 
 int GetChannelGroupsAmount(void) 
 { 
-	return g.Tuners ? g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) 
 { 
-	return g.Tuners ? g.Tuners->PvrGetChannelGroups(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetChannelGroups(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group) 
 { 
-	return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
 }
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
@@ -302,7 +320,7 @@ void CloseLiveStream(void)
 
 int GetCurrentClientChannel(void)
 {
-	return g.iCurrentChannelUniqueId;
+  return g.iCurrentChannelUniqueId;
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)
@@ -322,12 +340,12 @@ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 
 bool CanPauseStream(void) 
 { 
-	return true; 
+  return true; 
 }
 
 bool CanSeekStream(void) 
 { 
-	return true; 
+  return true; 
 }
 
 /* UNUSED API FUNCTIONS */
@@ -378,3 +396,4 @@ PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_N
 PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size) { return PVR_ERROR_NOT_IMPLEMENTED; }
 bool IsTimeshifting(void) { return false; }
+}

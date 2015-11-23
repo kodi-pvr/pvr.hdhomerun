@@ -1,4 +1,7 @@
 v1.0.4
+- Fix coverity scan issues
+
+v1.0.4
 - Fix addon.xml
 
 v1.0.3
