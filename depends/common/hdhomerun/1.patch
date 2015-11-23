@@ -1,0 +1,66 @@
+diff -Naur libhdhomerun/hdhomerun_sock_posix.c libhdhomerun_new/hdhomerun_sock_posix.c
+--- libhdhomerun/hdhomerun_sock_posix.c	2014-08-01 19:04:42.000000000 -0500
++++ libhdhomerun_new/hdhomerun_sock_posix.c	2015-11-22 17:02:43.276812000 -0600
+@@ -155,7 +155,10 @@
+ 
+ 	/* Allow broadcast. */
+ 	int sock_opt = 1;
+-	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&sock_opt, sizeof(sock_opt));
++	if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&sock_opt, sizeof(sock_opt)) != 0) {
++		close(sock);
++		return HDHOMERUN_SOCK_INVALID;
++	}
+ 
+ 	/* Success. */
+ 	return sock;
+@@ -276,7 +279,9 @@
+ bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse)
+ {
+ 	int sock_opt = allow_reuse;
+-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&sock_opt, sizeof(sock_opt));
++	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&sock_opt, sizeof(sock_opt)) != 0)  {
++		return FALSE;
++	}
+ 
+ 	struct sockaddr_in sock_addr;
+ 	memset(&sock_addr, 0, sizeof(sock_addr));
+diff -Naur libhdhomerun/hdhomerun_sock_windows.c libhdhomerun_new/hdhomerun_sock_windows.c
+--- libhdhomerun/hdhomerun_sock_windows.c	2014-08-01 19:04:42.000000000 -0500
++++ libhdhomerun_new/hdhomerun_sock_windows.c	2015-11-22 17:08:09.082274300 -0600
+@@ -117,7 +117,10 @@
+ 
+ 	/* Allow broadcast. */
+ 	int sock_opt = 1;
+-	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&sock_opt, sizeof(sock_opt));
++	if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&sock_opt, sizeof(sock_opt)) != 0) {
++		closesocket(sock);
++		return HDHOMERUN_SOCK_INVALID;
++	}
+ 
+ 	/* Success. */
+ 	return sock;
+@@ -239,7 +242,9 @@
+ bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse)
+ {
+ 	int sock_opt = allow_reuse;
+-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&sock_opt, sizeof(sock_opt));
++	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&sock_opt, sizeof(sock_opt)) != 0) {
++		return FALSE;
++	}
+ 
+ 	struct sockaddr_in sock_addr;
+ 	memset(&sock_addr, 0, sizeof(sock_addr));
+diff -Naur libhdhomerun/hdhomerun_video.c libhdhomerun_new/hdhomerun_video.c
+--- libhdhomerun/hdhomerun_video.c	2014-01-16 13:01:59.000000000 -0600
++++ libhdhomerun_new/hdhomerun_video.c	2015-11-22 17:03:32.532989400 -0600
+@@ -86,7 +86,9 @@
+ 
+ 	/* Expand socket buffer size. */
+ 	int rx_size = 1024 * 1024;
+-	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, (char *)&rx_size, sizeof(rx_size));
++	if (setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, (char *)&rx_size, sizeof(rx_size)) != 0) {
++		goto error;
++	}
+ 
+ 	/* Bind socket. */
+ 	if (!hdhomerun_sock_bind(vs->sock, INADDR_ANY, listen_port, allow_port_reuse)) {
