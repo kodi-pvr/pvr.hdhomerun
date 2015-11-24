@@ -1,4 +1,7 @@
-v1.0.4
+v1.0.6
+- Add needs_configuration to addon.xml
+
+v1.0.5
 - Fix coverity scan issues
 
 v1.0.4
