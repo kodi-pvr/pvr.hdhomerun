@@ -47,7 +47,7 @@ unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 bool HDHomeRunTuners::Update(int nMode)
 {
   struct hdhomerun_discover_device_t foundDevices[16];
-  size_t nTunerCount, nTunerIndex, nIndex, nCount, nGuideIndex;
+  Json::Value::ArrayIndex nTunerCount, nTunerIndex, nIndex, nCount, nGuideIndex;
   String strUrl, strJson;
   Json::Reader jsonReader;
   Json::Value jsonResponse;
@@ -119,7 +119,7 @@ bool HDHomeRunTuners::Update(int nMode)
 				  if (jsonGuide.type() != Json::arrayValue)
 					  continue;
 
-				  for (size_t i = 0; i < jsonGuide.size(); i++, nCount++)
+				  for (Json::Value::ArrayIndex i = 0; i < jsonGuide.size(); i++, nCount++)
 				  {
 					  Json::Value& jsonGuideItem = jsonGuide[i];
 					  int iSeriesNumber = 0, iEpisodeNumber = 0;
@@ -133,7 +133,7 @@ bool HDHomeRunTuners::Update(int nMode)
 					  
 					  unsigned int nGenreType = 0;
 					  Json::Value& jsonFilter = jsonGuideItem["Filter"];
-					  for (size_t nGenreIndex = 0; nGenreIndex < jsonFilter.size(); nGenreIndex++)
+					  for (Json::Value::ArrayIndex nGenreIndex = 0; nGenreIndex < jsonFilter.size(); nGenreIndex++)
 					  {
 						  String str = jsonFilter[nGenreIndex].asString();
 
@@ -248,7 +248,7 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 	AutoLock l(this);
 
 	for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
-		for (size_t nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
+		for (Json::Value::ArrayIndex nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
 			if (!iterTuner->LineUp[nIndex]["_Hide"].asBool())
 				nCount++;
 
@@ -258,7 +258,7 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 {
 	PVR_CHANNEL pvrChannel;
-	size_t nIndex;
+	Json::Value::ArrayIndex nIndex;
 	
 	if (bRadio)
 		return PVR_ERROR_NO_ERROR;
@@ -289,7 +289,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
-	size_t nChannelIndex, nGuideIndex;
+	Json::Value::ArrayIndex nChannelIndex, nGuideIndex;
 
 	AutoLock l(this);
 
@@ -381,7 +381,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 	AutoLock l(this);
 
 	for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
-		for (size_t nChannelIndex = 0; nChannelIndex < iterTuner->LineUp.size(); nChannelIndex++)
+		for (Json::Value::ArrayIndex nChannelIndex = 0; nChannelIndex < iterTuner->LineUp.size(); nChannelIndex++)
 		{
 			const Json::Value& jsonChannel = iterTuner->LineUp[nChannelIndex];
 
