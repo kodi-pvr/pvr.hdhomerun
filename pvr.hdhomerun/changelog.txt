@@ -1,3 +1,6 @@
+v1.0.7
+- kodi.guilib is mandatory, enforce it
+
 v1.0.6
 - Add needs_configuration to addon.xml
 
