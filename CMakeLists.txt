@@ -8,18 +8,18 @@ enable_language(CXX)
 
 find_package(kodi REQUIRED)
 find_package(kodiplatform REQUIRED)
-find_package(platform REQUIRED)
+find_package(p8-platform REQUIRED)
 find_package(JsonCpp REQUIRED)
 find_package(hdhomerun REQUIRED)
 
 include_directories(${kodiplatform_INCLUDE_DIRS}
-                    ${platform_INCLUDE_DIRS}
+                    ${p8-platform_INCLUDE_DIRS}
                     ${KODI_INCLUDE_DIR}
                     ${JSONCPP_INCLUDE_DIRS}
                     ${HDHOMERUN_INCLUDE_DIRS})
 
 set(DEPLIBS ${kodiplatform_LIBRARIES}
-            ${platform_LIBRARIES}
+            ${p8-platform_LIBRARIES}
             ${JSONCPP_LIBRARIES}
             ${HDHOMERUN_LIBRARIES})
 
