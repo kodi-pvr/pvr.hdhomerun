@@ -25,8 +25,8 @@
 #include "client.h"
 #include <kodi/xbmc_pvr_dll.h>
 #include <kodi/libKODI_guilib.h>
-#include <platform/util/util.h>
-#include <platform/threads/threads.h>
+#include <p8-platform/util/util.h>
+#include <p8-platform/threads/threads.h>
 #include "HDHomeRunTuners.h"
 #include "Utils.h"
 
@@ -34,7 +34,7 @@ using namespace ADDON;
 
 GlobalsType g;
 
-class UpdateThread : public PLATFORM::CThread
+class UpdateThread : public P8PLATFORM::CThread
 {
 public:
   void *Process()
@@ -42,7 +42,7 @@ public:
     for (;;)
     {
       for (int i = 0; i < 60*60; i++)
-        if (PLATFORM::CThread::Sleep(1000))
+        if (P8PLATFORM::CThread::Sleep(1000))
           break;
       
       if (IsStopped())
