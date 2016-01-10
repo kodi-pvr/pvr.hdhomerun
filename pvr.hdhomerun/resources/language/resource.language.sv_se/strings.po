@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Generellt"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Göm skyddade kanaler"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Aktivera debugloggning"
+msgstr "Aktivera loggning för felsökning"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Göm kanaldubletter"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Markera ny sändning"

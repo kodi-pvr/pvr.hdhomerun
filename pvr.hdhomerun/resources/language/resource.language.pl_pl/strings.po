@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Ogólne"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Ukrywaj chronione kanały"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Rejestruj informacje diagnostyczne"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Ukrywaj duplikaty kanałów"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Zaznaczaj nowy serial"

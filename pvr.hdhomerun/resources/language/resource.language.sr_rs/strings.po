@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Опште"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Сакриј заштићене канале"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Омогући евиденцију грешака"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Сакриј дуплиране канале"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Означи нову емисију"
