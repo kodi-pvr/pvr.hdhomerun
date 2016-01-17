@@ -1,3 +1,6 @@
+v2.0.0
+- Initial Kodi Krypton version.
+
 v1.0.9
 - Updated language files from Transifex
 
