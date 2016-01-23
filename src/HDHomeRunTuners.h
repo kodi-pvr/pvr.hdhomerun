@@ -24,7 +24,7 @@
  */
 
 #include "client.h"
-#include <platform/threads/mutex.h>
+#include <p8-platform/threads/mutex.h>
 #include <hdhomerun.h>
 #include <json/json.h>
 
@@ -86,5 +86,5 @@ public:
 
 protected:
 	Tuners m_Tuners;
-	PLATFORM::CMutex m_Lock;
+	P8PLATFORM::CMutex m_Lock;
 };
