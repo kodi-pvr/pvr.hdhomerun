@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="2.0.0"
+  version="2.0.1"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>
@@ -24,10 +24,12 @@
     <summary lang="es_ES">Cliente PVR HDHomeRun</summary>
     <summary lang="fr_CA">Client de numériscope HDHomeRun</summary>
     <summary lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</summary>
+    <summary lang="gl_ES">Cliente PVR HDHomeRun</summary>
     <summary lang="hr_HR">HDHomeRun PVR klijent</summary>
     <summary lang="hu_HU">HDHomeRun PVR ügyfél</summary>
     <summary lang="ja_JP">HDHomeRun用 PVR クライアント</summary>
     <summary lang="lt_LT">HDHomeRun PVR klientas</summary>
+    <summary lang="lv_LV">HDHomeRun PVR klients</summary>
     <summary lang="nl_NL">HDHomeRun PVR Cliënt</summary>
     <summary lang="pl_PL">Klient telewizji dla HDHomeRun</summary>
     <summary lang="pt_BR">HDHomeRun PVR Cliente</summary>
@@ -48,10 +50,12 @@
     <description lang="es_ES">Cliente PVR HDHomeRun</description>
     <description lang="fr_CA">Client de numériscope HDHomeRun</description>
     <description lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</description>
+    <description lang="gl_ES">Cliente PVR HDHomeRun</description>
     <description lang="hr_HR">HDHomeRun PVR klijent</description>
     <description lang="hu_HU">HDHomeRun PVR ügyfél</description>
     <description lang="ja_JP">HDHomeRun用 PVR クライアント</description>
     <description lang="lt_LT">HDHomeRun PVR klientas</description>
+    <description lang="lv_LV">HDHomeRun PVR klients</description>
     <description lang="nl_NL">HDHomeRun PVR Cliënt</description>
     <description lang="pl_PL">Klient telewizji dla HDHomeRun</description>
     <description lang="pt_BR">HDHomeRun PVR Cliente</description>
