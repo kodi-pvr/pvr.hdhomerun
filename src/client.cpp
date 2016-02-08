@@ -317,11 +317,6 @@ void CloseLiveStream(void)
   g.iCurrentChannelUniqueId = 0;
 }
 
-int GetCurrentClientChannel(void)
-{
-  return g.iCurrentChannelUniqueId;
-}
-
 bool SwitchChannel(const PVR_CHANNEL &channel)
 {
   CloseLiveStream();
