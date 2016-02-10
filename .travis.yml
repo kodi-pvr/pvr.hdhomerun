@@ -32,6 +32,14 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install jsoncpp                         ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq                    ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq -y libjsoncpp-dev ; fi
+# Work around libhdhomerun-dev old package in trusty
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      curl -O http://mirrors.kernel.org/ubuntu/pool/universe/libh/libhdhomerun/libhdhomerun-dev_20150826-2_amd64.deb &&
+      curl -O http://mirrors.kernel.org/ubuntu/pool/universe/libh/libhdhomerun/libhdhomerun2_20150826-2_amd64.deb &&
+      sudo dpkg -i libhdhomerun2_20150826-2_amd64.deb &&
+      sudo dpkg -i libhdhomerun-dev_20150826-2_amd64.deb &&
+      sudo apt-get install -f;
+    fi
 
 #
 # The addon source is automatically checked out in $TRAVIS_BUILD_DIR,
