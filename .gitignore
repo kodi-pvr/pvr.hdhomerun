@@ -1,0 +1,23 @@
+# build artifacts
+build/
+debian/changelog
+debian/files
+debian/kodi-pvr-hdhomerun-dbg.debhelper.log
+debian/kodi-pvr-hdhomerun-dbg.substvars
+debian/kodi-pvr-hdhomerun-dbg/
+debian/kodi-pvr-hdhomerun.debhelper.log
+debian/kodi-pvr-hdhomerun.postinst.debhelper
+debian/kodi-pvr-hdhomerun.postrm.debhelper
+debian/kodi-pvr-hdhomerun.substvars
+debian/kodi-pvr-hdhomerun/
+debian/tmp/
+obj-x86_64-linux-gnu/
+pvr.hdhomerun/addon.xml
+
+# clion
+.idea/
+
+# Eclipse/CDT
+.cproject
+.project
+.settings/
