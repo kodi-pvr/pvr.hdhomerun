@@ -175,7 +175,9 @@ bool HDHomeRunTuners::Update(int nMode)
         KODI_LOG(LOG_DEBUG, "Found %u guide entries", nCount);
       }
       else
+      {
         KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
+      }
     }
 
   //
