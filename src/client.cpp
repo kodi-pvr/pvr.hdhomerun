@@ -24,7 +24,6 @@
 
 #include "client.h"
 #include <kodi/xbmc_pvr_dll.h>
-#include <kodi/libKODI_guilib.h>
 #include <p8-platform/util/util.h>
 #include <p8-platform/threads/threads.h>
 #include "HDHomeRunTuners.h"
@@ -223,12 +222,12 @@ const char* GetMininumPVRAPIVersion(void)
 
 const char* GetGUIAPIVersion(void)
 {
-  return KODI_GUILIB_API_VERSION;
+  return ""; // GUI API not used
 }
 
 const char* GetMininumGUIAPIVersion(void)
 {
-  return KODI_GUILIB_MIN_API_VERSION;
+  return ""; // GUI API not used
 }
 
 PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
@@ -318,11 +317,6 @@ void CloseLiveStream(void)
   g.iCurrentChannelUniqueId = 0;
 }
 
-int GetCurrentClientChannel(void)
-{
-  return g.iCurrentChannelUniqueId;
-}
-
 bool SwitchChannel(const PVR_CHANNEL &channel)
 {
   CloseLiveStream();
@@ -397,4 +391,5 @@ PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size) { return PVR_ERROR_NOT_IMPLEMENTED; }
 bool IsTimeshifting(void) { return false; }
 bool IsRealTimeStream(void) { return true; }
+PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 }
