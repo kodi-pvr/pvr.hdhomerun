@@ -40,6 +40,11 @@ before_install:
       sudo dpkg -i libhdhomerun-dev_20150826-2_amd64.deb &&
       sudo apt-get install -f;
     fi
+  # Work around old libhdhomerun in homebrew
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew tap zcsizmadia/tap
+      brew install libhdhomerun-20150826;
+    fi
 
 #
 # The addon source is automatically checked out in $TRAVIS_BUILD_DIR,
