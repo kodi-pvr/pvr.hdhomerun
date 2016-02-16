@@ -42,6 +42,7 @@ before_install:
     fi
   # Work around old libhdhomerun in homebrew
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew unlink libhdhomerun &&
       brew tap zcsizmadia/tap &&
       brew install libhdhomerun-20150826;
     fi
