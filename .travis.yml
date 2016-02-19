@@ -27,9 +27,10 @@ matrix:
 # on the Internet say
 #
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then which cmake || brew update                   ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                                  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then which cmake || brew install cmake            ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install jsoncpp                         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew unlink json-c                           ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install jsoncpp libhdhomerun            ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq                    ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq -y libjsoncpp-dev ; fi
 # Work around libhdhomerun-dev old package in trusty
