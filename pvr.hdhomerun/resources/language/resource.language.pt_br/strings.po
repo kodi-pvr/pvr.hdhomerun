@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Geral"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Ocultar canais protegidos"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Habilitar registro de depuração"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Ocultar canais duplicados"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Marcar novo show"

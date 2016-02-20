@@ -1,3 +1,6 @@
+v1.0.10
+- Updated language files from Transifex
+
 v1.0.9
 - Updated language files from Transifex
 

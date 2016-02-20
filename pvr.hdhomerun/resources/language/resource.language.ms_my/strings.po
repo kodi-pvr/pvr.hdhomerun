@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Am"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Sembunyi saluran dilindungi"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Benarkan pengelogan nyahpepijat"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Sembunyi saluran pendua"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Tanda rancangan baharu"

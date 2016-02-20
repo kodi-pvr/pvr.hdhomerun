@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Général"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Masquer les chaînes protégées"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Activer le mode de débogage"
+msgstr "Activer la journalisation de débogage"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Masquer les doublons de chaîne"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Marquer la nouvelle émission"

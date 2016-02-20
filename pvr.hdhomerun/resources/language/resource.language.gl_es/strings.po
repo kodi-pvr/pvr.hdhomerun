@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Xeral"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Agochar as canles protexidas"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Activar rexistro de depuración"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Agochar as canles duplicadas"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Marcar novo programa"
