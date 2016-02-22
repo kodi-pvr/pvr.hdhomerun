@@ -1,0 +1,33 @@
+version: BuildNr.{build}
+
+init:
+- ps: $commit = $env:appveyor_repo_commit.SubString(0,7)
+- ps: $timestamp = $env:appveyor_repo_commit_timestamp.SubString(0,10)
+- ps: Update-AppveyorBuild -Version ("{0}-{1}-{2}" -f $env:appveyor_repo_branch, $commit, $timestamp)
+
+# clone directory
+clone_folder: c:\projects\pvr.hdhomerun
+
+# fetch repository as zip archive
+shallow_clone: true                 # default is "false"
+
+environment:
+  ADDON: pvr.hdhomerun
+
+  matrix:
+    #- GENERATOR: "Visual Studio 14"
+    #  CONFIG: Debug
+
+    - GENERATOR: "Visual Studio 14"
+      CONFIG: Release
+
+build_script:
+  - cd ..
+  - set ROOT=%cd%
+  - git clone --depth=1 https://github.com/xbmc/xbmc.git
+  - cd %ADDON%
+  - mkdir build
+  - cd build
+  # Must use absolute path for cmake to build depends correctly
+  - cmake -G "%GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DCMAKE_USER_MAKE_RULES_OVERRIDE=%ROOT%\xbmc\project\cmake\scripts\windows\c-flag-overrides.cmake -DCMAKE_USER_MAKE_RULES_OVERRIDE_CXX=%ROOT%\xbmc\project\cmake\scripts\windows\cxx-flag-overrides.cmake -DPACKAGE_ZIP=1 %ROOT%\xbmc\project\cmake\addons
+  - cmake --build . --config %CONFIG%
