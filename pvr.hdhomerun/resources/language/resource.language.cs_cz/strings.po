@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Hlavní"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Skrýt chráněné kanály"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Povolit zaznamenávání ladících informací"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Skrýt duplikátní kanály"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Označit nový seriál"
