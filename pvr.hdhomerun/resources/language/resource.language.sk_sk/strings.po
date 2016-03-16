@@ -18,8 +18,20 @@ msgstr ""
 
 msgctxt "#32001"
 msgid "General"
-msgstr "Hlavné"
+msgstr "Všeobecné"
+
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Skryť chránené kanály"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Začať ukladať informácie / debug log"
+msgstr "Zapnúť záznam informácií do denníka"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Skryť duplicitné kanály"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Označiť novú reláciu"
