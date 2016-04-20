@@ -186,27 +186,30 @@ void ADDON_FreeSettings()
 {
 }
 
-void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data)
-{
-  if (g.Tuners == NULL)
-    return;
-
-  if (strcmp("xbmc", sender) == 0)
-  {
-    if (strcmp("System", flag) == 0)
-    {
-      if (strcmp("OnWake", message) == 0)
-      {
-        g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
-        g.PVR->TriggerChannelUpdate();
-      }
-    }
-  }
-}
-
 /***********************************************************
  * PVR Client AddOn specific public library functions
  ***********************************************************/
+
+void OnSystemSleep()
+{
+}
+
+void OnSystemWake()
+{
+  if (g.Tuners && g.PVR)
+  {
+    g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+    g.PVR->TriggerChannelUpdate();
+  }
+}
+
+void OnPowerSavingActivated()
+{
+}
+
+void OnPowerSavingDeactivated()
+{
+}
 
 const char* GetPVRAPIVersion(void)
 {
