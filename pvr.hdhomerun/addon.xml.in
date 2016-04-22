@@ -2,7 +2,7 @@
 <addon
   id="pvr.hdhomerun"
   version="2.2.1"
-  name="PVR HDHomeRun Client"
+  name="HDHomeRun PVR Client Addon"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>
     <c-pluff version="0.1"/>
