@@ -20,6 +20,14 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Γενικά"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Απόκρυψη προστατευμένων καναλιού"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Καταγραφή σφαλμάτων"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Απόκρυψη διπλών καναλιών"
