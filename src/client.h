@@ -23,8 +23,8 @@
  *
  */
 
-#include <kodi/libXBMC_addon.h>
-#include <kodi/libXBMC_pvr.h>
+#include <libXBMC_addon.h>
+#include <libXBMC_pvr.h>
 #include <p8-platform/util/StdString.h>
 
 typedef CStdString String;
