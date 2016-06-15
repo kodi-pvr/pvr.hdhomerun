@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="1.0.13"
+  version="1.0.14"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>
@@ -35,6 +35,7 @@
     <summary lang="lt_LT">HDHomeRun PVR klientas</summary>
     <summary lang="lv_LV">HDHomeRun PVR klients</summary>
     <summary lang="ms_MY">Klien PVR HDHomeRun</summary>
+    <summary lang="nb_NO">HDHomeRun PVR-klient</summary>
     <summary lang="nl_NL">HDHomeRun PVR Cliënt</summary>
     <summary lang="pl_PL">Klient telewizji dla HDHomeRun</summary>
     <summary lang="pt_BR">HDHomeRun PVR Cliente</summary>
@@ -67,6 +68,7 @@
     <description lang="lt_LT">HDHomeRun PVR klientas</description>
     <description lang="lv_LV">HDHomeRun PVR klients</description>
     <description lang="ms_MY">Klien PVR HDHomeRun</description>
+    <description lang="nb_NO">HDHomeRun PVR-klient</description>
     <description lang="nl_NL">HDHomeRun PVR Cliënt</description>
     <description lang="pl_PL">Klient telewizji dla HDHomeRun</description>
     <description lang="pt_BR">HDHomeRun PVR Cliente</description>
