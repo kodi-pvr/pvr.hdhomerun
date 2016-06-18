@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Yleiset"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Piilota suojatut kanavat"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Suorituslokin tallennus (debug log)"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Piilota monistetut kanavat"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Merkitse uusi näytös"
