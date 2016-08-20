@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="2.4.1"
+  version="2.4.2"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>
@@ -31,6 +31,7 @@
     <summary lang="hu_HU">HDHomeRun PVR ügyfél</summary>
     <summary lang="it_IT">Client PVR HDHomeRun</summary>
     <summary lang="ja_JP">HDHomeRun用 PVR クライアント</summary>
+    <summary lang="ko_KR">HDHomeRun PVR 클라이언트</summary>
     <summary lang="lt_LT">HDHomeRun PVR klientas</summary>
     <summary lang="lv_LV">HDHomeRun PVR klients</summary>
     <summary lang="ms_MY">Klien PVR HDHomeRun</summary>
@@ -64,6 +65,7 @@
     <description lang="hu_HU">HDHomeRun PVR ügyfél</description>
     <description lang="it_IT">Client PVR HDHomeRun</description>
     <description lang="ja_JP">HDHomeRun用 PVR クライアント</description>
+    <description lang="ko_KR">HDHomeRun PVR 클라이언트</description>
     <description lang="lt_LT">HDHomeRun PVR klientas</description>
     <description lang="lv_LV">HDHomeRun PVR klients</description>
     <description lang="ms_MY">Klien PVR HDHomeRun</description>
