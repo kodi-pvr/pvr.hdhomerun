@@ -30,8 +30,8 @@ msgstr "Suorituslokin tallennus (debug log)"
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
-msgstr "Piilota monistetut kanavat"
+msgstr "Piilota kanavien kaksoiskappaleet"
 
 msgctxt "#32005"
 msgid "Mark new show"
-msgstr "Merkitse uusi näytös"
+msgstr "Merkitse uudet ohjelmat"

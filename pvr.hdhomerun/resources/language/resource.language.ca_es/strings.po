@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "General"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Oculta els canals protegits"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Enable debug logging"
+msgstr "Habilita el registre de depuració"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Oculta els canals duplicats"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Marca el programa de TV nou"
