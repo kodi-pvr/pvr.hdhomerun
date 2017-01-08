@@ -1,3 +1,6 @@
+v3.0.2
+- Correct channel Number if back-end provided channel number is used
+
 v3.0.0
 - Initial Kodi v18 version
 
