@@ -208,7 +208,7 @@ bool HDHomeRunTuners::Update(int nMode)
             (g.Settings.bHideDuplicateChannels && guideNumberSet.find(jsonChannel["GuideNumber"].asString()) != guideNumberSet.end()));
 
           jsonChannel["_UID"] = PvrCalculateUniqueId(jsonChannel["GuideName"].asString() + jsonChannel["URL"].asString());
-          jsonChannel["_ChannelName"] = jsonChannel["GuideNumber"].asString() + " " + jsonChannel["GuideName"].asString();
+          jsonChannel["_ChannelName"] = jsonChannel["GuideName"].asString();
                     
           // Find guide entry
           for (nGuideIndex = 0; nGuideIndex < pTuner->Guide.size(); nGuideIndex++)
@@ -216,7 +216,7 @@ bool HDHomeRunTuners::Update(int nMode)
             const Json::Value& jsonGuide = pTuner->Guide[nGuideIndex];
             if (jsonGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
             {
-              jsonChannel["_ChannelName"] = jsonChannel["GuideNumber"].asString() + " " + jsonGuide["Affiliate"].asString();
+              jsonChannel["_ChannelName"] = jsonGuide["Affiliate"].asString();
               jsonChannel["_IconPath"] = jsonGuide["ImageURL"].asString();
               break;
             }
@@ -225,11 +225,24 @@ bool HDHomeRunTuners::Update(int nMode)
           jsonChannel["_Hide"] = bHide;
 
           if (bHide)
+          {
             jsonChannel["_ChannelNumber"] = 0;
+            jsonChannel["_SubChannelNumber"] = 0;
+          }
           else
           {
-            jsonChannel["_ChannelNumber"] = nChannelNumber++;
+            int nChannel = 0, nSubChannel = 0;
+            if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d.%d", &nChannel, &nSubChannel) != 2)
+            {
+              nSubChannel = 0;
+              if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d", &nChannel) != 1)
+                nChannel = nChannelNumber;
+            }
+            jsonChannel["_ChannelNumber"] = nChannel;
+            jsonChannel["_SubChannelNumber"] = nSubChannel;
             guideNumberSet.insert(jsonChannel["GuideNumber"].asString());
+
+            nChannelNumber++;
           }
         }
 
@@ -280,6 +293,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
       pvrChannel.iUniqueId = jsonChannel["_UID"].asUInt();
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
+      pvrChannel.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
       PVR_STRCPY(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str());
       PVR_STRCPY(pvrChannel.strStreamURL, jsonChannel["URL"].asString().c_str());
       PVR_STRCPY(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str());
