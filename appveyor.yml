@@ -24,7 +24,7 @@ environment:
 build_script:
   - cd ..
   - set ROOT=%cd%
-  - git clone --depth=1 https://github.com/xbmc/xbmc.git
+  - git clone -b Krypton --depth=1 https://github.com/xbmc/xbmc.git
   - cd %ADDON%
   - mkdir build
   - cd build
