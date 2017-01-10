@@ -1,3 +1,6 @@
+v3.0.3
+- Fixed issue where some channels that were supposed to have a name did not.
+
 v3.0.2
 - Correct channel Number if back-end provided channel number is used
 
