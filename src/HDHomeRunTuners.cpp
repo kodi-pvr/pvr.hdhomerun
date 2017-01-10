@@ -216,8 +216,8 @@ bool HDHomeRunTuners::Update(int nMode)
             const Json::Value& jsonGuide = pTuner->Guide[nGuideIndex];
             if (jsonGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
             {
-			        if (jsonChannel["_ChannelName"] == "" && jsonGuide["Affiliate"].asString() != "")
-			          jsonChannel["_ChannelName"] = jsonGuide["Affiliate"].asString();
+              if (jsonChannel["_ChannelName"] == "" && jsonGuide["Affiliate"].asString() != "")
+                jsonChannel["_ChannelName"] = jsonGuide["Affiliate"].asString();
               jsonChannel["_IconPath"] = jsonGuide["ImageURL"].asString();
               break;
             }
