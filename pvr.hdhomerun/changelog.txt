@@ -1,3 +1,6 @@
+v2.4.6
+- Fixed issue where if Guide's Affiliate is empty the channel would become an Unknown Channel
+
 v2.4.5
 - Correct channel Number if back-end provided channel number is used
 
