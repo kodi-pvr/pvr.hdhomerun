@@ -20,7 +20,7 @@ HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
 4. `cd pvr.hdhomerun`
 5. `mkdir build`
 6. `cd build`
-7. `cmake -G "Visual Studio 14" -DADDONS_TO_BUILD=pvr.hdhomerun -DCMAKE_BUILD_TYPE=Debug -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DCMAKE_USER_MAKE_RULES_OVERRIDE=%ROOT%\xbmc\project\cmake\scripts\windows\c-flag-overrides.cmake -DCMAKE_USER_MAKE_RULES_OVERRIDE_CXX=%ROOT%\xbmc\project\cmake\scripts\windows\cxx-flag-overrides.cmake -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons`
+7. `cmake -G "Visual Studio 14" -DADDONS_TO_BUILD=pvr.hdhomerun -DCMAKE_BUILD_TYPE=Debug-DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DCMAKE_USER_MAKE_RULES_OVERRIDE=%ROOT%\xbmc\cmake\scripts\windows\CFlagOverrides.cmake -DCMAKE_USER_MAKE_RULES_OVERRIDE_CXX=%ROOT%\xbmc\cmake\scripts\windows\CXXFlagOverrides.cmake -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons`
 8. `cmake --build . --config Debug`
 
 ## Useful links
