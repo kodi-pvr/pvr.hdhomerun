@@ -26,7 +26,7 @@ msgstr "Göm skyddade kanaler"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Aktivera loggning för felsökning"
+msgstr "Aktivera debugloggning"
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
