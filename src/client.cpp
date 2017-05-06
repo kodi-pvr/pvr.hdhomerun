@@ -75,7 +75,9 @@ void ADDON_ReadSettings(void)
   if (!g.XBMC->GetSetting("mark_new", &g.Settings.bMarkNew))
     g.Settings.bMarkNew = true;
 
-  if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
+  if (g.XBMC->GetSetting("debug", &g.Settings.bDebug))
+    g.Settings.bDebug = true;
+  else
     g.Settings.bDebug = false;
 }
 
