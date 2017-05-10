@@ -79,6 +79,9 @@ void ADDON_ReadSettings(void)
     g.Settings.bDebug = true;
   else
     g.Settings.bDebug = false;
+
+  if (!g.XBMC->GetSetting("use_legacy", &g.Settings.bUseLegacy))
+      g.Settings.bUseLegacy = true;
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -176,6 +179,11 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
   else
   if (strcmp(settingName, "debug") == 0)
     g.Settings.bDebug = *(bool*)settingValue;
+  else
+  if (strcmp(settingName, "use_legacy") == 0) {
+      g.Settings.bUseLegacy = *(bool*)settingValue;
+      return ADDON_STATUS_NEED_RESTART;
+  }
 
   return ADDON_STATUS_OK;
 }

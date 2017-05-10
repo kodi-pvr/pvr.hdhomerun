@@ -33,18 +33,11 @@ class HDHomeRunTuners;
 
 struct SettingsType
 {
-	SettingsType()
-	{
-		bHideProtected = true;
-		bHideDuplicateChannels = true;
-		bDebug = false;
-		bMarkNew = false;
-	}
-
-	bool bHideProtected;
-	bool bHideDuplicateChannels;
-	bool bDebug;
-	bool bMarkNew;
+	bool bHideProtected         = true;
+	bool bHideDuplicateChannels = true;
+	bool bDebug                 = false;
+	bool bMarkNew               = false;
+	bool bUseLegacy             = true;
 };
 
 struct GlobalsType

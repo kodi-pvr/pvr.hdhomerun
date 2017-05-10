@@ -35,3 +35,8 @@ msgstr "Hide duplicate channels"
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Mark new show"
+
+msgctxt "#32006"
+msgid "Use legacy hardware"
+msgstr "Use legacy hardware"
+
