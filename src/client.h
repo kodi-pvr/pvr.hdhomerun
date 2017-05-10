@@ -54,9 +54,9 @@ struct GlobalsType
 		bCreated = false;
 		currentStatus = ADDON_STATUS_UNKNOWN;
 		iCurrentChannelUniqueId = 0;
-		XBMC = NULL;
-		PVR = NULL;
-		Tuners = NULL;
+		XBMC   = nullptr;
+		PVR    = nullptr;
+		Tuners = nullptr;
 	}
 
 	bool bCreated;
