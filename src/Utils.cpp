@@ -28,72 +28,73 @@
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)
 {
-	static bool g_bDebugConsole = false;
-	char szBuffer[4096];
-	int nLen;
-	va_list args;
-	DWORD dwWritten;
-	
-	if (!g_bDebugConsole)
-	{
-		::AllocConsole();
-		g_bDebugConsole = true;
-	}
+    static bool g_bDebugConsole = false;
+    char szBuffer[4096];
+    int nLen;
+    va_list args;
+    DWORD dwWritten;
 
-	va_start(args, szFormat);
-	nLen = vsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, args);
-	::WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), szBuffer, nLen, &dwWritten, 0);
-	va_end(args);
+    if (!g_bDebugConsole)
+    {
+        ::AllocConsole();
+        g_bDebugConsole = true;
+    }
 
-	return nLen;
+    va_start(args, szFormat);
+    nLen = vsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, args);
+    ::WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), szBuffer, nLen, &dwWritten, 0);
+    va_end(args);
+
+    return nLen;
 }
 #endif
 
 bool GetFileContents(const String& url, String& strContent)
 {
-	char buffer[1024];
-	void* fileHandle;
-	
-	strContent.clear();
+    char buffer[1024];
+    void* fileHandle;
 
-	fileHandle = g.XBMC->OpenFile(url, 0);
+    strContent.clear();
 
-	if (fileHandle == NULL)
-	{
-		KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
-		return false;
-	}
-	
-	for (;;)
-	{
-		int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
-		if (bytesRead <= 0)
-			break;
-		strContent.append(buffer, bytesRead);
-	}
+    fileHandle = g.XBMC->OpenFile(url, 0);
 
-	g.XBMC->CloseFile(fileHandle);
+    if (fileHandle == NULL)
+    {
+        KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
+        return false;
+    }
 
-	return true;
+    for (;;)
+    {
+        int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+        if (bytesRead <= 0)
+            break;
+        strContent.append(buffer, bytesRead);
+    }
+
+    g.XBMC->CloseFile(fileHandle);
+
+    return true;
 }
 
 String EncodeURL(const String& strUrl)
 {
-	String str, strEsc;
+    String str, strEsc;
 
-	for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
-	{
-		char c = *iter;
+    for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end();
+            iter++)
+    {
+        char c = *iter;
 
-		if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
-			str += c;
-		else
-		{
-			String strPercent;
-			strPercent.Format("%%%02X", (int)c);
-			str += strPercent;
-		}
-	}
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+            str += c;
+        else
+        {
+            String strPercent;
+            strPercent.Format("%%%02X", (int) c);
+            str += strPercent;
+        }
+    }
 
-	return str;
+    return str;
 }
