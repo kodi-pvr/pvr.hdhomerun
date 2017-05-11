@@ -114,7 +114,7 @@ bool HDHomeRunTuners::Update(int nMode)
             // Find existing device
             for (Tuners::iterator iter = m_Tuners.begin();
                     iter != m_Tuners.end(); iter++)
-                if (iter->Device.ip_addr == foundDevices[nTunerIndex].ip_addr)
+                if (iter->_discover_device.ip_addr == foundDevices[nTunerIndex].ip_addr)
                 {
                     pTuner = &*iter;
                     break;
@@ -127,7 +127,7 @@ bool HDHomeRunTuners::Update(int nMode)
         //
         // Update device
         //
-        pTuner->Device = foundDevices[nTunerIndex];
+        pTuner->_discover_device = foundDevices[nTunerIndex];
 
         //
         // Guide
@@ -138,7 +138,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
             // TODO - remove logging
 
-            hdhomerun_discover_device_t *discover_dev = &pTuner->Device;
+            hdhomerun_discover_device_t *discover_dev = &pTuner->_discover_device;
             KODI_LOG(LOG_DEBUG, "hdhomerun_discover_device_t %p", discover_dev);
             KODI_LOG(LOG_DEBUG, "IP:    %08x", discover_dev->ip_addr);
             KODI_LOG(LOG_DEBUG, "Type:  %08x", discover_dev->device_type);
@@ -176,10 +176,10 @@ bool HDHomeRunTuners::Update(int nMode)
             hdhomerun_debug_destroy(dbg);
 
             strUrl.Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s",
-                    EncodeURL(pTuner->Device.device_auth).c_str());
+                    EncodeURL(pTuner->_discover_device.device_auth).c_str());
 
             KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide for %08x: %s",
-                    pTuner->Device.device_id, strUrl.c_str());
+                    pTuner->_discover_device.device_id, strUrl.c_str());
 
             if (GetFileContents(strUrl.c_str(), strJson))
                 if (jsonReader.parse(strJson, pTuner->Guide)
@@ -248,7 +248,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
         if (nMode & UpdateLineUp)
         {
-            hdhomerun_discover_device_t *discover_dev = &pTuner->Device;
+            hdhomerun_discover_device_t *discover_dev = &pTuner->_discover_device;
             String sDiscoverUrl;
             sDiscoverUrl.Format("%s/discover.json", discover_dev->base_url);
             if (GetFileContents(sDiscoverUrl.c_str(), strJson))
@@ -262,11 +262,11 @@ bool HDHomeRunTuners::Update(int nMode)
             }
             else
             {
-                strUrl.Format("%s/lineup.json", pTuner->Device.base_url);
+                strUrl.Format("%s/lineup.json", pTuner->_discover_device.base_url);
             }
 
             KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun lineup for %08x: %s",
-                    pTuner->Device.device_id, strUrl.c_str());
+                    pTuner->_discover_device.device_id, strUrl.c_str());
 
             if (GetFileContents(strUrl.c_str(), strJson))
             {
@@ -278,7 +278,7 @@ bool HDHomeRunTuners::Update(int nMode)
                     // TODO remove hack
                     // Print the device ID with the channel name in the Kodi display
                     char device_id_s[10] = "";
-                    sprintf(device_id_s, " %08x", pTuner->Device.device_id);
+                    sprintf(device_id_s, " %08x", pTuner->_discover_device.device_id);
 
                     for (nIndex = 0; nIndex < pTuner->LineUp.size(); nIndex++)
                     {
@@ -349,13 +349,13 @@ bool HDHomeRunTuners::Update(int nMode)
                     }
 
                     KODI_LOG(LOG_DEBUG, "Found %u channels for %08x",
-                            pTuner->LineUp.size(), pTuner->Device.device_id);
+                            pTuner->LineUp.size(), pTuner->_discover_device.device_id);
                 }
                 else
                 {
                     KODI_LOG(LOG_ERROR,
                             "Failed to parse lineup from %s for %08x",
-                            strUrl.c_str(), pTuner->Device.device_id);
+                            strUrl.c_str(), pTuner->_discover_device.device_id);
                 }
             }
         }

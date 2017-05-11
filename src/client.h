@@ -42,25 +42,15 @@ struct SettingsType
 
 struct GlobalsType
 {
-    GlobalsType()
-    {
-        bCreated = false;
-        currentStatus = ADDON_STATUS_UNKNOWN;
-        iCurrentChannelUniqueId = 0;
-        XBMC = nullptr;
-        PVR = nullptr;
-        Tuners = nullptr;
-    }
+    bool         bCreated                = false;
+    ADDON_STATUS currentStatus           = ADDON_STATUS_UNKNOWN;
+    unsigned int iCurrentChannelUniqueId = 0;
+    String       strUserPath;
+    String       strClientPath;
+    ADDON::CHelper_libXBMC_addon* XBMC   = nullptr;
+    CHelper_libXBMC_pvr*          PVR    = nullptr;
 
-    bool bCreated;
-    ADDON_STATUS currentStatus;
-    unsigned int iCurrentChannelUniqueId;
-    String strUserPath;
-    String strClientPath;
-    ADDON::CHelper_libXBMC_addon* XBMC;
-    CHelper_libXBMC_pvr* PVR;
-
-    HDHomeRunTuners* Tuners;
+    HDHomeRunTuners*              Tuners = nullptr;
 
     SettingsType Settings;
 };

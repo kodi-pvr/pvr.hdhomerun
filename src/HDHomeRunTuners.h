@@ -43,13 +43,8 @@ public:
 public:
     struct Tuner
     {
-        Tuner()
-        {
-            memset(&Device, 0, sizeof(Device));
-        }
-
-        hdhomerun_discover_device_t Device;
-        hdhomerun_device_t* _raw_device = nullptr;
+        hdhomerun_discover_device_t _discover_device = {0};
+        hdhomerun_device_t*         _raw_device      = nullptr;
 
         Json::Value LineUp;
         Json::Value Guide;
@@ -68,14 +63,14 @@ public:
         AutoLock(HDHomeRunTuners& p) :
                 m_p(&p)
         {
-            m_p->Unlock();
+            m_p->Lock();
         }
         ~AutoLock()
         {
             m_p->Unlock();
         }
     protected:
-        HDHomeRunTuners* m_p;
+        HDHomeRunTuners* m_p = nullptr;
     };
 
 public:
