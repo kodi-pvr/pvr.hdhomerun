@@ -27,6 +27,9 @@
 #include <libXBMC_pvr.h>
 #include <p8-platform/util/StdString.h>
 
+namespace PVRHDHomeRun {
+
+
 typedef CStdString String;
 
 class HDHomeRunTuners;
@@ -56,3 +59,5 @@ struct GlobalsType
 };
 
 extern GlobalsType g;
+
+};

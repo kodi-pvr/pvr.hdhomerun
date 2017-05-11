@@ -30,6 +30,9 @@
 #include <cstring>
 #include <vector>
 
+namespace PVRHDHomeRun {
+
+
 class HDHomeRunTuners
 {
 public:
@@ -104,4 +107,6 @@ public:
 protected:
     Tuners m_Tuners;
     P8PLATFORM::CMutex m_Lock;
+};
+
 };

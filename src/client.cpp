@@ -31,6 +31,8 @@
 
 using namespace ADDON;
 
+namespace PVRHDHomeRun {
+
 GlobalsType g;
 
 class UpdateThread: public P8PLATFORM::CThread
@@ -60,6 +62,9 @@ public:
 };
 
 UpdateThread g_UpdateThread;
+}; // namespace
+
+using namespace PVRHDHomeRun;
 
 extern "C"
 {

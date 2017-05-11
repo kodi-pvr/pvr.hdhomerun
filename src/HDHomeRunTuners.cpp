@@ -30,6 +30,8 @@
 
 using namespace ADDON;
 
+namespace PVRHDHomeRun {
+
 static const String g_strGroupFavoriteChannels("Favorite channels");
 static const String g_strGroupHDChannels("HD channels");
 static const String g_strGroupSDChannels("SD channels");
@@ -248,6 +250,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
         if (nMode & UpdateLineUp)
         {
+            // Find URL in the discovery data
             hdhomerun_discover_device_t *discover_dev = &pTuner->_discover_device;
             String sDiscoverUrl;
             sDiscoverUrl.Format("%s/discover.json", discover_dev->base_url);
@@ -262,6 +265,7 @@ bool HDHomeRunTuners::Update(int nMode)
             }
             else
             {
+                // Fall back to a pattern
                 strUrl.Format("%s/lineup.json", pTuner->_discover_device.base_url);
             }
 
@@ -421,6 +425,16 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
         const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
+
+    KODI_LOG(LOG_DEBUG, "PvrGetEPCForChannel Handle:%p Channel ID: %08x Number: %u Sub: %u Start: %u End: %u",
+            handle,
+            channel.iUniqueId,
+            channel.iChannelNumber,
+            channel.iSubChannelNumber,
+            iStart,
+            iEnd
+            );
+
     Json::Value::ArrayIndex nChannelIndex, nGuideIndex;
 
     AutoLock l(this);
@@ -550,3 +564,5 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
 
     return PVR_ERROR_NO_ERROR;
 }
+
+};

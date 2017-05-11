@@ -49,6 +49,8 @@ int DbgPrintf(const char* szFormat, ...)
 }
 #endif
 
+namespace PVRHDHomeRun {
+
 bool GetFileContents(const String& url, String& strContent)
 {
     char buffer[1024];
@@ -98,3 +100,5 @@ String EncodeURL(const String& strUrl)
 
     return str;
 }
+
+};
