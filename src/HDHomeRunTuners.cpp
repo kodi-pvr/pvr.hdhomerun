@@ -60,12 +60,12 @@ void Tuner::_get_var(String& value, const char* name)
     }
 }
 
-void Tuner::_get_data()
+void Tuner::_get_api_data()
 {
     _get_var(_channelmap, "/tuner0/channelmap");
 }
 
-void Tuner::_get_lineup_url()
+void Tuner::_get_discover_data()
 {
     String discoverURL;
     String discoverResults;
@@ -84,6 +84,9 @@ void Tuner::_get_lineup_url()
             // Side-effect, also get the tuner count.
             auto& tunercount  = discoverJson["TunerCount"];
             _tunercount = tunercount.asUInt();
+
+            auto& legacy = discoverJson["Legacy"];
+            _legacy = legacy.asBool();
         }
     }
     else
@@ -91,9 +94,6 @@ void Tuner::_get_lineup_url()
         // Fall back to a pattern for "modern" devices
         _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
     }
-
-    // Get channelmap TODO
-
 
     KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
             _discover_device.device_id, _lineupURL.c_str());
@@ -127,6 +127,15 @@ void Tuner::_get_lineup()
     {
         _lineup.push_back(v);
     }
+}
+
+void Tuner::RefreshLineup()
+{
+    if (_legacy)
+    {
+        _get_discover_data();
+    }
+    _get_lineup();
 }
 
 LineupEntry::LineupEntry(const Json::Value& v)

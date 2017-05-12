@@ -112,8 +112,8 @@ public:
         , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
         , _discover_device(d)
     {
-        _get_data();
-        _get_lineup_url();
+        _get_api_data();
+        _get_discover_data();
         _get_lineup();
     }
     ~Tuner()
@@ -121,11 +121,15 @@ public:
         hdhomerun_device_destroy(_device);
         hdhomerun_debug_destroy(_debug);
     }
+    void RefreshLineup();
 
 private:
     void _get_var(String& value, const char* name);
-    void _get_data();
-    void _get_lineup_url();
+    // Called once
+    void _get_api_data();
+    // Called multiple times for legacy devices
+    void _get_discover_data();
+    // Called multiple for all devices
     void _get_lineup();
 
     hdhomerun_debug_t*          _debug;
@@ -134,6 +138,7 @@ private:
     // Discover Data
     String                      _lineupURL;
     unsigned int                _tunercount;
+    bool                        _legacy;
     // API Data
     String                      _channelmap;
     std::vector<LineupEntry>    _lineup;
