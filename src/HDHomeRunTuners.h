@@ -91,6 +91,7 @@ public:
 
     uint32_t _channel;
     uint32_t _subchannel;
+    bool     _drm;
 };
 
 
