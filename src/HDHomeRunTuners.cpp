@@ -93,7 +93,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
     KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
 
-    AutoLock l(this);
+    Lock lock(this);
 
     if (nMode & UpdateDiscover)
         m_Tuners.clear();
@@ -372,7 +372,7 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 {
     int nCount = 0;
 
-    AutoLock l(this);
+    Lock lock(this);
 
     for (Tuners::const_iterator iterTuner = m_Tuners.begin();
             iterTuner != m_Tuners.end(); iterTuner++)
@@ -392,7 +392,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
     if (bRadio)
         return PVR_ERROR_NO_ERROR;
 
-    AutoLock l(this);
+    Lock lock(this);
 
     for (Tuners::const_iterator iterTuner = m_Tuners.begin();
             iterTuner != m_Tuners.end(); iterTuner++)
@@ -437,7 +437,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
 
     Json::Value::ArrayIndex nChannelIndex, nGuideIndex;
 
-    AutoLock l(this);
+    Lock lock(this);
 
     for (Tuners::const_iterator iterTuner = m_Tuners.begin();
             iterTuner != m_Tuners.end(); iterTuner++)
@@ -531,7 +531,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
 {
     int nCount = 0;
 
-    AutoLock l(this);
+    Lock lock(this);
 
     for (Tuners::const_iterator iterTuner = m_Tuners.begin();
             iterTuner != m_Tuners.end(); iterTuner++)

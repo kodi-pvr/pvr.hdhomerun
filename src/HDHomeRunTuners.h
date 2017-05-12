@@ -32,8 +32,47 @@
 
 namespace PVRHDHomeRun {
 
+class Lockable {
+public:
+    void LockObject() {
+        _lock.Lock();
+    }
+    void UnlockObject() {
+        _lock.Unlock();
+    }
+private:
+    P8PLATFORM::CMutex _lock;
+};
 
-class HDHomeRunTuners
+class Lock {
+public:
+    Lock(Lockable* obj) : _obj(obj)
+        {
+            _obj->LockObject();
+        }
+    ~Lock()
+    {
+        _obj->UnlockObject();
+    }
+private:
+    Lockable* _obj;
+};
+
+class LineupEntry
+{
+public:
+    String   _guidenumber;
+    String   _guidename;
+    uint32_t _channel;
+    uint32_t _subchannel;
+};
+
+class Lineup : public Lockable
+{
+
+};
+
+class HDHomeRunTuners : public Lockable
 {
 public:
     enum
@@ -55,26 +94,6 @@ public:
 
     typedef std::vector<Tuner> Tuners;
 
-    class AutoLock
-    {
-    public:
-        AutoLock(HDHomeRunTuners* p) :
-                m_p(p)
-        {
-            m_p->Lock();
-        }
-        AutoLock(HDHomeRunTuners& p) :
-                m_p(&p)
-        {
-            m_p->Lock();
-        }
-        ~AutoLock()
-        {
-            m_p->Unlock();
-        }
-    protected:
-        HDHomeRunTuners* m_p = nullptr;
-    };
 
 public:
     HDHomeRunTuners();
@@ -94,19 +113,10 @@ public:
 protected:
     unsigned int PvrCalculateUniqueId(const String& str);
 
-public:
-    void Lock()
-    {
-        m_Lock.Lock();
-    }
-    void Unlock()
-    {
-        m_Lock.Unlock();
-    }
+
 
 protected:
     Tuners m_Tuners;
-    P8PLATFORM::CMutex m_Lock;
 };
 
 };
