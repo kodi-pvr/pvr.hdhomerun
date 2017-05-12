@@ -90,8 +90,8 @@ public:
     String   _guidename;
     String   _url;
 
-    uint32_t _channel;
-    uint32_t _subchannel;
+    uint32_t _channel    = 0;
+    uint32_t _subchannel = 0;
     bool     _drm;
 };
 

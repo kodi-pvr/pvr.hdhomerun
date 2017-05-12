@@ -131,7 +131,16 @@ void Tuner::_get_lineup()
 
 LineupEntry::LineupEntry(const Json::Value& v)
 {
+    _guidenumber = v["GuideNumber"].asString();
+    _guidename   = v["GuideName"].asString();
+    _url         = v["URL"].asString();
+    _drm         = v["DRM"].asBool();
 
+     _channel = atoi(_guidenumber.c_str());
+     if (auto dot = _guidenumber.Find('.'))
+     {
+         _subchannel = atoi(_guidenumber.c_str() + dot + 1);
+     }
 }
 
 template<typename T>
