@@ -104,7 +104,7 @@ public:
     std::map<std::pair<uint32_t, uint32_t>, LineupEntry> _map;
 };
 
-class Tuner
+class Tuner : public Lockable
 {
 public:
     Tuner(const hdhomerun_discover_device_t& d)

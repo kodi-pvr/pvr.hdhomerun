@@ -56,6 +56,7 @@ void Tuner::_get_var(String& value, const char* name)
         KODI_LOG(LOG_DEBUG, "channelmap(%08x) = %s",
                 _discover_device.device_id, get_val);
 
+        Lock lock(this);
         value.assign(get_val);
     }
 }
@@ -79,19 +80,19 @@ void Tuner::_get_discover_data()
         if (jsonReader.parse(discoverResults, discoverJson))
         {
             auto& lineupvalue = discoverJson["LineupURL"];
-            _lineupURL.assign(lineupvalue.asString());
-
-            // Side-effect, also get the tuner count.
             auto& tunercount  = discoverJson["TunerCount"];
-            _tunercount = tunercount.asUInt();
+            auto& legacy      = discoverJson["Legacy"];
 
-            auto& legacy = discoverJson["Legacy"];
-            _legacy = legacy.asBool();
+            Lock lock(this);
+            _lineupURL  = std::move(lineupvalue.asString());
+            _tunercount = std::move(tunercount.asUInt());
+            _legacy     = std::move(legacy.asBool());
         }
     }
     else
     {
         // Fall back to a pattern for "modern" devices
+        Lock lock(this);
         _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
     }
 
@@ -122,6 +123,7 @@ void Tuner::_get_lineup()
         return;
     }
 
+    Lock lock(this);
     _lineup.clear();
     for(auto& v : lineupJson)
     {
