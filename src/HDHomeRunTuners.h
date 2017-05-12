@@ -84,7 +84,8 @@ public:
 class LineupEntry
 {
 public:
-    // From the lineup results
+    LineupEntry(const Json::Value&);
+
     String   _guidenumber;
     String   _guidename;
     String   _url;
@@ -135,6 +136,7 @@ private:
     unsigned int                _tunercount;
     // API Data
     String                      _channelmap;
+    std::vector<LineupEntry>    _lineup;
 };
 
 

@@ -122,10 +122,16 @@ void Tuner::_get_lineup()
         return;
     }
 
+    _lineup.clear();
     for(auto& v : lineupJson)
     {
-
+        _lineup.push_back(v);
     }
+}
+
+LineupEntry::LineupEntry(const Json::Value& v)
+{
+
 }
 
 template<typename T>
