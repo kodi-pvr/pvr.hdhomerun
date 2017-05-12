@@ -179,9 +179,7 @@ unsigned int GetGenreType(const T& arr)
 
     return nGenreType;
 }
-HDHomeRunTuners::HDHomeRunTuners()
-{
-}
+
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 {

@@ -110,7 +110,7 @@ public:
     Tuner(const hdhomerun_discover_device_t& d)
         : _debug(hdhomerun_debug_create())
         , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
-        , _discover_device(d)
+        , _discover_device(d) // copy
     {
         _get_api_data();
         _get_discover_data();
@@ -123,6 +123,24 @@ public:
     }
     void RefreshLineup();
 
+    // Accessors
+    unsigned int TunerCount() const
+    {
+        return _tunercount;
+    }
+    bool Legacy() const
+    {
+        return _legacy;
+    }
+    const String& ChannelMap() const
+    {
+        return _channelmap;
+    }
+    const std::vector<LineupEntry>& Lineup() const
+    {
+        return _lineup;
+    }
+
 private:
     void _get_var(String& value, const char* name);
     // Called once
@@ -132,6 +150,7 @@ private:
     // Called multiple for all devices
     void _get_lineup();
 
+    // The hdhomerun_... objects depend on the order listed here for proper instantiation.
     hdhomerun_debug_t*          _debug;
     hdhomerun_device_t*         _device;
     hdhomerun_discover_device_t _discover_device;
@@ -169,7 +188,6 @@ public:
 
 
 public:
-    HDHomeRunTuners();
 
     bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
 
