@@ -42,13 +42,13 @@ void Tuner::_get_var(String& value, const char* name)
     char *get_err;
     if (hdhomerun_device_get_var(_device, name, &get_val, &get_err) < 0)
     {
-        KODI_LOG(LOG_DEBUG,
+        KODI_LOG(LOG_ERROR,
                 "communication error sending %s request to %08x",
                 name, _discover_device.device_id);
     }
     else if (get_err)
     {
-        KODI_LOG(LOG_DEBUG, "error %s with %s request from %08x",
+        KODI_LOG(LOG_ERROR, "error %s with %s request from %08x",
                 get_err, name, _discover_device.device_id);
     }
     else
@@ -101,9 +101,31 @@ void Tuner::_get_lineup_url()
 }
 void Tuner::_get_lineup()
 {
+    String lineupStr;
+    if (!GetFileContents(_lineupURL), lineupStr)
+    {
+        KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", _lineupURL.c_str());
+        return;
+    }
 
+    Json::Value lineupJson;
+    Json::Reader jsonReader;
+    if (!jsonReader.parse(lineupStr, lineupJson))
+    {
+        KODI_LOG(LOG_ERROR, "Cannot parse JSON value returned from %s", _lineupURL.c_str());
+        return;
+    }
 
+    if (lineupJson.type() != Json::arrayValue)
+    {
+        KODI_LOG(LOG_ERROR, "Lineup is not a JSON array, returned from %s", _lineupURL.c_str());
+        return;
+    }
 
+    for(auto& v : lineupJson)
+    {
+
+    }
 }
 
 template<typename T>
@@ -111,9 +133,9 @@ unsigned int GetGenreType(const T& arr)
 {
     unsigned int nGenreType = 0;
 
-    for (auto i = arr.begin(); i != arr.end(); i++)
+    for (auto& i : arr)
     {
-        auto str = (*i).asString();
+        auto str = i.asString();
 
         if (str == "News")
             nGenreType |= EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
