@@ -72,7 +72,7 @@ void Tuner::_get_lineup_url()
 
     // Ask the device for its lineup URL
     discoverURL.Format("%s/discover.json", _discover_device.base_url);
-    if (GetFileContents(discoverURL.c_str(), discoverResults))
+    if (GetFileContents(discoverURL, discoverResults))
     {
         Json::Reader jsonReader;
         Json::Value discoverJson;
@@ -102,7 +102,7 @@ void Tuner::_get_lineup_url()
 void Tuner::_get_lineup()
 {
     String lineupStr;
-    if (!GetFileContents(_lineupURL), lineupStr)
+    if (!GetFileContents(_lineupURL, lineupStr))
     {
         KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", _lineupURL.c_str());
         return;
