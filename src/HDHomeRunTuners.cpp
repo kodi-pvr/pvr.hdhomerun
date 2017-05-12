@@ -36,8 +36,79 @@ static const String g_strGroupFavoriteChannels("Favorite channels");
 static const String g_strGroupHDChannels("HD channels");
 static const String g_strGroupSDChannels("SD channels");
 
+void Tuner::_get_var(String& value, const char* name)
+{
+    char *get_val;
+    char *get_err;
+    if (hdhomerun_device_get_var(_device, name, &get_val, &get_err) < 0)
+    {
+        KODI_LOG(LOG_DEBUG,
+                "communication error sending %s request to %08x",
+                name, _discover_device.device_id);
+    }
+    else if (get_err)
+    {
+        KODI_LOG(LOG_DEBUG, "error %s with %s request from %08x",
+                get_err, name, _discover_device.device_id);
+    }
+    else
+    {
+        KODI_LOG(LOG_DEBUG, "channelmap(%08x) = %s",
+                _discover_device.device_id, get_val);
+
+        value.assign(get_val);
+    }
+}
+
+void Tuner::_get_data()
+{
+    _get_var(_channelmap, "/tuner0/channelmap");
+}
+
+void Tuner::_get_lineup_url()
+{
+    String discoverURL;
+    String discoverResults;
+
+    // Ask the device for its lineup URL
+    discoverURL.Format("%s/discover.json", _discover_device.base_url);
+    if (GetFileContents(discoverURL.c_str(), discoverResults))
+    {
+        Json::Reader jsonReader;
+        Json::Value discoverJson;
+        if (jsonReader.parse(discoverResults, discoverJson))
+        {
+            auto& lineupvalue = discoverJson["LineupURL"];
+            _lineupURL.assign(lineupvalue.asString());
+
+            // Side-effect, also get the tuner count.
+            auto& tunercount  = discoverJson["TunerCount"];
+            _tunercount = tunercount.asUInt();
+        }
+    }
+    else
+    {
+        // Fall back to a pattern for "modern" devices
+        _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
+    }
+
+    // Get channelmap TODO
+
+
+    KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
+            _discover_device.device_id, _lineupURL.c_str());
+
+}
+void Tuner::_get_lineup()
+{
+
+
+
+}
+
 template<typename T>
-unsigned int GetGenreType(const T& arr) {
+unsigned int GetGenreType(const T& arr)
+{
     unsigned int nGenreType = 0;
 
     for (auto i = arr.begin(); i != arr.end(); i++)

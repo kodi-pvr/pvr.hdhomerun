@@ -58,19 +58,84 @@ private:
     Lockable* _obj;
 };
 
+
+class GuideEntry
+{
+public:
+    time_t _starttime;
+    time_t _endtime;
+    time_t _originalairdate;
+    String _title;
+    String _episodenumber;
+    String _episodetitle;
+    String _synopsis;
+    String _imageurl;
+    String _seriesid;
+};
+
+class X {
+public:
+    String  _guidenumber;
+    String  _guidename;
+    String  _affiliate;
+    String  _imageurl;
+
+};
 class LineupEntry
 {
 public:
+    // From the lineup results
     String   _guidenumber;
     String   _guidename;
+    String   _url;
+
     uint32_t _channel;
     uint32_t _subchannel;
 };
 
+
+
 class Lineup : public Lockable
 {
-
+public:
+    std::vector<LineupEntry> _entries;
+    std::map<std::pair<uint32_t, uint32_t>, LineupEntry> _map;
 };
+
+class Tuner
+{
+public:
+    Tuner(const hdhomerun_discover_device_t& d)
+        : _debug(hdhomerun_debug_create())
+        , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
+        , _discover_device(d)
+    {
+        _get_data();
+        _get_lineup_url();
+        _get_lineup();
+    }
+    ~Tuner()
+    {
+        hdhomerun_device_destroy(_device);
+        hdhomerun_debug_destroy(_debug);
+    }
+
+private:
+    void _get_var(String& value, const char* name);
+    void _get_data();
+    void _get_lineup_url();
+    void _get_lineup();
+
+    hdhomerun_debug_t*          _debug;
+    hdhomerun_device_t*         _device;
+    hdhomerun_discover_device_t _discover_device;
+    // Discover Data
+    String                      _lineupURL;
+    unsigned int                _tunercount;
+    // API Data
+    String                      _channelmap;
+};
+
 
 class HDHomeRunTuners : public Lockable
 {
