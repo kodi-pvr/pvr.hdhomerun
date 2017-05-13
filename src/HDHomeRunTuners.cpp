@@ -223,21 +223,27 @@ void Lineup::DiscoverTuners()
     }
 
     // Iterate through tuners, determine if there are stale entries.
-    for (auto& tuner : _tuners)
+    for (Tuner* tuner : _tuners)
     {
-        auto id = tuner->DeviceID();
+        uint32_t id = tuner->DeviceID();
         if (discovered_ids.find(id) == discovered_ids.end())
         {
             // Tuner went away
             tuner_removed = true;
 
             // Remove tuner from lineups
-            for (auto& cm: _entries)
+            for (std::map<String, ChannelMapLineup>::iterator i=_entries.begin(); i != _entries.end(); i++)
             {
-                auto entries = cm.second._entries;
-                for (auto& lge: entries)
+                ChannelMapLineup& cm = (*i).second;
+                std::set<LineupGuideEntry>& entries = cm._entries;
+
+                for(std::set<LineupGuideEntry>::iterator lgei = entries.begin(); lgei != entries.end(); lgei++ )
                 {
-                    auto& tuners = lge._tuners;
+                    // Why is this const?
+                    const LineupGuideEntry& lgec = *lgei;
+                    LineupGuideEntry& lge = const_cast<LineupGuideEntry&>(lgec);
+
+                    std::set<Tuner*>& tuners = lge._tuners;
                     if (tuners.find(tuner) != tuners.end())
                     {
                         tuners.erase(tuner);
@@ -249,11 +255,11 @@ void Lineup::DiscoverTuners()
                         entries.erase(entries.find(lge));
                     }
                 }
-                if (cm.second._entries.size() == 0)
+                if (cm._entries.size() == 0)
                 {
                     // No entries left for channelmap
 
-                    _entries.erase(cm);
+                    _entries.erase(i);
                 }
             }
 

@@ -34,6 +34,12 @@
 
 namespace PVRHDHomeRun {
 
+template<typename T>
+bool operator<(const T&a, const T&b)
+{
+    return a.operator<(b);
+}
+
 class Lockable {
 public:
     void LockObject() {
@@ -199,6 +205,10 @@ public:
     // Pointers to tuners within the Lineup.
     std::set<Tuner*>   _tuners;
 
+    bool operator<(const LineupGuideEntry& rhs) const
+    {
+        return _lineupentry < rhs._lineupentry;
+    }
 };
 
 class ChannelMapLineup
