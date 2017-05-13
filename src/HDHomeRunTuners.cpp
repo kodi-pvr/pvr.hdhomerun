@@ -267,10 +267,10 @@ void Lineup::DiscoverTuners()
     }
 
     if (tuner_added) {
-        // TODO
+        // TODO - check lineup, add new tuner to lineup entries, might create new lineup entries for this tuner.
     }
     if (tuner_removed) {
-        // TODO
+        // TODO - Lineup should be correct, anything to do?
     }
 }
 
