@@ -182,6 +182,98 @@ unsigned int GetGenreType(const T& arr)
     return nGenreType;
 }
 
+Lineup::~Lineup()
+{
+    for (auto& tuner: _tuners)
+    {
+        delete tuner;
+    }
+}
+
+void Lineup::DiscoverTuners()
+{
+    struct hdhomerun_discover_device_t discover_devices[64];
+    size_t tuner_count = hdhomerun_discover_find_devices_custom_v2(
+            0,
+            HDHOMERUN_DEVICE_TYPE_TUNER,
+            HDHOMERUN_DEVICE_ID_WILDCARD,
+            discover_devices,
+            64
+            );
+
+    std::set<uint32_t> discovered_ids;
+
+    bool tuner_added   = false;
+    bool tuner_removed = false;
+    Lock lock(this);
+    for (size_t i=0; i<tuner_count; i++)
+    {
+        auto& dd = discover_devices[i];
+        auto  id = dd.device_id;
+
+        discovered_ids.insert(id);
+
+        if (_device_ids.find(id) == _device_ids.end())
+        {
+            // New tuner
+            tuner_added = true;
+
+            _tuners.insert(new Tuner(dd));
+        }
+    }
+
+    // Iterate through tuners, determine if there are stale entries.
+    for (auto& tuner : _tuners)
+    {
+        auto id = tuner->DeviceID();
+        if (discovered_ids.find(id) == discovered_ids.end())
+        {
+            // Tuner went away
+            tuner_removed = true;
+
+            // Remove tuner from lineups
+            for (auto& cm: _entries)
+            {
+                auto entries = cm.second._entries;
+                for (auto& lge: entries)
+                {
+                    auto& tuners = lge._tuners;
+                    if (tuners.find(tuner) != tuners.end())
+                    {
+                        tuners.erase(tuner);
+                    }
+                    if (tuners.size() == 0)
+                    {
+                        // No tuners left for this lineup guide entry, remove it
+
+                        entries.erase(entries.find(lge));
+                    }
+                }
+                if (cm.second._entries.size() == 0)
+                {
+                    // No entries left for channelmap
+
+                    _entries.erase(cm);
+                }
+            }
+
+            // Erase tuner from this
+            _tuners.erase(tuner);
+            _device_ids.erase(id);
+
+            // Delete tuner object
+            delete tuner;
+        }
+    }
+
+    if (tuner_added) {
+        // TODO
+    }
+    if (tuner_removed) {
+        // TODO
+    }
+}
+
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 {

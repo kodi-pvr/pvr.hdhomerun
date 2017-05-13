@@ -272,7 +272,7 @@ const char *GetBackendName(void)
 
 const char *GetBackendVersion(void)
 {
-    static const char *strBackendVersion = "0.1";
+    static const char *strBackendVersion = "0.2";
     return strBackendVersion;
 }
 

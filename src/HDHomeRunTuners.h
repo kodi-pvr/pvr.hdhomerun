@@ -29,6 +29,8 @@
 #include <json/json.h>
 #include <cstring>
 #include <vector>
+#include <set>
+#include <memory>
 
 namespace PVRHDHomeRun {
 
@@ -59,9 +61,11 @@ private:
 };
 
 
-class GuideEntry
+class GuideChannelEntry
 {
 public:
+    GuideChannelEntry(const Json::Value&);
+
     time_t _starttime;
     time_t _endtime;
     time_t _originalairdate;
@@ -69,18 +73,35 @@ public:
     String _episodenumber;
     String _episodetitle;
     String _synopsis;
-    String _imageurl;
-    String _seriesid;
+    String _imageURL;
+    String _seriesID;
+
+    bool operator<(const GuideChannelEntry& rhs) const
+    {
+        return _starttime < rhs._starttime;
+    }
 };
 
-class X {
+class GuideChannel : public Lockable
+{
 public:
+    GuideChannel(const Json::Value&);
+
     String  _guidenumber;
     String  _guidename;
     String  _affiliate;
     String  _imageurl;
 
+    std::set<GuideChannelEntry> _entries;
 };
+
+// Might not need this class, it would be tuner-specific
+class Guide : public Lockable
+{
+    std::vector<GuideChannel> _channels;
+    String                    _channelmap;
+};
+
 class LineupEntry
 {
 public:
@@ -93,15 +114,11 @@ public:
     uint32_t _channel    = 0;
     uint32_t _subchannel = 0;
     bool     _drm;
-};
 
-
-
-class Lineup : public Lockable
-{
-public:
-    std::vector<LineupEntry> _entries;
-    std::map<std::pair<uint32_t, uint32_t>, LineupEntry> _map;
+    bool operator<(const LineupEntry& rhs) const
+    {
+        return (_channel < rhs._channel) || (_subchannel < rhs._subchannel);
+    }
 };
 
 class Tuner : public Lockable
@@ -140,6 +157,10 @@ public:
     {
         return _lineup;
     }
+    const uint32_t DeviceID() const
+    {
+        return _discover_device.device_id;
+    }
 
 private:
     void _get_var(String& value, const char* name);
@@ -161,8 +182,58 @@ private:
     // API Data
     String                      _channelmap;
     std::vector<LineupEntry>    _lineup;
+public:
+    bool operator<(const Tuner& rhs) const
+    {
+        return DeviceID() < rhs.DeviceID();
+    }
 };
 
+
+class LineupGuideEntry : public Lockable
+{
+public:
+    LineupEntry        _lineupentry;
+    GuideChannel       _guidechannel;
+    String             _channelmap;
+    // Pointers to tuners within the Lineup.
+    std::set<Tuner*>   _tuners;
+
+};
+
+class ChannelMapLineup
+{
+public:
+    String                     _channelmap;
+    std::set<LineupGuideEntry> _entries;
+};
+
+class Lineup : public Lockable
+{
+public:
+    Lineup();
+    ~Lineup();
+
+    void DiscoverTuners();
+    void Update();
+
+    PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
+    int PvrGetChannelsAmount();
+    PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle,
+            const PVR_CHANNEL& channel,
+            time_t iStart,
+            time_t iEnd);
+    int PvrGetChannelGroupsAmount(void);
+    PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
+    PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle,
+            const PVR_CHANNEL_GROUP &group);
+
+private:
+    // Pointer to tuners since the CMutex does not support moves.
+    std::set<Tuner*>                   _tuners;
+    std::set<uint32_t>                 _device_ids;
+    std::map<String, ChannelMapLineup> _entries;
+};
 
 class HDHomeRunTuners : public Lockable
 {
