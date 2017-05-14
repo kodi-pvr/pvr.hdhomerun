@@ -130,20 +130,8 @@ public:
 class Tuner : public Lockable
 {
 public:
-    Tuner(const hdhomerun_discover_device_t& d)
-        : _debug(hdhomerun_debug_create())
-        , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
-        , _discover_device(d) // copy
-    {
-        _get_api_data();
-        _get_discover_data();
-        _get_lineup();
-    }
-    ~Tuner()
-    {
-        hdhomerun_device_destroy(_device);
-        hdhomerun_debug_destroy(_debug);
-    }
+    Tuner(const hdhomerun_discover_device_t& d);
+    ~Tuner();
     void RefreshLineup();
 
     // Accessors

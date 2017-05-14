@@ -36,6 +36,23 @@ static const String g_strGroupFavoriteChannels("Favorite channels");
 static const String g_strGroupHDChannels("HD channels");
 static const String g_strGroupSDChannels("SD channels");
 
+Tuner::Tuner(const hdhomerun_discover_device_t& d)
+    : _debug(hdhomerun_debug_create())
+    , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
+    , _discover_device(d) // copy
+{
+    _get_api_data();
+    _get_discover_data();
+    _get_lineup();
+}
+
+Tuner::~Tuner()
+{
+    hdhomerun_device_destroy(_device);
+    hdhomerun_debug_destroy(_debug);
+}
+
+
 void Tuner::_get_var(String& value, const char* name)
 {
     char *get_val;
@@ -44,17 +61,20 @@ void Tuner::_get_var(String& value, const char* name)
     {
         KODI_LOG(LOG_ERROR,
                 "communication error sending %s request to %08x",
-                name, _discover_device.device_id);
+                name, _discover_device.device_id
+        );
     }
     else if (get_err)
     {
         KODI_LOG(LOG_ERROR, "error %s with %s request from %08x",
-                get_err, name, _discover_device.device_id);
+                get_err, name, _discover_device.device_id
+        );
     }
     else
     {
         KODI_LOG(LOG_DEBUG, "channelmap(%08x) = %s",
-                _discover_device.device_id, get_val);
+                _discover_device.device_id, get_val
+        );
 
         Lock lock(this);
         value.assign(get_val);
@@ -64,6 +84,7 @@ void Tuner::_get_var(String& value, const char* name)
 void Tuner::_get_api_data()
 {
     _get_var(_channelmap, "/tuner0/channelmap");
+    KODI_LOG(LOG_DEBUG, "HDR ID %08x channelmap %s", _discover_device.device_id, _channelmap.c_str());
 }
 
 void Tuner::_get_discover_data()
@@ -83,6 +104,13 @@ void Tuner::_get_discover_data()
             auto& tunercount  = discoverJson["TunerCount"];
             auto& legacy      = discoverJson["Legacy"];
 
+            KODI_LOG(LOG_DEBUG, "HDR ID %08x LineupURL %s Tuner Count %d Legacy %d",
+                    _discover_device.device_id,
+                    _lineupURL.c_str(),
+                    _tunercount,
+                    _legacy
+            );
+
             Lock lock(this);
             _lineupURL  = std::move(lineupvalue.asString());
             _tunercount = std::move(tunercount.asUInt());
@@ -92,16 +120,23 @@ void Tuner::_get_discover_data()
     else
     {
         // Fall back to a pattern for "modern" devices
+        KODI_LOG(LOG_DEBUG, "HDR ID %08x Fallback lineup URL %s/lineup.json",
+                _discover_device.device_id,
+                _discover_device.base_url
+        );
+
         Lock lock(this);
         _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
     }
 
-    KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
-            _discover_device.device_id, _lineupURL.c_str());
 
 }
 void Tuner::_get_lineup()
 {
+    KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
+            _discover_device.device_id, _lineupURL.c_str()
+    );
+
     String lineupStr;
     if (!GetFileContents(_lineupURL, lineupStr))
     {
@@ -205,6 +240,7 @@ void Lineup::DiscoverTuners()
 
     bool tuner_added   = false;
     bool tuner_removed = false;
+
     Lock lock(this);
     for (size_t i=0; i<tuner_count; i++)
     {
