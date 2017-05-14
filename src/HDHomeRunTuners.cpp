@@ -217,8 +217,10 @@ void Lineup::DiscoverTuners()
         {
             // New tuner
             tuner_added = true;
+            KODI_LOG(LOG_DEBUG, "Adding tuner %08x", id);
 
             _tuners.insert(new Tuner(dd));
+            _device_ids.insert(id);
         }
     }
 
@@ -230,6 +232,7 @@ void Lineup::DiscoverTuners()
         {
             // Tuner went away
             tuner_removed = true;
+            KODI_LOG(LOG_DEBUG, "Removing tuner %08x", id);
 
             // Remove tuner from lineups
             for (std::map<String, ChannelMapLineup>::iterator i=_entries.begin(); i != _entries.end(); i++)
@@ -246,12 +249,15 @@ void Lineup::DiscoverTuners()
                     std::set<Tuner*>& tuners = lge._tuners;
                     if (tuners.find(tuner) != tuners.end())
                     {
+                        // Remove tuner from lineup
+                        KODI_LOG(LOG_DEBUG, "Removing tuner from LineupGuideEntry %p", &lge);
                         tuners.erase(tuner);
                     }
                     if (tuners.size() == 0)
                     {
                         // No tuners left for this lineup guide entry, remove it
 
+                        KODI_LOG(LOG_DEBUG, "No tuners left, removing LineupGuideEntry %p", &lge);
                         entries.erase(entries.find(lge));
                     }
                 }
@@ -259,6 +265,7 @@ void Lineup::DiscoverTuners()
                 {
                     // No entries left for channelmap
 
+                    KODI_LOG(LOG_DEBUG, "Removing empty channelmap %s", (*i).first);
                     _entries.erase(i);
                 }
             }
