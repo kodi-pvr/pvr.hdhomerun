@@ -33,8 +33,25 @@ using namespace ADDON;
 
 namespace PVRHDHomeRun {
 
+GuideNumber::GuideNumber(const Json::Value& v)
+{
+    _guidenumber = v["GuideNumber"].asString();
+    _guidename   = v["GuideName"].asString();
 
-bool LineupEntry::operator<(const LineupEntry& rhs) const
+     _channel = atoi(_guidenumber.c_str());
+     if (auto dot = _guidenumber.Find('.'))
+     {
+         _subchannel = atoi(_guidenumber.c_str() + dot + 1);
+     }
+     else
+     {
+         _subchannel = 0;
+     }
+
+     //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
+}
+
+bool GuideNumber::operator<(const GuideNumber& rhs) const
 {
     bool ret = false;
     if (_channel < rhs._channel)
@@ -58,7 +75,7 @@ bool LineupEntry::operator<(const LineupEntry& rhs) const
 
     return ret;
 }
-bool LineupEntry::operator==(const LineupEntry& rhs) const
+bool GuideNumber::operator==(const GuideNumber& rhs) const
 {
     bool ret = (_channel == rhs._channel)
             && (_subchannel == rhs._subchannel)
@@ -66,7 +83,13 @@ bool LineupEntry::operator==(const LineupEntry& rhs) const
             ;
     return ret;
 }
-
+String GuideNumber::toString() const
+{
+    char channel[64];
+    sprintf(channel, "%d.%d", _channel, _subchannel);
+    return String("") + channel + " "
+            + "_guidename("   + _guidename   + ") ";
+}
 
 static const String g_strGroupFavoriteChannels("Favorite channels");
 static const String g_strGroupHDChannels("HD channels");
@@ -209,37 +232,14 @@ void Tuner::RefreshLineup()
     _get_lineup();
 }
 
+
 LineupEntry::LineupEntry(const Json::Value& v)
+: GuideNumber(v)
 {
-    _guidenumber = v["GuideNumber"].asString();
-    _guidename   = v["GuideName"].asString();
     _url         = v["URL"].asString();
     _drm         = v["DRM"].asBool();
 
-     _channel = atoi(_guidenumber.c_str());
-     if (auto dot = _guidenumber.Find('.'))
-     {
-         _subchannel = atoi(_guidenumber.c_str() + dot + 1);
-     }
-     else
-     {
-         _subchannel = 0;
-     }
-
      //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
-}
-
-String LineupEntry::toString() const
-{
-    char channel[64];
-    sprintf(channel, "%d.%d", _channel, _subchannel);
-
-    return String("") + channel + " "
-            //+ "_guidenumber(" + _guidenumber + ") "
-            + "_guidename("   + _guidename   + ") "
-            //+ "_url("         + _url         + ") "
-            //+ "_drm(" + String(_drm?"True) ":"False)")
-            ;
 }
 
 template<typename T>
@@ -385,7 +385,6 @@ void Lineup::UpdateLineup()
     {
         KODI_LOG(LOG_DEBUG, "Reading lineup from %08x", t->DeviceID());
         Lock tlock(t);
-        KODI_LOG(LOG_DEBUG, "Locked tuner, copying lineup ...");
 
         const auto& lineup = t->Lineup();
         std::copy(

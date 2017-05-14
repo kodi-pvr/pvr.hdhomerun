@@ -74,6 +74,30 @@ private:
     Lockable* _obj;
 };
 
+class GuideNumber {
+public:
+    GuideNumber(const Json::Value&);
+    GuideNumber(const GuideNumber&) = default;
+    virtual ~GuideNumber() = default;
+
+    String _guidenumber;
+    String _guidename;
+
+    uint32_t _channel;
+    uint32_t _subchannel;
+
+    String toString() const;
+
+    static const uint32_t SubchannelLimit = 10000;
+    uint32_t ID() const
+    {
+        // _subchannel better be below 10000.
+        return (_channel * SubchannelLimit) + (_subchannel);
+    }
+
+    bool operator<(const GuideNumber&) const;
+    bool operator==(const GuideNumber&) const;
+};
 
 class GuideChannelEntry
 {
@@ -94,15 +118,18 @@ public:
     {
         return _starttime < rhs._starttime;
     }
+    bool operator==(const GuideChannelEntry& rhs) const
+    {
+        return _starttime == rhs._starttime;
+    }
 };
 
-class GuideChannel : public Lockable
+
+class GuideChannel : public GuideNumber, public Lockable
 {
 public:
     GuideChannel(const Json::Value&);
 
-    String  _guidenumber;
-    String  _guidename;
     String  _affiliate;
     String  _imageurl;
 
@@ -115,30 +142,28 @@ class Guide : public Lockable
     std::vector<GuideChannel> _channels;
 };
 
-class LineupEntry
+class LineupEntry : public GuideNumber
 {
 public:
     LineupEntry(const Json::Value&);
+    LineupEntry(const LineupEntry& o) = default;
 
-    String   _guidenumber;
-    String   _guidename;
     String   _url;
-
-    uint32_t _channel;
-    uint32_t _subchannel;
     bool     _drm;
+};
 
-    String toString() const;
-
-    static const uint32_t SubchannelLimit = 10000;
-    uint32_t ID() const
+class Tuner;
+class LineupEntryWithTuner : public LineupEntry, public Lockable
+{
+    LineupEntryWithTuner(const LineupEntry& o)
+    : LineupEntry(o)
+    {}
+    void AddTuner(Tuner* t)
     {
-        // _subchannel better be below 10000.
-        return (_channel * SubchannelLimit) + (_subchannel);
+        _tuners.insert(t);
     }
-    bool operator<(const LineupEntry& rhs) const;
-    bool operator==(const LineupEntry& rhs) const;
 
+    std::set<Tuner*> _tuners;
 };
 
 class Tuner : public Lockable
