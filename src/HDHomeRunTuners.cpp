@@ -53,27 +53,26 @@ GuideNumber::GuideNumber(const Json::Value& v)
 
 bool GuideNumber::operator<(const GuideNumber& rhs) const
 {
-    bool ret = false;
     if (_channel < rhs._channel)
     {
-        ret = true;
+        return true;
     }
     else if (_channel == rhs._channel)
     {
         if (_subchannel < rhs._subchannel)
         {
-            ret = true;
+            return true;
         }
         else if (_subchannel == rhs._subchannel)
         {
             if (strcmp(_guidename.c_str(), rhs._guidename.c_str()) < 0)
             {
-                ret = true;
+                return true;
             }
         }
     }
 
-    return ret;
+    return false;
 }
 bool GuideNumber::operator==(const GuideNumber& rhs) const
 {
@@ -387,12 +386,17 @@ void Lineup::UpdateLineup()
         Lock tlock(t);
 
         const auto& lineup = t->Lineup();
-        std::copy(
+        std::copy_if(
                 lineup.begin(),
                 lineup.end(),
                 std::inserter(allEntries,
                         allEntries.end()
-                )
+                ),
+                [&](const LineupEntry& le)
+                {
+                    return g.Settings.bAllowUnknownChannels
+                            || strcmp(le._guidename.c_str(), "Unknown");
+                }
         );
 
         KODI_LOG(LOG_DEBUG, "... Done with lineup copy");

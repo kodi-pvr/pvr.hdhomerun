@@ -41,6 +41,7 @@ struct SettingsType
     bool bHideDuplicateChannels = true;
     bool bDebug                 = false;
     bool bMarkNew               = false;
+    bool bAllowUnknownChannels  = false;
     bool bUseLegacy             = false;
 };
 
