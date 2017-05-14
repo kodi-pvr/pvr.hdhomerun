@@ -60,7 +60,7 @@ bool GetFileContents(const String& url, String& strContent)
 
     fileHandle = g.XBMC->OpenFile(url, 0);
 
-    if (fileHandle == NULL)
+    if (fileHandle == nullptr)
     {
         KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
         return false;

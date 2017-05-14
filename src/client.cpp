@@ -57,7 +57,7 @@ public:
                 g.PVR->TriggerChannelUpdate();
             }
         }
-        return NULL;
+        return nullptr;
     }
 };
 
@@ -71,7 +71,7 @@ extern "C"
 
 void ADDON_ReadSettings(void)
 {
-    if (g.XBMC == NULL)
+    if (g.XBMC == nullptr)
         return;
 
     if (!g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected))
@@ -123,7 +123,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     g.strClientPath = pvrprops->strClientPath;
 
     g.Tuners = new HDHomeRunTuners;
-    if (g.Tuners == NULL)
+    if (g.Tuners == nullptr)
         return ADDON_STATUS_PERMANENT_FAILURE;
 
     ADDON_ReadSettings();
@@ -169,7 +169,7 @@ unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
 
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
-    if (g.Tuners == NULL)
+    if (g.Tuners == nullptr)
         return ADDON_STATUS_OK;
 
     if (strcmp(settingName, "hide_protected") == 0)
@@ -515,7 +515,7 @@ void DemuxAbort(void)
 }
 DemuxPacket* DemuxRead(void)
 {
-    return NULL;
+    return nullptr;
 }
 unsigned int GetChannelSwitchDelay(void)
 {
