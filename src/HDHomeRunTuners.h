@@ -24,6 +24,7 @@
  */
 
 #include "client.h"
+#include "Utils.h"
 #include <p8-platform/threads/mutex.h>
 #include <hdhomerun.h>
 #include <json/json.h>
@@ -31,14 +32,21 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <string>
 
 namespace PVRHDHomeRun {
 
 template<typename T>
-bool operator<(const T&a, const T&b)
+bool operator<(const T& a, const T& b)
 {
     return a.operator<(b);
 }
+template<typename T>
+bool operator==(const T& a, const T& b)
+{
+    return a.operator==(b);
+}
+
 
 class Lockable {
 public:
@@ -105,7 +113,6 @@ public:
 class Guide : public Lockable
 {
     std::vector<GuideChannel> _channels;
-    String                    _channelmap;
 };
 
 class LineupEntry
@@ -117,14 +124,21 @@ public:
     String   _guidename;
     String   _url;
 
-    uint32_t _channel    = 0;
-    uint32_t _subchannel = 0;
+    uint32_t _channel;
+    uint32_t _subchannel;
     bool     _drm;
 
-    bool operator<(const LineupEntry& rhs) const
+    String toString() const;
+
+    static const uint32_t SubchannelLimit = 10000;
+    uint32_t ID() const
     {
-        return (_channel < rhs._channel) || (_subchannel < rhs._subchannel);
+        // _subchannel better be below 10000.
+        return (_channel * SubchannelLimit) + (_subchannel);
     }
+    bool operator<(const LineupEntry& rhs) const;
+    bool operator==(const LineupEntry& rhs) const;
+
 };
 
 class Tuner : public Lockable
@@ -142,10 +156,6 @@ public:
     bool Legacy() const
     {
         return _legacy;
-    }
-    const String& ChannelMap() const
-    {
-        return _channelmap;
     }
     const std::vector<LineupEntry>& Lineup() const
     {
@@ -173,8 +183,7 @@ private:
     String                      _lineupURL;
     unsigned int                _tunercount;
     bool                        _legacy;
-    // API Data
-    String                      _channelmap;
+    // Lineup entries
     std::vector<LineupEntry>    _lineup;
 public:
     bool operator<(const Tuner& rhs) const
@@ -189,7 +198,6 @@ class LineupGuideEntry : public Lockable
 public:
     LineupEntry        _lineupentry;
     GuideChannel       _guidechannel;
-    String             _channelmap;
     // Pointers to tuners within the Lineup.
     std::set<Tuner*>   _tuners;
 
@@ -199,13 +207,6 @@ public:
     }
 };
 
-class ChannelMapLineup
-{
-public:
-    String                     _channelmap;
-    std::set<LineupGuideEntry> _entries;
-};
-
 class Lineup : public Lockable
 {
 public:
@@ -213,6 +214,7 @@ public:
     ~Lineup();
 
     void DiscoverTuners();
+    void UpdateLineup();
     void Update();
 
     PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
@@ -228,9 +230,10 @@ public:
 
 private:
     // Pointer to tuners since the CMutex does not support moves.
-    std::set<Tuner*>                   _tuners;
-    std::set<uint32_t>                 _device_ids;
-    std::map<String, ChannelMapLineup> _entries;
+    std::set<Tuner*>           _tuners;
+    std::set<uint32_t>         _device_ids;
+    std::set<LineupGuideEntry> _entries;
+
 };
 
 class HDHomeRunTuners : public Lockable

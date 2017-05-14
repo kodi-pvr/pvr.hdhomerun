@@ -89,8 +89,8 @@ void ADDON_ReadSettings(void)
     else
         g.Settings.bDebug = false;
 
-    if (!g.XBMC->GetSetting("use_legacy", &g.Settings.bUseLegacy))
-        g.Settings.bUseLegacy = true;
+    //if (!g.XBMC->GetSetting("use_legacy", &g.Settings.bUseLegacy))
+    //    g.Settings.bUseLegacy = true;
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -122,11 +122,18 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     g.strUserPath = pvrprops->strUserPath;
     g.strClientPath = pvrprops->strClientPath;
 
+    KODI_LOG(LOG_DEBUG, "Creating old-style HDHomeRunTuners");
     g.Tuners = new HDHomeRunTuners;
     if (g.Tuners == nullptr)
         return ADDON_STATUS_PERMANENT_FAILURE;
 
     ADDON_ReadSettings();
+
+    KODI_LOG(LOG_DEBUG, "Creating new-style Lineup");
+    g.lineup = new Lineup();
+    if (g.lineup == nullptr)
+        return ADDON_STATUS_PERMANENT_FAILURE;
+    KODI_LOG(LOG_DEBUG, "Done with new-style Lineup");
 
     if (g.Tuners)
     {
@@ -149,6 +156,7 @@ void ADDON_Destroy()
 {
     g_UpdateThread.StopThread();
 
+    SAFE_DELETE(g.lineup);
     SAFE_DELETE(g.Tuners);
     SAFE_DELETE(g.PVR);
     SAFE_DELETE(g.XBMC);
@@ -186,11 +194,11 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
         g.Settings.bMarkNew = *(bool*) settingValue;
     else if (strcmp(settingName, "debug") == 0)
         g.Settings.bDebug = *(bool*) settingValue;
-    else if (strcmp(settingName, "use_legacy") == 0)
-    {
-        g.Settings.bUseLegacy = *(bool*) settingValue;
-        return ADDON_STATUS_NEED_RESTART;
-    }
+    //else if (strcmp(settingName, "use_legacy") == 0)
+    //{
+    //    g.Settings.bUseLegacy = *(bool*) settingValue;
+    //    return ADDON_STATUS_NEED_RESTART;
+    //}
 
     return ADDON_STATUS_OK;
 }
@@ -337,6 +345,12 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
     CloseLiveStream();
+
+    KODI_LOG(LOG_DEBUG, "OpenLiveStream channel %d.%d - %s",
+            channel.iChannelNumber,
+            channel.iSubChannelNumber,
+            channel.strStreamURL
+    );
 
     g.iCurrentChannelUniqueId = channel.iUniqueId;
 

@@ -25,12 +25,48 @@
 #include "client.h"
 #include "Utils.h"
 #include "HDHomeRunTuners.h"
-#include <set>
 #include <functional>
+#include <algorithm>
+#include <iterator>
 
 using namespace ADDON;
 
 namespace PVRHDHomeRun {
+
+
+bool LineupEntry::operator<(const LineupEntry& rhs) const
+{
+    bool ret = false;
+    if (_channel < rhs._channel)
+    {
+        ret = true;
+    }
+    else if (_channel == rhs._channel)
+    {
+        if (_subchannel < rhs._subchannel)
+        {
+            ret = true;
+        }
+        else if (_subchannel == rhs._subchannel)
+        {
+            if (strcmp(_guidename.c_str(), rhs._guidename.c_str()) < 0)
+            {
+                ret = true;
+            }
+        }
+    }
+
+    return ret;
+}
+bool LineupEntry::operator==(const LineupEntry& rhs) const
+{
+    bool ret = (_channel == rhs._channel)
+            && (_subchannel == rhs._subchannel)
+            && !strcmp(_guidename.c_str(), rhs._guidename.c_str())
+            ;
+    return ret;
+}
+
 
 static const String g_strGroupFavoriteChannels("Favorite channels");
 static const String g_strGroupHDChannels("HD channels");
@@ -83,8 +119,6 @@ void Tuner::_get_var(String& value, const char* name)
 
 void Tuner::_get_api_data()
 {
-    _get_var(_channelmap, "/tuner0/channelmap");
-    KODI_LOG(LOG_DEBUG, "HDR ID %08x channelmap %s", _discover_device.device_id, _channelmap.c_str());
 }
 
 void Tuner::_get_discover_data()
@@ -100,19 +134,19 @@ void Tuner::_get_discover_data()
         Json::Value discoverJson;
         if (jsonReader.parse(discoverResults, discoverJson))
         {
-            auto& lineupvalue = discoverJson["LineupURL"];
-            auto& tunercount  = discoverJson["TunerCount"];
-            auto& legacy      = discoverJson["Legacy"];
+            auto& lineupURL  = discoverJson["LineupURL"];
+            auto& tunercount = discoverJson["TunerCount"];
+            auto& legacy     = discoverJson["Legacy"];
 
             KODI_LOG(LOG_DEBUG, "HDR ID %08x LineupURL %s Tuner Count %d Legacy %d",
                     _discover_device.device_id,
-                    _lineupURL.c_str(),
-                    _tunercount,
-                    _legacy
+                    lineupURL.asString(),
+                    tunercount.asUInt(),
+                    legacy.asBool()
             );
 
             Lock lock(this);
-            _lineupURL  = std::move(lineupvalue.asString());
+            _lineupURL  = std::move(lineupURL.asString());
             _tunercount = std::move(tunercount.asUInt());
             _legacy     = std::move(legacy.asBool());
         }
@@ -187,6 +221,25 @@ LineupEntry::LineupEntry(const Json::Value& v)
      {
          _subchannel = atoi(_guidenumber.c_str() + dot + 1);
      }
+     else
+     {
+         _subchannel = 0;
+     }
+
+     //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
+}
+
+String LineupEntry::toString() const
+{
+    char channel[64];
+    sprintf(channel, "%d.%d", _channel, _subchannel);
+
+    return String("") + channel + " "
+            //+ "_guidenumber(" + _guidenumber + ") "
+            + "_guidename("   + _guidename   + ") "
+            //+ "_url("         + _url         + ") "
+            //+ "_drm(" + String(_drm?"True) ":"False)")
+            ;
 }
 
 template<typename T>
@@ -215,6 +268,12 @@ unsigned int GetGenreType(const T& arr)
     }
 
     return nGenreType;
+}
+
+Lineup::Lineup()
+{
+    KODI_LOG(LOG_DEBUG, "Lineup::Lineup()");
+    DiscoverTuners();
 }
 
 Lineup::~Lineup()
@@ -247,6 +306,9 @@ void Lineup::DiscoverTuners()
         auto& dd = discover_devices[i];
         auto  id = dd.device_id;
 
+        if (dd.is_legacy && !g.Settings.bUseLegacy)
+            continue;
+
         discovered_ids.insert(id);
 
         if (_device_ids.find(id) == _device_ids.end())
@@ -270,39 +332,26 @@ void Lineup::DiscoverTuners()
             tuner_removed = true;
             KODI_LOG(LOG_DEBUG, "Removing tuner %08x", id);
 
-            // Remove tuner from lineups
-            for (std::map<String, ChannelMapLineup>::iterator i=_entries.begin(); i != _entries.end(); i++)
+
+            for(std::set<LineupGuideEntry>::iterator lgei = _entries.begin(); lgei != _entries.end(); lgei++ )
             {
-                ChannelMapLineup& cm = (*i).second;
-                std::set<LineupGuideEntry>& entries = cm._entries;
+                // Why is this const?
+                const LineupGuideEntry& lgec = *lgei;
+                LineupGuideEntry& lge = const_cast<LineupGuideEntry&>(lgec);
 
-                for(std::set<LineupGuideEntry>::iterator lgei = entries.begin(); lgei != entries.end(); lgei++ )
+                std::set<Tuner*>& tuners = lge._tuners;
+                if (tuners.find(tuner) != tuners.end())
                 {
-                    // Why is this const?
-                    const LineupGuideEntry& lgec = *lgei;
-                    LineupGuideEntry& lge = const_cast<LineupGuideEntry&>(lgec);
-
-                    std::set<Tuner*>& tuners = lge._tuners;
-                    if (tuners.find(tuner) != tuners.end())
-                    {
-                        // Remove tuner from lineup
-                        KODI_LOG(LOG_DEBUG, "Removing tuner from LineupGuideEntry %p", &lge);
-                        tuners.erase(tuner);
-                    }
-                    if (tuners.size() == 0)
-                    {
-                        // No tuners left for this lineup guide entry, remove it
-
-                        KODI_LOG(LOG_DEBUG, "No tuners left, removing LineupGuideEntry %p", &lge);
-                        entries.erase(entries.find(lge));
-                    }
+                    // Remove tuner from lineup
+                    KODI_LOG(LOG_DEBUG, "Removing tuner from LineupGuideEntry %p", &lge);
+                    tuners.erase(tuner);
                 }
-                if (cm._entries.size() == 0)
+                if (tuners.size() == 0)
                 {
-                    // No entries left for channelmap
+                    // No tuners left for this lineup guide entry, remove it
 
-                    KODI_LOG(LOG_DEBUG, "Removing empty channelmap %s", (*i).first);
-                    _entries.erase(i);
+                    KODI_LOG(LOG_DEBUG, "No tuners left, removing LineupGuideEntry %p", &lge);
+                    _entries.erase(lgei);
                 }
             }
 
@@ -317,12 +366,50 @@ void Lineup::DiscoverTuners()
 
     if (tuner_added) {
         // TODO - check lineup, add new tuner to lineup entries, might create new lineup entries for this tuner.
+
+        UpdateLineup();
     }
     if (tuner_removed) {
         // TODO - Lineup should be correct, anything to do?
     }
 }
 
+void Lineup::UpdateLineup()
+{
+    std::set<LineupEntry> allEntries;
+
+    KODI_LOG(LOG_DEBUG, "Lineup::UpdateLineup");
+
+    Lock lock(this);
+    for (Tuner* t: _tuners)
+    {
+        KODI_LOG(LOG_DEBUG, "Reading lineup from %08x", t->DeviceID());
+        Lock tlock(t);
+        KODI_LOG(LOG_DEBUG, "Locked tuner, copying lineup ...");
+
+        const auto& lineup = t->Lineup();
+        std::copy(
+                lineup.begin(),
+                lineup.end(),
+                std::inserter(allEntries,
+                        allEntries.end()
+                )
+        );
+
+        KODI_LOG(LOG_DEBUG, "... Done with lineup copy");
+    }
+
+    for (const auto& entry: allEntries)
+    {
+        KODI_LOG(LOG_DEBUG,
+                "Lineup Entry: %d.%d - %s - %s",
+                entry._channel,
+                entry._subchannel,
+                entry._guidenumber.c_str(),
+                entry._guidename.c_str()
+        );
+    }
+}
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 {
@@ -654,8 +741,18 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
     for (Tuners::const_iterator iterTuner = m_Tuners.begin();
             iterTuner != m_Tuners.end(); iterTuner++)
+    {
+        KODI_LOG(LOG_DEBUG, "Tuner: %08x Legacy: %u UseLegacy: %u",
+                iterTuner->_discover_device.device_id,
+                iterTuner->_discover_device.is_legacy,
+                g.Settings.bUseLegacy
+        );
+        if (iterTuner->_discover_device.is_legacy && !(g.Settings.bUseLegacy))
+            continue;
+
         for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
         {
+
             const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
 
             if (jsonChannel["_Hide"].asBool())
@@ -670,12 +767,14 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
             PVR_STRCPY(pvrChannel.strChannelName,
                     jsonChannel["_ChannelName"].asString().c_str());
             PVR_STRCPY(pvrChannel.strStreamURL,
-                    jsonChannel["URL"].asString().c_str());
+                    "");
+                    //jsonChannel["URL"].asString().c_str());
             PVR_STRCPY(pvrChannel.strIconPath,
                     jsonChannel["_IconPath"].asString().c_str());
 
             g.PVR->TransferChannelEntry(handle, &pvrChannel);
         }
+    }
 
     return PVR_ERROR_NO_ERROR;
 }
@@ -730,9 +829,9 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
 
                 memset(&tag, 0, sizeof(tag));
 
-                String strTitle(jsonGuideItem["Title"].asString()), strSynopsis(
-                        jsonGuideItem["Synopsis"].asString()), strImageURL(
-                        jsonGuideItem["ImageURL"].asString());
+                String strTitle(jsonGuideItem["Title"].asString());
+                String strSynopsis(jsonGuideItem["Synopsis"].asString());
+                String strImageURL(jsonGuideItem["ImageURL"].asString());
 
                 tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
                 tag.strTitle = strTitle.c_str();
@@ -746,6 +845,20 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
                 tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
                 tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
                 tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+
+                KODI_LOG(LOG_DEBUG,
+                        "PvrGetEPCForChannel "
+                        " Channel: %u Sub: %u Start: %u End: %u"
+                        " TunerID: %08x - Title %s"
+                        ,
+                        channel.iChannelNumber,
+                        channel.iSubChannelNumber,
+                        tag.startTime,
+                        tag.endTime,
+                        iterTuner->_discover_device.device_id,
+                        tag.strTitle
+                        );
+
 
                 g.PVR->TransferEpgEntry(handle, &tag);
             }

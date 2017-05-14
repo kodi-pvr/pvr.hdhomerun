@@ -33,6 +33,7 @@ namespace PVRHDHomeRun {
 typedef CStdString String;
 
 class HDHomeRunTuners;
+class Lineup;
 
 struct SettingsType
 {
@@ -40,7 +41,7 @@ struct SettingsType
     bool bHideDuplicateChannels = true;
     bool bDebug                 = false;
     bool bMarkNew               = false;
-    bool bUseLegacy             = true;
+    bool bUseLegacy             = false;
 };
 
 struct GlobalsType
@@ -54,6 +55,7 @@ struct GlobalsType
     CHelper_libXBMC_pvr*          PVR    = nullptr;
 
     HDHomeRunTuners*              Tuners = nullptr;
+    Lineup*                       lineup = nullptr;
 
     SettingsType Settings;
 };

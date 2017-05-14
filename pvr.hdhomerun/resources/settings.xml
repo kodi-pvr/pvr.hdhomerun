@@ -7,7 +7,8 @@
     <setting id="debug" type="bool" label="32003" default="false" />
     <setting id="hide_duplicate" type="bool" label="32004" default="true" />
     <setting id="mark_new" type="bool" label="32005" default="true" />
-    <setting id="use_legacy" type="bool" label="32006" default="false" />
+    
+    <!-- <setting id="use_legacy" type="bool" label="32006" default="false" /> -->
 
   </category>
 
