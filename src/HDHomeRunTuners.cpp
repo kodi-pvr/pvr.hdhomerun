@@ -363,6 +363,10 @@ void Lineup::UpdateLineup()
         {
             // TODO Check here for g.Settings.bAllowUnknownChannels
             GuideNumber number = v;
+            if ((!g.Settings.bAllowUnknownChannels) && (!strcmp(number._guidename.c_str(), "Unknown")))
+            {
+                continue;
+            }
             _lineup.insert(number);
             if (_info.find(number) == _info.end())
             {
@@ -479,6 +483,8 @@ void Lineup::UpdateGuide()
         idx += buf;
     }
     KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuners - %s", index.size(), idx.c_str());
+
+
 }
 
 int Lineup::PvrGetChannelsAmount()
