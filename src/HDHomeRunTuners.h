@@ -202,13 +202,24 @@ public:
 class Lineup : public Lockable
 {
 public:
-    Lineup();
-    ~Lineup() {}
+    Lineup() = default;
+    ~Lineup()
+    {
+        for (auto tuner: _tuners)
+        {
+            delete tuner;
+        }
+    }
 
     void DiscoverTuners();
-    void UpdateLineup();
     void UpdateGuide();
-    void Update(); // Lineup, guide
+    void UpdateLineup();
+    void Update()
+    {
+        DiscoverTuners();
+        UpdateLineup();
+        UpdateGuide();
+    }
 
     PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
     int PvrGetChannelsAmount();

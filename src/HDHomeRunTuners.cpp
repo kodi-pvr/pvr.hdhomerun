@@ -171,16 +171,16 @@ void Tuner::_get_discover_data()
             auto& tunercount = discoverJson["TunerCount"];
             auto& legacy     = discoverJson["Legacy"];
 
-            KODI_LOG(LOG_DEBUG, "HDR ID %08x LineupURL %s Tuner Count %d Legacy %d",
-                    _discover_device.device_id,
-                    lineupURL.asString(),
-                    tunercount.asUInt(),
-                    legacy.asBool()
-            );
-
             _lineupURL  = std::move(lineupURL.asString());
             _tunercount = std::move(tunercount.asUInt());
             _legacy     = std::move(legacy.asBool());
+
+            KODI_LOG(LOG_DEBUG, "HDR ID %08x LineupURL %s Tuner Count %d Legacy %d",
+                    _discover_device.device_id,
+                    _lineupURL.c_str(),
+                    _tunercount,
+                    _legacy
+            );
         }
     }
     else
@@ -232,11 +232,6 @@ unsigned int GetGenreType(const T& arr)
     return nGenreType;
 }
 
-Lineup::Lineup()
-{
-    KODI_LOG(LOG_DEBUG, "Lineup::Lineup()");
-    DiscoverTuners();
-}
 
 void Lineup::DiscoverTuners()
 {
@@ -397,6 +392,13 @@ void Lineup::UpdateLineup()
                 tuners.c_str()
         );
     }
+}
+
+void Lineup::UpdateGuide()
+{
+    // Find a minimal covering of the lineup
+
+    //TODO
 }
 
 int Lineup::PvrGetChannelsAmount()
@@ -748,71 +750,7 @@ bool HDHomeRunTuners::Update(int nMode)
     return true;
 }
 
-int HDHomeRunTuners::PvrGetChannelsAmount()
-{
-    int nCount = 0;
 
-    Lock lock(this);
-
-    for (Tuners::const_iterator iterTuner = m_Tuners.begin();
-            iterTuner != m_Tuners.end(); iterTuner++)
-        for (Json::Value::ArrayIndex nIndex = 0;
-                nIndex < iterTuner->LineUp.size(); nIndex++)
-            if (!iterTuner->LineUp[nIndex]["_Hide"].asBool())
-                nCount++;
-
-    return nCount;
-}
-
-PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
-{
-    PVR_CHANNEL pvrChannel;
-    Json::Value::ArrayIndex nIndex;
-
-    if (bRadio)
-        return PVR_ERROR_NO_ERROR;
-
-    Lock lock(this);
-
-    for (Tuners::const_iterator iterTuner = m_Tuners.begin();
-            iterTuner != m_Tuners.end(); iterTuner++)
-    {
-        KODI_LOG(LOG_DEBUG, "Tuner: %08x Legacy: %u UseLegacy: %u",
-                iterTuner->_discover_device.device_id,
-                iterTuner->_discover_device.is_legacy,
-                g.Settings.bUseLegacy
-        );
-        if (iterTuner->_discover_device.is_legacy && !(g.Settings.bUseLegacy))
-            continue;
-
-        for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
-        {
-
-            const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
-
-            if (jsonChannel["_Hide"].asBool())
-                continue;
-
-            memset(&pvrChannel, 0, sizeof(pvrChannel));
-
-            pvrChannel.iUniqueId = jsonChannel["_UID"].asUInt();
-            pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
-            pvrChannel.iSubChannelNumber =
-                    jsonChannel["_SubChannelNumber"].asUInt();
-            PVR_STRCPY(pvrChannel.strChannelName,
-                    jsonChannel["_ChannelName"].asString().c_str());
-            PVR_STRCPY(pvrChannel.strStreamURL,
-                    "");
-                    //jsonChannel["URL"].asString().c_str());
-            PVR_STRCPY(pvrChannel.strIconPath,
-                    jsonChannel["_IconPath"].asString().c_str());
-
-            g.PVR->TransferChannelEntry(handle, &pvrChannel);
-        }
-    }
-
-    return PVR_ERROR_NO_ERROR;
-}
 
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
         const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
@@ -957,7 +895,7 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
         PVR_CHANNEL_GROUP_MEMBER channelGroupMember = {0};
         PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
         channelGroupMember.iChannelUniqueId = number.ID();
-        channelGroupMember.iChannelUniqueId = number._channel;
+        //channelGroupMember.iChannelUniqueId = number._channel;
 
         g.PVR->TransferChannelGroupMember(handle, &channelGroupMember);
     }
