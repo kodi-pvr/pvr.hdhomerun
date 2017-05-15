@@ -33,6 +33,10 @@ using namespace ADDON;
 
 namespace PVRHDHomeRun {
 
+static const String g_strGroupFavoriteChannels("Favorite channels");
+static const String g_strGroupHDChannels("HD channels");
+static const String g_strGroupSDChannels("SD channels");
+
 GuideNumber::GuideNumber(const Json::Value& v)
 {
     _guidenumber = v["GuideNumber"].asString();
@@ -90,9 +94,18 @@ String GuideNumber::toString() const
             + "_guidename("   + _guidename   + ") ";
 }
 
-static const String g_strGroupFavoriteChannels("Favorite channels");
-static const String g_strGroupHDChannels("HD channels");
-static const String g_strGroupSDChannels("SD channels");
+// GuideEntry
+
+// Guide
+
+Info::Info(const Json::Value& v)
+{
+    _url         = v["URL"].asString();
+    _drm         = v["DRM"].asBool();
+
+     //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
+}
+
 
 Tuner::Tuner(const hdhomerun_discover_device_t& d)
     : _debug(hdhomerun_debug_create())
@@ -101,7 +114,6 @@ Tuner::Tuner(const hdhomerun_discover_device_t& d)
 {
     _get_api_data();
     _get_discover_data();
-    _get_lineup();
 }
 
 Tuner::~Tuner()
@@ -134,7 +146,6 @@ void Tuner::_get_var(String& value, const char* name)
                 _discover_device.device_id, get_val
         );
 
-        Lock lock(this);
         value.assign(get_val);
     }
 }
@@ -167,7 +178,6 @@ void Tuner::_get_discover_data()
                     legacy.asBool()
             );
 
-            Lock lock(this);
             _lineupURL  = std::move(lineupURL.asString());
             _tunercount = std::move(tunercount.asUInt());
             _legacy     = std::move(legacy.asBool());
@@ -181,44 +191,7 @@ void Tuner::_get_discover_data()
                 _discover_device.base_url
         );
 
-        Lock lock(this);
         _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
-    }
-
-
-}
-void Tuner::_get_lineup()
-{
-    KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
-            _discover_device.device_id, _lineupURL.c_str()
-    );
-
-    String lineupStr;
-    if (!GetFileContents(_lineupURL, lineupStr))
-    {
-        KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", _lineupURL.c_str());
-        return;
-    }
-
-    Json::Value lineupJson;
-    Json::Reader jsonReader;
-    if (!jsonReader.parse(lineupStr, lineupJson))
-    {
-        KODI_LOG(LOG_ERROR, "Cannot parse JSON value returned from %s", _lineupURL.c_str());
-        return;
-    }
-
-    if (lineupJson.type() != Json::arrayValue)
-    {
-        KODI_LOG(LOG_ERROR, "Lineup is not a JSON array, returned from %s", _lineupURL.c_str());
-        return;
-    }
-
-    Lock lock(this);
-    _lineup.clear();
-    for(auto& v : lineupJson)
-    {
-        _lineup.push_back(v);
     }
 }
 
@@ -228,18 +201,8 @@ void Tuner::RefreshLineup()
     {
         _get_discover_data();
     }
-    _get_lineup();
 }
 
-
-LineupEntry::LineupEntry(const Json::Value& v)
-: GuideNumber(v)
-{
-    _url         = v["URL"].asString();
-    _drm         = v["DRM"].asBool();
-
-     //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
-}
 
 template<typename T>
 unsigned int GetGenreType(const T& arr)
@@ -275,14 +238,6 @@ Lineup::Lineup()
     DiscoverTuners();
 }
 
-Lineup::~Lineup()
-{
-    for (auto& tuner: _tuners)
-    {
-        delete tuner;
-    }
-}
-
 void Lineup::DiscoverTuners()
 {
     struct hdhomerun_discover_device_t discover_devices[64];
@@ -316,50 +271,48 @@ void Lineup::DiscoverTuners()
             tuner_added = true;
             KODI_LOG(LOG_DEBUG, "Adding tuner %08x", id);
 
-            _tuners.insert(new Tuner(dd));
+            _tuners.insert(dd);
             _device_ids.insert(id);
         }
     }
 
     // Iterate through tuners, determine if there are stale entries.
-    for (Tuner* tuner : _tuners)
+    for (auto& tuner : _tuners)
     {
-        uint32_t id = tuner->DeviceID();
+        uint32_t id = tuner.DeviceID();
         if (discovered_ids.find(id) == discovered_ids.end())
         {
             // Tuner went away
             tuner_removed = true;
             KODI_LOG(LOG_DEBUG, "Removing tuner %08x", id);
 
+            auto ptuner = const_cast<Tuner*>(&tuner);
 
-            for(std::set<LineupGuideEntry>::iterator lgei = _entries.begin(); lgei != _entries.end(); lgei++ )
+            for (auto number : _lineup)
             {
-                // Why is this const?
-                const LineupGuideEntry& lgec = *lgei;
-                LineupGuideEntry& lge = const_cast<LineupGuideEntry&>(lgec);
+                auto info = _info[number];
+                auto tuners = info._tuners;
 
-                std::set<Tuner*>& tuners = lge._tuners;
-                if (tuners.find(tuner) != tuners.end())
+                if (tuners.find(ptuner) != tuners.end())
                 {
                     // Remove tuner from lineup
-                    KODI_LOG(LOG_DEBUG, "Removing tuner from LineupGuideEntry %p", &lge);
-                    tuners.erase(tuner);
+                    KODI_LOG(LOG_DEBUG, "Removing tuner from GuideNumber %s", number.toString().c_str());
+                    tuners.erase(ptuner);
                 }
                 if (tuners.size() == 0)
                 {
                     // No tuners left for this lineup guide entry, remove it
 
-                    KODI_LOG(LOG_DEBUG, "No tuners left, removing LineupGuideEntry %p", &lge);
-                    _entries.erase(lgei);
+                    KODI_LOG(LOG_DEBUG, "No tuners left, removing GuideNumber %s", number.toString().c_str());
+                    _lineup.erase(number);
+                    _info.erase(number);
+                    _guide.erase(number);
                 }
             }
 
             // Erase tuner from this
             _tuners.erase(tuner);
             _device_ids.erase(id);
-
-            // Delete tuner object
-            delete tuner;
         }
     }
 
@@ -375,41 +328,71 @@ void Lineup::DiscoverTuners()
 
 void Lineup::UpdateLineup()
 {
-    std::set<LineupEntry> allEntries;
-
     KODI_LOG(LOG_DEBUG, "Lineup::UpdateLineup");
 
     Lock lock(this);
-    for (Tuner* t: _tuners)
-    {
-        KODI_LOG(LOG_DEBUG, "Reading lineup from %08x", t->DeviceID());
-        Lock tlock(t);
+    _lineup.clear();
 
-        const auto& lineup = t->Lineup();
-        std::copy_if(
-                lineup.begin(),
-                lineup.end(),
-                std::inserter(allEntries,
-                        allEntries.end()
-                ),
-                [&](const LineupEntry& le)
-                {
-                    return g.Settings.bAllowUnknownChannels
-                            || strcmp(le._guidename.c_str(), "Unknown");
-                }
+    for (auto& tuner: _tuners)
+    {
+
+        KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
+                tuner._discover_device.device_id, tuner._lineupURL.c_str()
         );
 
-        KODI_LOG(LOG_DEBUG, "... Done with lineup copy");
+        String lineupStr;
+        if (!GetFileContents(tuner._lineupURL, lineupStr))
+        {
+            KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", tuner._lineupURL.c_str());
+            continue;
+        }
+
+        Json::Value lineupJson;
+        Json::Reader jsonReader;
+        if (!jsonReader.parse(lineupStr, lineupJson))
+        {
+            KODI_LOG(LOG_ERROR, "Cannot parse JSON value returned from %s", tuner._lineupURL.c_str());
+            continue;
+        }
+
+        if (lineupJson.type() != Json::arrayValue)
+        {
+            KODI_LOG(LOG_ERROR, "Lineup is not a JSON array, returned from %s", tuner._lineupURL.c_str());
+            continue;
+        }
+
+        auto ptuner = const_cast<Tuner*>(&tuner);
+        for (auto& v : lineupJson)
+        {
+            GuideNumber number = v;
+            _lineup.insert(number);
+            if (_info.find(number) == _info.end())
+            {
+                Info info = v;
+                _info[number] = info;
+            }
+            _info[number]._tuners.insert(ptuner);
+        }
     }
 
-    for (const auto& entry: allEntries)
+    for (const auto& number: _lineup)
     {
+        String tuners;
+        auto& info = _info[number];
+
+        for (auto tuner : info._tuners)
+        {
+            char id[10];
+            sprintf(id, " %08x", tuner->DeviceID());
+            tuners += id;
+        }
         KODI_LOG(LOG_DEBUG,
-                "Lineup Entry: %d.%d - %s - %s",
-                entry._channel,
-                entry._subchannel,
-                entry._guidenumber.c_str(),
-                entry._guidename.c_str()
+                "Lineup Entry: %d.%d - %s - %s - %s",
+                number._channel,
+                number._subchannel,
+                number._guidenumber.c_str(),
+                number._guidename.c_str(),
+                tuners.c_str()
         );
     }
 }

@@ -47,9 +47,9 @@ bool operator==(const T& a, const T& b)
     return a.operator==(b);
 }
 
-
 class Lockable {
 public:
+    virtual ~Lockable() {}
     void LockObject() {
         _lock.Lock();
     }
@@ -74,7 +74,8 @@ private:
     Lockable* _obj;
 };
 
-class GuideNumber {
+class GuideNumber
+{
 public:
     GuideNumber(const Json::Value&);
     GuideNumber(const GuideNumber&) = default;
@@ -99,10 +100,10 @@ public:
     bool operator==(const GuideNumber&) const;
 };
 
-class GuideChannelEntry
+class GuideEntry
 {
 public:
-    GuideChannelEntry(const Json::Value&);
+    GuideEntry(const Json::Value&);
 
     time_t _starttime;
     time_t _endtime;
@@ -114,59 +115,28 @@ public:
     String _imageURL;
     String _seriesID;
 
-    bool operator<(const GuideChannelEntry& rhs) const
+    bool operator<(const GuideEntry& rhs) const
     {
         return _starttime < rhs._starttime;
     }
-    bool operator==(const GuideChannelEntry& rhs) const
+    bool operator==(const GuideEntry& rhs) const
     {
         return _starttime == rhs._starttime;
     }
 };
 
 
-class GuideChannel : public GuideNumber, public Lockable
+class Guide
 {
 public:
-    GuideChannel(const Json::Value&);
+    Guide(const Json::Value&);
 
-    String  _affiliate;
-    String  _imageurl;
-
-    std::set<GuideChannelEntry> _entries;
+    String               _affiliate;
+    String               _imageurl;
+    std::set<GuideEntry> _entries;
 };
 
-// Might not need this class, it would be tuner-specific
-class Guide : public Lockable
-{
-    std::vector<GuideChannel> _channels;
-};
-
-class LineupEntry : public GuideNumber
-{
-public:
-    LineupEntry(const Json::Value&);
-    LineupEntry(const LineupEntry& o) = default;
-
-    String   _url;
-    bool     _drm;
-};
-
-class Tuner;
-class LineupEntryWithTuner : public LineupEntry, public Lockable
-{
-    LineupEntryWithTuner(const LineupEntry& o)
-    : LineupEntry(o)
-    {}
-    void AddTuner(Tuner* t)
-    {
-        _tuners.insert(t);
-    }
-
-    std::set<Tuner*> _tuners;
-};
-
-class Tuner : public Lockable
+class Tuner
 {
 public:
     Tuner(const hdhomerun_discover_device_t& d);
@@ -182,10 +152,6 @@ public:
     {
         return _legacy;
     }
-    const std::vector<LineupEntry>& Lineup() const
-    {
-        return _lineup;
-    }
     const uint32_t DeviceID() const
     {
         return _discover_device.device_id;
@@ -197,8 +163,6 @@ private:
     void _get_api_data();
     // Called multiple times for legacy devices
     void _get_discover_data();
-    // Called multiple for all devices
-    void _get_lineup();
 
     // The hdhomerun_... objects depend on the order listed here for proper instantiation.
     hdhomerun_debug_t*          _debug;
@@ -208,35 +172,33 @@ private:
     String                      _lineupURL;
     unsigned int                _tunercount;
     bool                        _legacy;
-    // Lineup entries
-    std::vector<LineupEntry>    _lineup;
 public:
     bool operator<(const Tuner& rhs) const
     {
         return DeviceID() < rhs.DeviceID();
     }
+    friend class Lineup;
 };
 
-
-class LineupGuideEntry : public Lockable
+class Info
 {
 public:
-    LineupEntry        _lineupentry;
-    GuideChannel       _guidechannel;
-    // Pointers to tuners within the Lineup.
-    std::set<Tuner*>   _tuners;
+    Info(const Json::Value&);
+    Info() = default;
 
-    bool operator<(const LineupGuideEntry& rhs) const
-    {
-        return _lineupentry < rhs._lineupentry;
-    }
+    String   _url;
+    bool     _drm = false;;
+
+    // Tuners which can receive this channel.
+    // Entries are owned by Lineup
+    std::set<Tuner*> _tuners;
 };
 
 class Lineup : public Lockable
 {
 public:
     Lineup();
-    ~Lineup();
+    ~Lineup() {}
 
     void DiscoverTuners();
     void UpdateLineup();
@@ -254,12 +216,16 @@ public:
             const PVR_CHANNEL_GROUP &group);
 
 private:
-    // Pointer to tuners since the CMutex does not support moves.
-    std::set<Tuner*>           _tuners;
-    std::set<uint32_t>         _device_ids;
-    std::set<LineupGuideEntry> _entries;
-
+    std::set<Tuner>              _tuners;
+    std::set<uint32_t>           _device_ids;
+    std::set<GuideNumber>        _lineup;
+    std::map<GuideNumber, Info>  _info;
+    std::map<GuideNumber, Guide> _guide;
 };
+
+
+
+
 
 class HDHomeRunTuners : public Lockable
 {
