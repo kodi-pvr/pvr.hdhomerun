@@ -132,7 +132,7 @@ public:
     Guide(const Json::Value&);
 
     String               _affiliate;
-    String               _imageurl;
+    String               _imageURL;
     std::set<GuideEntry> _entries;
 };
 

@@ -401,6 +401,57 @@ void Lineup::UpdateLineup()
     }
 }
 
+int Lineup::PvrGetChannelsAmount()
+{
+    return _lineup.size();
+}
+PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
+{
+    if (radio)
+        return PVR_ERROR_NO_ERROR;
+
+    Lock lock(this);
+    for (auto& entry: _lineup)
+    {
+        PVR_CHANNEL pvrChannel = {0};
+
+        pvrChannel.iUniqueId         = entry.ID();
+        pvrChannel.iChannelNumber    = entry._channel;
+        pvrChannel.iSubChannelNumber = entry._subchannel;
+        PVR_STRCPY(pvrChannel.strChannelName, entry._guidename.c_str());
+        PVR_STRCPY(pvrChannel.strStreamURL, "");
+        // TODO - image URL comes from the guide
+
+        auto git = _guide.find(entry);
+        if (git != _guide.end()) {
+            auto& guide = git->second;
+            PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL);
+        }
+
+        g.PVR->TransferChannelEntry(handle, &pvrChannel);
+    }
+    return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR Lineup::PvrGetEPGForChannel(ADDON_HANDLE handle,
+        const PVR_CHANNEL& channel, time_t start, time_t end
+        )
+{
+    KODI_LOG(LOG_DEBUG,
+            "PvrGetEPCForChannel Handle:%p Channel ID: %d Number: %u Sub: %u Start: %u End: %u",
+            handle,
+            channel.iUniqueId,
+            channel.iChannelNumber,
+            channel.iSubChannelNumber,
+            start,
+            end
+            );
+
+    Lock lock(this);
+
+
+}
+
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 {
     int nHash = (int) std::hash<std::string>()(str);
