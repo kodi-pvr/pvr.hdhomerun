@@ -140,6 +140,8 @@ class Tuner
 {
 public:
     Tuner(const hdhomerun_discover_device_t& d);
+    Tuner(const Tuner&) = delete;
+    Tuner(Tuner&&) = default;
     ~Tuner();
     void RefreshLineup();
 
@@ -216,7 +218,7 @@ public:
             const PVR_CHANNEL_GROUP &group);
 
 private:
-    std::set<Tuner>              _tuners;
+    std::set<Tuner*>             _tuners;
     std::set<uint32_t>           _device_ids;
     std::set<GuideNumber>        _lineup;
     std::map<GuideNumber, Info>  _info;

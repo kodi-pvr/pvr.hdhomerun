@@ -28,6 +28,7 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
+#include <string>
 
 using namespace ADDON;
 
@@ -43,7 +44,8 @@ GuideNumber::GuideNumber(const Json::Value& v)
     _guidename   = v["GuideName"].asString();
 
      _channel = atoi(_guidenumber.c_str());
-     if (auto dot = _guidenumber.Find('.'))
+     auto dot = _guidenumber.find('.');
+     if (std::string::npos != dot)
      {
          _subchannel = atoi(_guidenumber.c_str() + dot + 1);
      }
@@ -108,7 +110,7 @@ Info::Info(const Json::Value& v)
 
 
 Tuner::Tuner(const hdhomerun_discover_device_t& d)
-    : _debug(hdhomerun_debug_create())
+    : _debug(nullptr) // _debug(hdhomerun_debug_create())
     , _device(hdhomerun_device_create(d.device_id, d.ip_addr, 0, _debug))
     , _discover_device(d) // copy
 {
@@ -119,7 +121,7 @@ Tuner::Tuner(const hdhomerun_discover_device_t& d)
 Tuner::~Tuner()
 {
     hdhomerun_device_destroy(_device);
-    hdhomerun_debug_destroy(_debug);
+    //hdhomerun_debug_destroy(_debug);
 }
 
 
@@ -271,22 +273,22 @@ void Lineup::DiscoverTuners()
             tuner_added = true;
             KODI_LOG(LOG_DEBUG, "Adding tuner %08x", id);
 
-            _tuners.insert(dd);
+            _tuners.insert(new Tuner(dd));
             _device_ids.insert(id);
         }
     }
 
     // Iterate through tuners, determine if there are stale entries.
-    for (auto& tuner : _tuners)
+    for (auto tuner : _tuners)
     {
-        uint32_t id = tuner.DeviceID();
+        uint32_t id = tuner->DeviceID();
         if (discovered_ids.find(id) == discovered_ids.end())
         {
             // Tuner went away
             tuner_removed = true;
             KODI_LOG(LOG_DEBUG, "Removing tuner %08x", id);
 
-            auto ptuner = const_cast<Tuner*>(&tuner);
+            auto ptuner = const_cast<Tuner*>(tuner);
 
             for (auto number : _lineup)
             {
@@ -313,6 +315,7 @@ void Lineup::DiscoverTuners()
             // Erase tuner from this
             _tuners.erase(tuner);
             _device_ids.erase(id);
+            delete(tuner);
         }
     }
 
@@ -333,17 +336,17 @@ void Lineup::UpdateLineup()
     Lock lock(this);
     _lineup.clear();
 
-    for (auto& tuner: _tuners)
+    for (auto tuner: _tuners)
     {
 
         KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun channel lineup for %08x: %s",
-                tuner._discover_device.device_id, tuner._lineupURL.c_str()
+                tuner->_discover_device.device_id, tuner->_lineupURL.c_str()
         );
 
         String lineupStr;
-        if (!GetFileContents(tuner._lineupURL, lineupStr))
+        if (!GetFileContents(tuner->_lineupURL, lineupStr))
         {
-            KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", tuner._lineupURL.c_str());
+            KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", tuner->_lineupURL.c_str());
             continue;
         }
 
@@ -351,19 +354,20 @@ void Lineup::UpdateLineup()
         Json::Reader jsonReader;
         if (!jsonReader.parse(lineupStr, lineupJson))
         {
-            KODI_LOG(LOG_ERROR, "Cannot parse JSON value returned from %s", tuner._lineupURL.c_str());
+            KODI_LOG(LOG_ERROR, "Cannot parse JSON value returned from %s", tuner->_lineupURL.c_str());
             continue;
         }
 
         if (lineupJson.type() != Json::arrayValue)
         {
-            KODI_LOG(LOG_ERROR, "Lineup is not a JSON array, returned from %s", tuner._lineupURL.c_str());
+            KODI_LOG(LOG_ERROR, "Lineup is not a JSON array, returned from %s", tuner->_lineupURL.c_str());
             continue;
         }
 
-        auto ptuner = const_cast<Tuner*>(&tuner);
+        auto ptuner = const_cast<Tuner*>(tuner);
         for (auto& v : lineupJson)
         {
+            // TODO Check here for g.Settings.bAllowUnknownChannels
             GuideNumber number = v;
             _lineup.insert(number);
             if (_info.find(number) == _info.end())
