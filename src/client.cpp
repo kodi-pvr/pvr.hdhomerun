@@ -49,11 +49,9 @@ public:
             if (IsStopped())
                 break;
 
-            if (g.Tuners)
+            if (g.lineup)
             {
-                g.Tuners->Update(
-                        HDHomeRunTuners::UpdateLineUp
-                                | HDHomeRunTuners::UpdateGuide);
+                g.lineup->UpdateGuide();
                 g.PVR->TriggerChannelUpdate();
             }
         }
@@ -122,11 +120,6 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     g.strUserPath = pvrprops->strUserPath;
     g.strClientPath = pvrprops->strClientPath;
 
-    KODI_LOG(LOG_DEBUG, "Creating old-style HDHomeRunTuners");
-    g.Tuners = new HDHomeRunTuners;
-    if (g.Tuners == nullptr)
-        return ADDON_STATUS_PERMANENT_FAILURE;
-
     ADDON_ReadSettings();
 
     KODI_LOG(LOG_DEBUG, "Creating new-style Lineup");
@@ -135,9 +128,9 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
         return ADDON_STATUS_PERMANENT_FAILURE;
     KODI_LOG(LOG_DEBUG, "Done with new-style Lineup");
 
-    if (g.Tuners)
+    if (g.lineup)
     {
-        g.Tuners->Update();
+        g.lineup->Update();
         g_UpdateThread.CreateThread(false);
     }
 
@@ -157,7 +150,6 @@ void ADDON_Destroy()
     g_UpdateThread.StopThread();
 
     SAFE_DELETE(g.lineup);
-    SAFE_DELETE(g.Tuners);
     SAFE_DELETE(g.PVR);
     SAFE_DELETE(g.XBMC);
 
@@ -177,7 +169,7 @@ unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
 
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
-    if (g.Tuners == nullptr)
+    if (g.lineup == nullptr)
         return ADDON_STATUS_OK;
 
     if (strcmp(settingName, "hide_protected") == 0)
@@ -221,10 +213,9 @@ void OnSystemSleep()
 
 void OnSystemWake()
 {
-    if (g.Tuners && g.PVR)
+    if (g.lineup && g.PVR)
     {
-        g.Tuners->Update(
-                HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+        g.lineup->Update();
         g.PVR->TriggerChannelUpdate();
     }
 }
@@ -305,40 +296,40 @@ PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel,
         time_t iStart, time_t iEnd)
 {
-    return g.Tuners ?
-            g.Tuners->PvrGetEPGForChannel(handle, channel, iStart, iEnd) :
+    return g.lineup ?
+            g.lineup->PvrGetEPGForChannel(handle, channel, iStart, iEnd) :
             PVR_ERROR_SERVER_ERROR;
 }
 
 int GetChannelsAmount(void)
 {
-    return g.Tuners ? g.Tuners->PvrGetChannelsAmount() : PVR_ERROR_SERVER_ERROR;
+    return g.lineup ? g.lineup->PvrGetChannelsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
 {
-    return g.Tuners ?
-            g.Tuners->PvrGetChannels(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
+    return g.lineup ?
+            g.lineup->PvrGetChannels(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
 int GetChannelGroupsAmount(void)
 {
-    return g.Tuners ?
-            g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
+    return g.lineup ?
+            g.lineup->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 {
-    return g.Tuners ?
-            g.Tuners->PvrGetChannelGroups(handle, bRadio) :
+    return g.lineup ?
+            g.lineup->PvrGetChannelGroups(handle, bRadio) :
             PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
         const PVR_CHANNEL_GROUP &group)
 {
-    return g.Tuners ?
-            g.Tuners->PvrGetChannelGroupMembers(handle, group) :
+    return g.lineup ?
+            g.lineup->PvrGetChannelGroupMembers(handle, group) :
             PVR_ERROR_SERVER_ERROR;
 }
 

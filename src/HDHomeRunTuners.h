@@ -130,6 +130,7 @@ class Guide
 {
 public:
     Guide(const Json::Value&);
+    Guide() = default;
 
     String               _affiliate;
     String               _imageURL;
@@ -189,7 +190,9 @@ public:
     Info() = default;
 
     String   _url;
-    bool     _drm = false;;
+    bool     _hd       = false;
+    bool     _drm      = false;
+    bool     _favorite = false;
 
     // Tuners which can receive this channel.
     // Entries are owned by Lineup
@@ -204,7 +207,8 @@ public:
 
     void DiscoverTuners();
     void UpdateLineup();
-    void Update();
+    void UpdateGuide();
+    void Update(); // Lineup, guide
 
     PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
     int PvrGetChannelsAmount();

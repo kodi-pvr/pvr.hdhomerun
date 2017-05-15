@@ -54,8 +54,6 @@ struct GlobalsType
     String       strClientPath;
     ADDON::CHelper_libXBMC_addon* XBMC   = nullptr;
     CHelper_libXBMC_pvr*          PVR    = nullptr;
-
-    HDHomeRunTuners*              Tuners = nullptr;
     Lineup*                       lineup = nullptr;
 
     SettingsType Settings;

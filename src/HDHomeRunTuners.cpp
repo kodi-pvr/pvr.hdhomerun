@@ -34,9 +34,6 @@ using namespace ADDON;
 
 namespace PVRHDHomeRun {
 
-static const String g_strGroupFavoriteChannels("Favorite channels");
-static const String g_strGroupHDChannels("HD channels");
-static const String g_strGroupSDChannels("SD channels");
 
 GuideNumber::GuideNumber(const Json::Value& v)
 {
@@ -102,8 +99,9 @@ String GuideNumber::toString() const
 
 Info::Info(const Json::Value& v)
 {
-    _url         = v["URL"].asString();
-    _drm         = v["DRM"].asBool();
+    _url = v["URL"].asString();
+    _drm = v["DRM"].asBool();
+    _hd  = v["HD"].asBool();
 
      //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
 }
@@ -411,22 +409,18 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
         return PVR_ERROR_NO_ERROR;
 
     Lock lock(this);
-    for (auto& entry: _lineup)
+    for (auto& number: _lineup)
     {
         PVR_CHANNEL pvrChannel = {0};
 
-        pvrChannel.iUniqueId         = entry.ID();
-        pvrChannel.iChannelNumber    = entry._channel;
-        pvrChannel.iSubChannelNumber = entry._subchannel;
-        PVR_STRCPY(pvrChannel.strChannelName, entry._guidename.c_str());
+        pvrChannel.iUniqueId         = number.ID();
+        pvrChannel.iChannelNumber    = number._channel;
+        pvrChannel.iSubChannelNumber = number._subchannel;
+        PVR_STRCPY(pvrChannel.strChannelName, number._guidename.c_str());
         PVR_STRCPY(pvrChannel.strStreamURL, "");
-        // TODO - image URL comes from the guide
 
-        auto git = _guide.find(entry);
-        if (git != _guide.end()) {
-            auto& guide = git->second;
-            PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL);
-        }
+        auto& guide = _guide[number];
+        PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL.c_str());
 
         g.PVR->TransferChannelEntry(handle, &pvrChannel);
     }
@@ -909,12 +903,17 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle,
     return PVR_ERROR_NO_ERROR;
 }
 
-int HDHomeRunTuners::PvrGetChannelGroupsAmount()
+int Lineup::PvrGetChannelGroupsAmount()
 {
     return 3;
 }
 
-PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
+static const char FavoriteChannels[] = "Favorite channels";
+static const char HDChannels[]       = "HD channels";
+static const char SDChannels[]       = "SD channels";
+
+
+PVR_ERROR Lineup::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 {
     PVR_CHANNEL_GROUP channelGroup;
 
@@ -924,57 +923,45 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
     memset(&channelGroup, 0, sizeof(channelGroup));
 
     channelGroup.iPosition = 1;
-    PVR_STRCPY(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str());
+    PVR_STRCPY(channelGroup.strGroupName, FavoriteChannels);
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     channelGroup.iPosition++;
-    PVR_STRCPY(channelGroup.strGroupName, g_strGroupHDChannels.c_str());
+    PVR_STRCPY(channelGroup.strGroupName, HDChannels);
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     channelGroup.iPosition++;
-    PVR_STRCPY(channelGroup.strGroupName, g_strGroupSDChannels.c_str());
+    PVR_STRCPY(channelGroup.strGroupName, SDChannels);
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
+PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
         const PVR_CHANNEL_GROUP &group)
 {
-    int nCount = 0;
-
     Lock lock(this);
 
-    for (Tuners::const_iterator iterTuner = m_Tuners.begin();
-            iterTuner != m_Tuners.end(); iterTuner++)
-        for (Json::Value::ArrayIndex nChannelIndex = 0;
-                nChannelIndex < iterTuner->LineUp.size(); nChannelIndex++)
-        {
-            const Json::Value& jsonChannel = iterTuner->LineUp[nChannelIndex];
+    for (const auto& number: _lineup)
+    {
+        auto& info  = _info[number];
+        auto& guide = _guide[number];
 
-            if (jsonChannel["_Hide"].asBool()
-                    || (strcmp(g_strGroupFavoriteChannels.c_str(),
-                            group.strGroupName) == 0
-                            && !jsonChannel["Favorite"].asBool())
-                    || (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName)
-                            == 0 && !jsonChannel["HD"].asBool())
-                    || (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName)
-                            == 0 && jsonChannel["HD"].asBool()))
-                continue;
+        if (!strcmp(FavoriteChannels, group.strGroupName) && !info._favorite)
+            continue;
+        if (!strcmp(HDChannels, group.strGroupName) && !info._hd)
+            continue;
+        if (!strcmp(SDChannels, group.strGroupName) && info._hd)
+            continue;
 
-            PVR_CHANNEL_GROUP_MEMBER channelGroupMember;
+        PVR_CHANNEL_GROUP_MEMBER channelGroupMember = {0};
+        PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
+        channelGroupMember.iChannelUniqueId = number.ID();
+        channelGroupMember.iChannelUniqueId = number._channel;
 
-            memset(&channelGroupMember, 0, sizeof(channelGroupMember));
-
-            PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
-            channelGroupMember.iChannelUniqueId = jsonChannel["_UID"].asUInt();
-            channelGroupMember.iChannelNumber =
-                    jsonChannel["_ChannelNumber"].asUInt();
-
-            g.PVR->TransferChannelGroupMember(handle, &channelGroupMember);
-        }
-
+        g.PVR->TransferChannelGroupMember(handle, &channelGroupMember);
+    }
     return PVR_ERROR_NO_ERROR;
 }
 
-};
+}; // namespace
