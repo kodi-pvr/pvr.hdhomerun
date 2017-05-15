@@ -93,9 +93,23 @@ String GuideNumber::toString() const
             + "_guidename("   + _guidename   + ") ";
 }
 
-// GuideEntry
+GuideEntry::GuideEntry(const Json::Value& v)
+{
+    _starttime       = v["StartTime"].asUInt();
+    _endtime         = v["EndTime"].asUInt();
+    _originalairdate = v["OriginalAirdate"].asUInt();
+    _title           = v["Title"].asString();
+    _episodenumber   = v["EpisodeNumber"].asString();
+    _synopsis        = v["Synopsis"].asString();
+    _imageURL        = v["ImageURL"].asString();
+    _seriesID        = v["SeriesID"].asString();
+}
 
-// Guide
+Guide::Guide(const Json::Value& v)
+{
+    _affiliate = v["Affiliate"].asString();
+    _imageURL  = v["ImageURL"].asString();
+}
 
 Info::Info(const Json::Value& v)
 {
@@ -474,7 +488,7 @@ void Lineup::UpdateGuide()
     }
     if (!matched)
     {
-        // Some sort of error
+        return;
     }
     String idx;
     for (auto& i : index) {
@@ -484,6 +498,55 @@ void Lineup::UpdateGuide()
     }
     KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuners - %s", index.size(), idx.c_str());
 
+    for (auto idx: index) {
+        auto tuner = tuners[idx];
+
+        String URL;
+        URL.Format(
+                "http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s",
+                EncodeURL(tuner->Auth()).c_str()
+        );
+        KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide for %08x: %s",
+                tuner->DeviceID(), URL.c_str());
+
+        String guidedata;
+        if (!GetFileContents(URL.c_str(), guidedata))
+        {
+            continue;
+        }
+        Json::Reader jsonreader;
+        Json::Value  jsontunerguide;
+        if (!jsonreader.parse(guidedata, jsontunerguide))
+        {
+            continue;
+        }
+        if (jsontunerguide.type() != Json::arrayValue)
+        {
+            continue;
+        }
+
+        for (auto& jsonchannelguide : jsontunerguide)
+        {
+            GuideNumber number       = jsonchannelguide;
+            if (_guide.find(number) == _guide.end())
+            {
+                _guide[number] = jsonchannelguide;
+            }
+            Guide channelguide = _guide[number];
+
+            auto jsonguidenetries = jsonchannelguide["Guide"];
+            if (jsonguidenetries.type() != Json::arrayValue)
+            {
+                continue;
+            }
+            for (auto& jsonentry: jsonguidenetries)
+            {
+                channelguide._entries.insert(jsonentry);
+            }
+
+            // TODO age out old entries
+        }
+    }
 
 }
 

@@ -159,6 +159,10 @@ public:
     {
         return _discover_device.device_id;
     }
+    const char* Auth() const
+    {
+        return _discover_device.device_auth;
+    }
 
 private:
     void _get_var(String& value, const char* name);
