@@ -316,6 +316,7 @@ void Lineup::DiscoverTuners()
         // TODO - check lineup, add new tuner to lineup entries, might create new lineup entries for this tuner.
 
         UpdateLineup();
+        UpdateGuide();
     }
     if (tuner_removed) {
         // TODO - Lineup should be correct, anything to do?
@@ -394,11 +395,90 @@ void Lineup::UpdateLineup()
     }
 }
 
+// Increment the first element until max is reached, then increment further indices.
+bool increment_index(
+        std::vector<size_t>::iterator index,
+        std::vector<size_t>::iterator end,
+        size_t max)
+{
+    if (index == end) {
+        return false;
+    }
+
+    (*index) ++;
+    if ((*index) >= max)
+    {
+        if (!increment_index(index+1, end, max-1))
+        {
+            return false;
+        }
+        (*index) = (*(index+1)) + 1;
+    }
+    return true;
+}
+
 void Lineup::UpdateGuide()
 {
     // Find a minimal covering of the lineup
 
-    //TODO
+    Lock lock(this);
+
+    // Create vector of tuners for channel search
+    std::vector<Tuner*> tuners;
+    std::copy(_tuners.begin(), _tuners.end(), std::back_inserter(tuners));
+
+    std::vector<size_t> index;
+    bool matched;
+    for (int num_tuners = 1; num_tuners <= tuners.size(); num_tuners ++)
+    {
+        // Create index, reverse order
+        index.clear();
+        for (size_t i=0; i<num_tuners; i++)
+        {
+            index.insert(index.begin(), i);
+        }
+
+        matched = true;
+        do {
+            // Unique combination of tuners in index
+            matched = true;
+            for (auto& number: _lineup)
+            {
+                auto& info = _info[number];
+                auto& info_tuners = info._tuners;
+
+                bool tunermatch = false;
+                for (auto idx: index) {
+                    auto tuner = tuners[idx];
+
+                    if (info_tuners.find(tuner) != info_tuners.end())
+                    {
+                        tunermatch = true;
+                        break;
+                    }
+                }
+                if (!tunermatch)
+                {
+                    matched = false;
+                    break;
+                }
+            }
+
+        } while (!matched && increment_index(index.begin(), index.end(), tuners.size()));
+        if (matched)
+            break;
+    }
+    if (!matched)
+    {
+        // Some sort of error
+    }
+    String idx;
+    for (auto& i : index) {
+        char buf[10];
+        sprintf(buf, " %08x", tuners[i]->DeviceID());
+        idx += buf;
+    }
+    KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuners - %s", index.size(), idx.c_str());
 }
 
 int Lineup::PvrGetChannelsAmount()
