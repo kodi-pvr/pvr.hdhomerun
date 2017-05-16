@@ -59,14 +59,6 @@ GuideNumber::GuideNumber(const Json::Value& v)
      {
          _subchannel = 0;
      }
-     auto& idxvec = NameIdxMap[_guidenumber];
-     if (std::find(idxvec.begin(), idxvec.end(), _guidename) == idxvec.end())
-     {
-         idxvec.push_back(_guidename);
-     }
-     _nameidx = std::find(idxvec.begin(), idxvec.end(), _guidename) - idxvec.begin();
-
-     //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
 }
 
 bool GuideNumber::operator<(const GuideNumber& rhs) const
@@ -81,13 +73,6 @@ bool GuideNumber::operator<(const GuideNumber& rhs) const
         {
             return true;
         }
-        else if (_subchannel == rhs._subchannel)
-        {
-            if (_nameidx < rhs._nameidx)
-            {
-                return true;
-            }
-        }
     }
 
     return false;
@@ -96,7 +81,6 @@ bool GuideNumber::operator==(const GuideNumber& rhs) const
 {
     bool ret = (_channel == rhs._channel)
             && (_subchannel == rhs._subchannel)
-            && (_nameidx == rhs._nameidx)
             ;
     return ret;
 }
@@ -107,7 +91,6 @@ String GuideNumber::toString() const
     return String("") + channel + " "
             + "_guidename("   + _guidename   + ") ";
 }
-std::map<String, std::vector<String>> GuideNumber::NameIdxMap;
 
 GuideEntry::GuideEntry(const Json::Value& v)
 {

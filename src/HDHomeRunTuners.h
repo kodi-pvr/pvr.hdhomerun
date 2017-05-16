@@ -79,8 +79,7 @@ private:
 class GuideNumber
 {
 private:
-    static const uint32_t NameIdxLimit    = 100;
-    static const uint32_t SubchannelLimit = 1000000;
+    static const uint32_t SubchannelLimit = 10000;
 public:
     GuideNumber(const Json::Value&);
     GuideNumber(const GuideNumber&) = default;
@@ -88,9 +87,7 @@ public:
     {
         _channel = id / SubchannelLimit;
          id %= SubchannelLimit;
-         _subchannel = id / NameIdxLimit;
-         id %= NameIdxLimit;
-         _nameidx = id;
+         _subchannel = id;
     }
     virtual ~GuideNumber() = default;
 
@@ -99,16 +96,13 @@ public:
 
     uint32_t _channel;
     uint32_t _subchannel;
-    uint32_t _nameidx;
-
-    static std::map<String, std::vector<String>> NameIdxMap;
 
     String toString() const;
 
     uint32_t ID() const
     {
         // _subchannel < 10000, _nameidx < 100
-        return (_channel * SubchannelLimit) + (_subchannel * NameIdxLimit) + _nameidx;
+        return (_channel * SubchannelLimit) + _subchannel;
     }
     operator uint32_t() const
     {
