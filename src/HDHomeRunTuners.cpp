@@ -34,6 +34,15 @@ using namespace ADDON;
 
 namespace PVRHDHomeRun {
 
+bool operator==(const String& a, const String& b)
+{
+    return !strcmp(a.c_str(), b.c_str());
+}
+bool operator==(const String& a, const char* b)
+{
+    return !strcmp(a.c_str(), b);
+}
+
 
 GuideNumber::GuideNumber(const Json::Value& v)
 {
@@ -50,6 +59,12 @@ GuideNumber::GuideNumber(const Json::Value& v)
      {
          _subchannel = 0;
      }
+     auto& idxvec = NameIdxMap[_guidenumber];
+     if (std::find(idxvec.begin(), idxvec.end(), _guidename) == idxvec.end())
+     {
+         idxvec.push_back(_guidename);
+     }
+     _nameidx = std::find(idxvec.begin(), idxvec.end(), _guidename) - idxvec.begin();
 
      //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
 }
@@ -68,7 +83,7 @@ bool GuideNumber::operator<(const GuideNumber& rhs) const
         }
         else if (_subchannel == rhs._subchannel)
         {
-            if (strcmp(_guidename.c_str(), rhs._guidename.c_str()) < 0)
+            if (_nameidx < rhs._nameidx)
             {
                 return true;
             }
@@ -81,7 +96,7 @@ bool GuideNumber::operator==(const GuideNumber& rhs) const
 {
     bool ret = (_channel == rhs._channel)
             && (_subchannel == rhs._subchannel)
-            && !strcmp(_guidename.c_str(), rhs._guidename.c_str())
+            && (_nameidx == rhs._nameidx)
             ;
     return ret;
 }
@@ -92,6 +107,7 @@ String GuideNumber::toString() const
     return String("") + channel + " "
             + "_guidename("   + _guidename   + ") ";
 }
+std::map<String, std::vector<String>> GuideNumber::NameIdxMap;
 
 GuideEntry::GuideEntry(const Json::Value& v)
 {
@@ -377,7 +393,7 @@ void Lineup::UpdateLineup()
         {
             // TODO Check here for g.Settings.bAllowUnknownChannels
             GuideNumber number = v;
-            if ((!g.Settings.bAllowUnknownChannels) && (!strcmp(number._guidename.c_str(), "Unknown")))
+            if ((!g.Settings.bAllowUnknownChannels) && (number._guidename == "Unknown"))
             {
                 continue;
             }
@@ -498,6 +514,8 @@ void Lineup::UpdateGuide()
     }
     KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuners - %s", index.size(), idx.c_str());
 
+    //return; // TODO - remove
+
     for (auto idx: index) {
         auto tuner = tuners[idx];
 
@@ -512,36 +530,47 @@ void Lineup::UpdateGuide()
         String guidedata;
         if (!GetFileContents(URL.c_str(), guidedata))
         {
+            KODI_LOG(LOG_ERROR, "Error requesting guide for %08x from %s",
+                    tuner->DeviceID(), URL.c_str());
             continue;
         }
+
         Json::Reader jsonreader;
         Json::Value  jsontunerguide;
         if (!jsonreader.parse(guidedata, jsontunerguide))
         {
+            KODI_LOG(LOG_ERROR, "Error parsing JSON guide data for %08x", tuner->DeviceID());
             continue;
         }
         if (jsontunerguide.type() != Json::arrayValue)
         {
+            KODI_LOG(LOG_ERROR, "Top-level JSON guide data is not an array for %08x", tuner->DeviceID());
             continue;
         }
 
         for (auto& jsonchannelguide : jsontunerguide)
         {
-            GuideNumber number       = jsonchannelguide;
+            GuideNumber number = jsonchannelguide;
+            KODI_LOG(LOG_DEBUG, "Guide number found: %u", number.ID());
+
             if (_guide.find(number) == _guide.end())
             {
+                KODI_LOG(LOG_DEBUG, "Inserting guide for channel");
                 _guide[number] = jsonchannelguide;
             }
-            Guide channelguide = _guide[number];
+
+            Guide& channelguide = _guide[number];
 
             auto jsonguidenetries = jsonchannelguide["Guide"];
             if (jsonguidenetries.type() != Json::arrayValue)
             {
+                KODI_LOG(LOG_ERROR, "Guide entries is not an array for %08x", tuner->DeviceID());
                 continue;
             }
             for (auto& jsonentry: jsonguidenetries)
             {
-                channelguide._entries.insert(jsonentry);
+                KODI_LOG(LOG_DEBUG, "Inserting guide entry");
+                channelguide.InsertEntry(jsonentry);
             }
 
             // TODO age out old entries
@@ -571,6 +600,8 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
         PVR_STRCPY(pvrChannel.strStreamURL, "");
 
         auto& guide = _guide[number];
+        KODI_LOG(LOG_DEBUG, "PvrGetChannels - ImageURL: %s", guide._imageURL.c_str());
+
         PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL.c_str());
 
         g.PVR->TransferChannelEntry(handle, &pvrChannel);
@@ -595,6 +626,33 @@ PVR_ERROR Lineup::PvrGetEPGForChannel(ADDON_HANDLE handle,
     Lock lock(this);
 
 
+    auto& info  = _info[channel.iUniqueId];
+    auto& guide = _guide[channel.iUniqueId];
+    for (auto& ge: guide._entries)
+    {
+        if (ge._endtime < start)
+            continue;
+        if (ge._starttime > end)
+            break;
+
+        EPG_TAG tag = {0};
+
+        tag.iUniqueBroadcastId = ge._id;
+        tag.strTitle           = ge._title.c_str();
+        tag.iChannelNumber     = channel.iUniqueId;
+        tag.startTime          = ge._starttime;
+        tag.endTime            = ge._endtime;
+        tag.firstAired         = ge._originalairdate;
+        tag.strPlot            = ge._synopsis;
+        tag.strIconPath        = ge._imageURL;
+        //tag.iSeriesNumber
+        //tag.iEpisodeNumber
+        //tag.iGenreType
+
+        g.PVR->TransferEpgEntry(handle, &tag);
+    }
+
+    return PVR_ERROR_NO_ERROR;
 }
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
@@ -995,9 +1053,9 @@ int Lineup::PvrGetChannelGroupsAmount()
     return 3;
 }
 
-static const char FavoriteChannels[] = "Favorite channels";
-static const char HDChannels[]       = "HD channels";
-static const char SDChannels[]       = "SD channels";
+static const String FavoriteChannels = "Favorite channels";
+static const String HDChannels       = "HD channels";
+static const String SDChannels       = "SD channels";
 
 
 PVR_ERROR Lineup::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
@@ -1010,15 +1068,15 @@ PVR_ERROR Lineup::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
     memset(&channelGroup, 0, sizeof(channelGroup));
 
     channelGroup.iPosition = 1;
-    PVR_STRCPY(channelGroup.strGroupName, FavoriteChannels);
+    PVR_STRCPY(channelGroup.strGroupName, FavoriteChannels.c_str());
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     channelGroup.iPosition++;
-    PVR_STRCPY(channelGroup.strGroupName, HDChannels);
+    PVR_STRCPY(channelGroup.strGroupName, HDChannels.c_str());
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     channelGroup.iPosition++;
-    PVR_STRCPY(channelGroup.strGroupName, SDChannels);
+    PVR_STRCPY(channelGroup.strGroupName, SDChannels.c_str());
     g.PVR->TransferChannelGroup(handle, &channelGroup);
 
     return PVR_ERROR_NO_ERROR;
@@ -1034,11 +1092,11 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
         auto& info  = _info[number];
         auto& guide = _guide[number];
 
-        if (!strcmp(FavoriteChannels, group.strGroupName) && !info._favorite)
+        if ((FavoriteChannels != group.strGroupName) && !info._favorite)
             continue;
-        if (!strcmp(HDChannels, group.strGroupName) && !info._hd)
+        if ((HDChannels != group.strGroupName) && !info._hd)
             continue;
-        if (!strcmp(SDChannels, group.strGroupName) && info._hd)
+        if ((SDChannels != group.strGroupName) && info._hd)
             continue;
 
         PVR_CHANNEL_GROUP_MEMBER channelGroupMember = {0};

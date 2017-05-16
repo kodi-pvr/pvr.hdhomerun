@@ -46,6 +46,8 @@ bool operator==(const T& a, const T& b)
 {
     return a.operator==(b);
 }
+bool operator==(const String& a, const String& b);
+bool operator==(const String& a, const char* b);
 
 class Lockable {
 public:
@@ -76,9 +78,20 @@ private:
 
 class GuideNumber
 {
+private:
+    static const uint32_t NameIdxLimit    = 100;
+    static const uint32_t SubchannelLimit = 1000000;
 public:
     GuideNumber(const Json::Value&);
     GuideNumber(const GuideNumber&) = default;
+    GuideNumber(uint32_t id)
+    {
+        _channel = id / SubchannelLimit;
+         id %= SubchannelLimit;
+         _subchannel = id / NameIdxLimit;
+         id %= NameIdxLimit;
+         _nameidx = id;
+    }
     virtual ~GuideNumber() = default;
 
     String _guidenumber;
@@ -86,14 +99,20 @@ public:
 
     uint32_t _channel;
     uint32_t _subchannel;
+    uint32_t _nameidx;
+
+    static std::map<String, std::vector<String>> NameIdxMap;
 
     String toString() const;
 
-    static const uint32_t SubchannelLimit = 10000;
     uint32_t ID() const
     {
-        // _subchannel better be below 10000.
-        return (_channel * SubchannelLimit) + (_subchannel);
+        // _subchannel < 10000, _nameidx < 100
+        return (_channel * SubchannelLimit) + (_subchannel * NameIdxLimit) + _nameidx;
+    }
+    operator uint32_t() const
+    {
+        return ID();
     }
 
     bool operator<(const GuideNumber&) const;
@@ -114,6 +133,7 @@ public:
     String _synopsis;
     String _imageURL;
     String _seriesID;
+    uint32_t _id;
 
     bool operator<(const GuideEntry& rhs) const
     {
@@ -121,7 +141,16 @@ public:
     }
     bool operator==(const GuideEntry& rhs) const
     {
-        return _starttime == rhs._starttime;
+        return
+                _starttime         == rhs._starttime
+               && _endtime         == rhs._endtime
+               && _originalairdate == rhs._originalairdate
+               && _title           == rhs._title
+               && _episodenumber   == rhs._episodenumber
+               && _synopsis        == rhs._synopsis
+               && _imageURL        == rhs._imageURL
+               && _seriesID        == rhs._seriesID
+                ;
     }
 };
 
@@ -132,9 +161,18 @@ public:
     Guide(const Json::Value&);
     Guide() = default;
 
+    void InsertEntry(Json::Value& v) {
+        auto ins = _entries.insert(v);
+        if (ins.second) {
+            auto& entry = const_cast<GuideEntry&>(*(ins.first));
+            entry._id = _nextidx ++;
+        }
+    }
+
     String               _affiliate;
     String               _imageURL;
     std::set<GuideEntry> _entries;
+    uint32_t             _nextidx = 1;
 };
 
 class Tuner
@@ -237,11 +275,11 @@ public:
             const PVR_CHANNEL_GROUP &group);
 
 private:
-    std::set<Tuner*>             _tuners;
-    std::set<uint32_t>           _device_ids;
-    std::set<GuideNumber>        _lineup;
-    std::map<GuideNumber, Info>  _info;
-    std::map<GuideNumber, Guide> _guide;
+    std::set<Tuner*>          _tuners;
+    std::set<uint32_t>        _device_ids;
+    std::set<GuideNumber>     _lineup;
+    std::map<uint32_t, Info>  _info;
+    std::map<uint32_t, Guide> _guide;
 };
 
 
