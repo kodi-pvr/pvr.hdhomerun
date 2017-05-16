@@ -575,15 +575,16 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
     for (auto& number: _lineup)
     {
         PVR_CHANNEL pvrChannel = {0};
+        auto& guide = _guide[number];
 
         pvrChannel.iUniqueId         = number.ID();
         pvrChannel.iChannelNumber    = number._channel;
         pvrChannel.iSubChannelNumber = number._subchannel;
-        PVR_STRCPY(pvrChannel.strChannelName, number._guidename.c_str());
-        PVR_STRCPY(pvrChannel.strStreamURL, "");
 
-        auto& guide = _guide[number];
-        KODI_LOG(LOG_DEBUG, "PvrGetChannels - ImageURL: %s", guide._imageURL.c_str());
+        const String* name = &number._guidename;
+        if (guide._affiliate.length())
+            name = &guide._affiliate;
+        PVR_STRCPY(pvrChannel.strChannelName, name->c_str());
 
         PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL.c_str());
 
