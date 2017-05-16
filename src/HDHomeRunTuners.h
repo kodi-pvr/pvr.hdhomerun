@@ -246,6 +246,8 @@ public:
             delete tuner;
         }
     }
+    bool OpenLiveStream(const PVR_CHANNEL&);
+    void CloseLiveStream();
 
     void DiscoverTuners();
     void UpdateGuide();

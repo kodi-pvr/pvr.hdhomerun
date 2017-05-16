@@ -335,22 +335,16 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
-    CloseLiveStream();
+    if (g.lineup)
+        return g.lineup->OpenLiveStream(channel);
 
-    KODI_LOG(LOG_DEBUG, "OpenLiveStream channel %d.%d - %s",
-            channel.iChannelNumber,
-            channel.iSubChannelNumber,
-            channel.strStreamURL
-    );
-
-    g.iCurrentChannelUniqueId = channel.iUniqueId;
-
-    return true;
+    return false;
 }
 
 void CloseLiveStream(void)
 {
-    g.iCurrentChannelUniqueId = 0;
+    if (g.lineup)
+        g.lineup->CloseLiveStream();
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)

@@ -49,7 +49,6 @@ struct GlobalsType
 {
     bool         bCreated                = false;
     ADDON_STATUS currentStatus           = ADDON_STATUS_UNKNOWN;
-    unsigned int iCurrentChannelUniqueId = 0;
     String       strUserPath;
     String       strClientPath;
     ADDON::CHelper_libXBMC_addon* XBMC   = nullptr;

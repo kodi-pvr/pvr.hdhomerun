@@ -700,4 +700,20 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
     return PVR_ERROR_NO_ERROR;
 }
 
+bool Lineup::OpenLiveStream(const PVR_CHANNEL& channel)
+{
+    KODI_LOG(LOG_DEBUG, "OpenLiveStream channel %u - %d.%d - %s",
+            channel.iUniqueId,
+            channel.iChannelNumber,
+            channel.iSubChannelNumber,
+            channel.strStreamURL
+    );
+
+    return true;
+}
+void Lineup::CloseLiveStream()
+{
+
+}
+
 }; // namespace PVRHDHomeRun
