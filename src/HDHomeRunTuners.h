@@ -118,15 +118,16 @@ class GuideEntry
 public:
     GuideEntry(const Json::Value&);
 
-    time_t _starttime;
-    time_t _endtime;
-    time_t _originalairdate;
-    String _title;
-    String _episodenumber;
-    String _episodetitle;
-    String _synopsis;
-    String _imageURL;
-    String _seriesID;
+    time_t   _starttime;
+    time_t   _endtime;
+    time_t   _originalairdate;
+    String   _title;
+    String   _episodenumber;
+    String   _episodetitle;
+    String   _synopsis;
+    String   _imageURL;
+    String   _seriesID;
+    uint32_t _genre;
     uint32_t _id;
 
     bool operator<(const GuideEntry& rhs) const

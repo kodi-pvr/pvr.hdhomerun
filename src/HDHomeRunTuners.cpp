@@ -92,6 +92,35 @@ String GuideNumber::toString() const
             + "_guidename("   + _guidename   + ") ";
 }
 
+template<typename T>
+unsigned int GetGenreType(const T& arr)
+{
+    unsigned int nGenreType = 0;
+
+    for (auto& i : arr)
+    {
+        auto str = i.asString();
+
+        if (str == "News")
+            nGenreType |= EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
+        else if (str == "Comedy")
+            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
+        else if (str == "Movie" || str == "Drama")
+            nGenreType |= EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
+        else if (str == "Food")
+            nGenreType |= EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
+        else if (str == "Talk Show")
+            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
+        else if (str == "Game Show")
+            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
+        else if (str == "Sport" || str == "Sports")
+            nGenreType |= EPG_EVENT_CONTENTMASK_SPORTS;
+    }
+
+    return nGenreType;
+}
+
+
 GuideEntry::GuideEntry(const Json::Value& v)
 {
     _starttime       = v["StartTime"].asUInt();
@@ -102,6 +131,7 @@ GuideEntry::GuideEntry(const Json::Value& v)
     _synopsis        = v["Synopsis"].asString();
     _imageURL        = v["ImageURL"].asString();
     _seriesID        = v["SeriesID"].asString();
+    _genre           = GetGenreType(v["Filter"]);
 }
 
 Guide::Guide(const Json::Value& v)
@@ -215,36 +245,6 @@ void Tuner::RefreshLineup()
         _get_discover_data();
     }
 }
-
-
-template<typename T>
-unsigned int GetGenreType(const T& arr)
-{
-    unsigned int nGenreType = 0;
-
-    for (auto& i : arr)
-    {
-        auto str = i.asString();
-
-        if (str == "News")
-            nGenreType |= EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
-        else if (str == "Comedy")
-            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
-        else if (str == "Movie" || str == "Drama")
-            nGenreType |= EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
-        else if (str == "Food")
-            nGenreType |= EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
-        else if (str == "Talk Show")
-            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
-        else if (str == "Game Show")
-            nGenreType |= EPG_EVENT_CONTENTMASK_SHOW;
-        else if (str == "Sport" || str == "Sports")
-            nGenreType |= EPG_EVENT_CONTENTMASK_SPORTS;
-    }
-
-    return nGenreType;
-}
-
 
 void Lineup::DiscoverTuners()
 {
@@ -534,11 +534,10 @@ void Lineup::UpdateGuide()
         for (auto& jsonchannelguide : jsontunerguide)
         {
             GuideNumber number = jsonchannelguide;
-            KODI_LOG(LOG_DEBUG, "Guide number found: %u", number.ID());
 
             if (_guide.find(number) == _guide.end())
             {
-                KODI_LOG(LOG_DEBUG, "Inserting guide for channel");
+                KODI_LOG(LOG_DEBUG, "Inserting guide for channel %u", number.ID());
                 _guide[number] = jsonchannelguide;
             }
 
@@ -552,7 +551,6 @@ void Lineup::UpdateGuide()
             }
             for (auto& jsonentry: jsonguidenetries)
             {
-                KODI_LOG(LOG_DEBUG, "Inserting guide entry");
                 channelguide.InsertEntry(jsonentry);
             }
 
@@ -631,7 +629,7 @@ PVR_ERROR Lineup::PvrGetEPGForChannel(ADDON_HANDLE handle,
         tag.strIconPath        = ge._imageURL;
         //tag.iSeriesNumber
         //tag.iEpisodeNumber
-        //tag.iGenreType
+        tag.iGenreType         = ge._genre;
 
         g.PVR->TransferEpgEntry(handle, &tag);
     }
