@@ -212,9 +212,20 @@ public:
                 );
         return buf;
     }
+    String GetVar(const String& name)
+    {
+        String retval;
+        _get_var(retval, name.c_str());
+        return retval;
+    }
+    void SetVar(const String& name, const String& value)
+    {
+        _set_var(value.c_str(), name.c_str());
+    }
 
 private:
     void _get_var(String& value, const char* name);
+    void _set_var(const char*value, const char* name);
     // Called once
     void _get_api_data();
     // Called multiple times for legacy devices
@@ -234,6 +245,35 @@ public:
         return DeviceID() < rhs.DeviceID();
     }
     friend class Lineup;
+    friend class TunerLock;
+};
+
+class TunerLock
+{
+public:
+    TunerLock(Tuner* t)
+    : _tuner(t)
+    {
+        char* ret_error;
+        if (hdhomerun_device_tuner_lockkey_request(_tuner->_device, &ret_error) > 0)
+        {
+            _success = true;
+        }
+    }
+    ~TunerLock()
+    {
+        if (_success)
+        {
+            hdhomerun_device_tuner_lockkey_release(_tuner->_device);
+        }
+    }
+    bool Success() const
+    {
+        return _success;
+    }
+private:
+    bool   _success = false;
+    Tuner* _tuner;
 };
 
 class Info
@@ -241,6 +281,10 @@ class Info
 public:
     Info(const Json::Value&);
     Info() = default;
+    Tuner* GetNextTuner();
+    void ResetNextTuner();
+    void AddTuner(Tuner*);
+    void RemoveTuner(Tuner*);
 
     String   _url;
     bool     _hd       = false;
@@ -249,7 +293,9 @@ public:
 
     // Tuners which can receive this channel.
     // Entries are owned by Lineup
-    std::set<Tuner*> _tuners;
+    bool                       _has_next = false;
+    std::set<Tuner*>::iterator _next = _tuners.begin();
+    std::set<Tuner*>           _tuners;
 };
 
 class Lineup : public Lockable

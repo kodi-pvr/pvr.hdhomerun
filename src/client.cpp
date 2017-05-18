@@ -335,15 +335,18 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
+    std::cout << "Client OpenLiveStream\n";
     return false;
 }
 
 void CloseLiveStream(void)
 {
+    std::cout << "Client CloseLiveStream\n";
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)
 {
+    std::cout << "Client SwitchChannel\n";
     CloseLiveStream();
 
     return OpenLiveStream(channel);

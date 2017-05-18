@@ -185,14 +185,41 @@ void Tuner::_get_var(String& value, const char* name)
     }
     else
     {
-        KODI_LOG(LOG_DEBUG, "channelmap(%08x) = %s",
-                _discover_device.device_id, get_val
+        KODI_LOG(LOG_DEBUG, "Success getting value %s = %s from %08x",
+                name, get_val,
+                _discover_device.device_id
         );
 
         value.assign(get_val);
     }
 }
-
+void Tuner::_set_var(const char* value, const char* name)
+{
+    char* set_err;
+    if (hdhomerun_device_set_var(_device, name, value, NULL, &set_err) < 0)
+    {
+        KODI_LOG(LOG_ERROR,
+                "communication error sending set request %s = %s to %08x",
+                name, value,
+                _discover_device.device_id
+        );
+    }
+    else if (set_err)
+    {
+        KODI_LOG(LOG_ERROR, "error %s with %s = %s request from %08x",
+                set_err,
+                name, value,
+                _discover_device.device_id
+        );
+    }
+    else
+    {
+        KODI_LOG(LOG_DEBUG, "Success setting value %s = %s from %08x",
+                name, value,
+                _discover_device.device_id
+        );
+    }
+}
 void Tuner::_get_api_data()
 {
 }
@@ -305,7 +332,7 @@ void Lineup::DiscoverTuners()
                 {
                     // Remove tuner from lineup
                     KODI_LOG(LOG_DEBUG, "Removing tuner from GuideNumber %s", number.toString().c_str());
-                    tuners.erase(ptuner);
+                    info.RemoveTuner(ptuner);
                 }
                 if (tuners.size() == 0)
                 {
@@ -386,7 +413,7 @@ void Lineup::UpdateLineup()
                 Info info = v;
                 _info[number] = info;
             }
-            _info[number]._tuners.insert(ptuner);
+            _info[number].AddTuner(ptuner);
         }
     }
 
@@ -700,6 +727,39 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
     return PVR_ERROR_NO_ERROR;
 }
 
+Tuner* Info::GetNextTuner()
+{
+    if (_has_next)
+    {
+        _next ++;
+        if (_next == _tuners.end())
+        {
+            _has_next = false;
+            return nullptr;
+        }
+    }
+    else
+    {
+        _has_next = true;
+        _next = _tuners.begin();
+    }
+    return *_next;
+}
+void Info::ResetNextTuner()
+{
+    _has_next = false;
+}
+void Info::AddTuner(Tuner* t)
+{
+    _tuners.insert(t);
+    ResetNextTuner();
+}
+void Info::RemoveTuner(Tuner* t)
+{
+    _tuners.erase(t);
+    ResetNextTuner();
+}
+
 const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
 {
     Lock lock(this);
@@ -714,10 +774,18 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         return "";
     }
     auto& info = _info[id];
-    auto tuner = *(info._tuners.begin());
+
+    Tuner* tuner = nullptr;
+
+    int pass;
+    do {
+        tuner = info.GetNextTuner();
+        if (tuner)
+            break;
+        pass ++;
+    } while (pass < 2);
 
     std::cout << std::hex << tuner->DeviceID() << " " << tuner->IP() << std::dec << "\n";
-    std::cout << tuner->BaseURL() << "\n";
 
     char cstr[32];
     if (channel.iSubChannelNumber)
