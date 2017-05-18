@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="3.0.3"
+  version="4.0.0"
   name="PVR HDHomeRun Client"
-  provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
+  provider-name="Matthew Lundberg and Zoltan Csizmadia">
   <requires>
-    <c-pluff version="0.1"/>
+    <c-pluff version="0.2"/>
     <import addon="xbmc.pvr" version="5.2.1"/>
   </requires>
   <extension
