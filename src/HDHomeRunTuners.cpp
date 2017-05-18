@@ -586,6 +586,8 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
 
         PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL.c_str());
 
+        sprintf(pvrChannel.strStreamURL, "pvr://stream/%d", number.ID());
+
         g.PVR->TransferChannelEntry(handle, &pvrChannel);
     }
     return PVR_ERROR_NO_ERROR;
@@ -698,20 +700,39 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
     return PVR_ERROR_NO_ERROR;
 }
 
-bool Lineup::OpenLiveStream(const PVR_CHANNEL& channel)
+const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
 {
-    KODI_LOG(LOG_DEBUG, "OpenLiveStream channel %u - %d.%d - %s",
-            channel.iUniqueId,
-            channel.iChannelNumber,
-            channel.iSubChannelNumber,
-            channel.strStreamURL
-    );
+    Lock lock(this);
+    std::cout << "Lineup::GetLiveStreamURL " << channel.iUniqueId << "\n";
 
-    return true;
+    auto  id    = channel.iUniqueId;
+    const auto& entry = _lineup.find(id);
+    if (entry == _lineup.end())
+    {
+        std::cout << "Not found\n";
+        KODI_LOG(LOG_ERROR, "Channel %d not found!", id);
+        return "";
+    }
+    auto& info = _info[id];
+    auto tuner = *(info._tuners.begin());
+
+    std::cout << std::hex << tuner->DeviceID() << " " << tuner->IP() << std::dec << "\n";
+    std::cout << tuner->BaseURL() << "\n";
+
+    char cstr[32];
+    if (channel.iSubChannelNumber)
+    {
+        sprintf(cstr, "%d.%d", channel.iChannelNumber, channel.iSubChannelNumber);
+    }
+    else
+    {
+        sprintf(cstr, "%d",    channel.iChannelNumber);
+    }
+    static char buf[1024];
+    sprintf(buf, "http://%s:5004/auto/v%s", tuner->IP().c_str(), cstr);
+
+    std::cout << buf << "\n";
+
+    return buf;
 }
-void Lineup::CloseLiveStream()
-{
-
-}
-
 }; // namespace PVRHDHomeRun

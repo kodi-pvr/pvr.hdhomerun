@@ -196,6 +196,22 @@ public:
     {
         return _discover_device.device_auth;
     }
+    const char* BaseURL() const
+    {
+        return _discover_device.base_url;
+    }
+    String IP() const
+    {
+        uint32_t ip = _discover_device.ip_addr;
+        char buf[18];
+        sprintf(buf, "%d.%d.%d.%d",
+                ip >> 24,
+                (ip >> 16) & 0xff,
+                (ip >> 8) & 0xff,
+                (ip) & 0xff
+                );
+        return buf;
+    }
 
 private:
     void _get_var(String& value, const char* name);
@@ -247,8 +263,6 @@ public:
             delete tuner;
         }
     }
-    bool OpenLiveStream(const PVR_CHANNEL&);
-    void CloseLiveStream();
 
     void DiscoverTuners();
     void UpdateGuide();
@@ -270,6 +284,8 @@ public:
     PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
     PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle,
             const PVR_CHANNEL_GROUP &group);
+
+    const char* GetLiveStreamURL(const PVR_CHANNEL& channel);
 
 private:
     std::set<Tuner*>          _tuners;

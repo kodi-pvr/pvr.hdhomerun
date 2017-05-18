@@ -335,16 +335,11 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
-    if (g.lineup)
-        return g.lineup->OpenLiveStream(channel);
-
     return false;
 }
 
 void CloseLiveStream(void)
 {
-    if (g.lineup)
-        g.lineup->CloseLiveStream();
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)
@@ -469,6 +464,8 @@ long long LengthLiveStream(void)
 }
 const char * GetLiveStreamURL(const PVR_CHANNEL &channel)
 {
+    if (g.lineup)
+        return g.lineup->GetLiveStreamURL(channel);
     return "";
 }
 PVR_ERROR DeleteRecording(const PVR_RECORDING &recording)
