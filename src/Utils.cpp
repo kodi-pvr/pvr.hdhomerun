@@ -104,4 +104,21 @@ String EncodeURL(const String& strUrl)
     return str;
 }
 
+String FormatIP(uint32_t ip)
+{
+    char buf[18];
+    sprintf(buf, "%d.%d.%d.%d",
+            ip >> 24,
+            (ip >> 16) & 0xff,
+            (ip >> 8) & 0xff,
+            (ip) & 0xff
+            );
+    return buf;
+}
+
+bool IPSubnetMatch(uint32_t a, uint32_t b, uint32_t subnet_mask)
+{
+    return (a & subnet_mask) == (b & subnet_mask);
+}
+
 };

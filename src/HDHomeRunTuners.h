@@ -203,17 +203,9 @@ public:
     {
         return _discover_device.base_url;
     }
-    String IP() const
+    uint32_t IP() const
     {
-        uint32_t ip = _discover_device.ip_addr;
-        char buf[18];
-        sprintf(buf, "%d.%d.%d.%d",
-                ip >> 24,
-                (ip >> 16) & 0xff,
-                (ip >> 8) & 0xff,
-                (ip) & 0xff
-                );
-        return buf;
+        return _discover_device.ip_addr;
     }
     String GetVar(const String& name)
     {

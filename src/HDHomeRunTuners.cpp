@@ -768,6 +768,20 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
     Lock lock(this);
     std::cout << "Lineup::GetLiveStreamURL " << channel.iUniqueId << "\n";
 
+    struct hdhomerun_local_ip_info_t ip_info[64];
+    int ip_info_count = hdhomerun_local_ip_info(ip_info, 64);
+
+    std::cout << "ip_info_count: " << ip_info_count << "\n";
+
+    for (size_t i=0; i<ip_info_count; i++)
+    {
+        auto& info = ip_info[i];
+        std::cout
+                << "IP: "<< FormatIP(info.ip_addr)
+                << " Mask: " << FormatIP(info.subnet_mask)
+                << "\n";
+    }
+
     auto  id    = channel.iUniqueId;
     const auto& entry = _lineup.find(id);
     if (entry == _lineup.end())
@@ -788,7 +802,7 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         pass ++;
     } while (pass < 2);
 
-    std::cout << std::hex << tuner->DeviceID() << " " << tuner->IP() << std::dec << "\n";
+    std::cout << std::hex << tuner->DeviceID() << " " << FormatIP(tuner->IP()) << std::dec << "\n";
 
     char cstr[32];
     if (channel.iSubChannelNumber)
@@ -800,7 +814,7 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         sprintf(cstr, "%d",    channel.iChannelNumber);
     }
     static char buf[1024];
-    sprintf(buf, "http://%s:5004/auto/v%s", tuner->IP().c_str(), cstr);
+    sprintf(buf, "http://%s:5004/auto/v%s", FormatIP(tuner->IP()).c_str(), cstr);
 
     std::cout << buf << "\n";
 
