@@ -152,6 +152,66 @@ Info::Info(const Json::Value& v)
      //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
 }
 
+Tuner* Info::GetNextTuner()
+{
+    if (_has_next)
+    {
+        _next ++;
+        if (_next == _tuners.end())
+        {
+            _has_next = false;
+            return nullptr;
+        }
+    }
+    else
+    {
+        _has_next = true;
+        _next = _tuners.begin();
+    }
+    return *_next;
+}
+
+void Info::ResetNextTuner()
+{
+    _has_next = false;
+}
+
+bool Info::AddTuner(Tuner* t)
+{
+    if (HasTuner(t))
+    {
+        return false;
+    }
+    _tuners.insert(t);
+    ResetNextTuner();
+
+    return true;
+}
+
+bool Info::RemoveTuner(Tuner* t)
+{
+    if (!HasTuner(t))
+    {
+        return false;
+    }
+    _tuners.erase(t);
+    ResetNextTuner();
+
+    return true;
+}
+
+String Info::TunerListString() const
+{
+    String tuners;
+    for (auto tuner : _tuners)
+    {
+        char id[10];
+        sprintf(id, " %08x", tuner->DeviceID());
+        tuners += id;
+    }
+
+    return tuners;
+}
 
 Tuner::Tuner(const hdhomerun_discover_device_t& d)
     : _debug(nullptr) // _debug(hdhomerun_debug_create())
@@ -352,18 +412,13 @@ void Lineup::DiscoverTuners()
             for (auto number : _lineup)
             {
                 auto info = _info[number];
-                auto tuners = info._tuners;
-
-                if (tuners.find(ptuner) != tuners.end())
+                if (info.RemoveTuner(tuner))
                 {
-                    // Remove tuner from lineup
-                    KODI_LOG(LOG_DEBUG, "Removing tuner from GuideNumber %s", number.toString().c_str());
-                    info.RemoveTuner(ptuner);
+                    KODI_LOG(LOG_DEBUG, "Removed tuner from GuideNumber %s", number.toString().c_str());
                 }
-                if (tuners.size() == 0)
+                if (info.TunerCount() == 0)
                 {
                     // No tuners left for this lineup guide entry, remove it
-
                     KODI_LOG(LOG_DEBUG, "No tuners left, removing GuideNumber %s", number.toString().c_str());
                     _lineup.erase(number);
                     _info.erase(number);
@@ -445,15 +500,9 @@ void Lineup::UpdateLineup()
 
     for (const auto& number: _lineup)
     {
-        String tuners;
         auto& info = _info[number];
+        String tuners = info.TunerListString();
 
-        for (auto tuner : info._tuners)
-        {
-            char id[10];
-            sprintf(id, " %08x", tuner->DeviceID());
-            tuners += id;
-        }
         KODI_LOG(LOG_DEBUG,
                 "Lineup Entry: %d.%d - %s - %s - %s",
                 number._channel,
@@ -517,13 +566,12 @@ void Lineup::UpdateGuide()
             for (auto& number: _lineup)
             {
                 auto& info = _info[number];
-                auto& info_tuners = info._tuners;
 
                 bool tunermatch = false;
                 for (auto idx: index) {
                     auto tuner = tuners[idx];
 
-                    if (info_tuners.find(tuner) != info_tuners.end())
+                    if (info.HasTuner(tuner))
                     {
                         tunermatch = true;
                         break;
@@ -535,7 +583,6 @@ void Lineup::UpdateGuide()
                     break;
                 }
             }
-
         } while (!matched && increment_index(index.begin(), index.end(), tuners.size()));
         if (matched)
             break;
@@ -753,39 +800,6 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
         g.PVR->TransferChannelGroupMember(handle, &channelGroupMember);
     }
     return PVR_ERROR_NO_ERROR;
-}
-
-Tuner* Info::GetNextTuner()
-{
-    if (_has_next)
-    {
-        _next ++;
-        if (_next == _tuners.end())
-        {
-            _has_next = false;
-            return nullptr;
-        }
-    }
-    else
-    {
-        _has_next = true;
-        _next = _tuners.begin();
-    }
-    return *_next;
-}
-void Info::ResetNextTuner()
-{
-    _has_next = false;
-}
-void Info::AddTuner(Tuner* t)
-{
-    _tuners.insert(t);
-    ResetNextTuner();
-}
-void Info::RemoveTuner(Tuner* t)
-{
-    _tuners.erase(t);
-    ResetNextTuner();
 }
 
 const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)

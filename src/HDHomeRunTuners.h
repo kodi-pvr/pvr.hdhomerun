@@ -279,14 +279,24 @@ public:
     Info() = default;
     Tuner* GetNextTuner();
     void ResetNextTuner();
-    void AddTuner(Tuner*);
-    void RemoveTuner(Tuner*);
+    bool AddTuner(Tuner*);
+    bool RemoveTuner(Tuner*);
+    bool HasTuner(Tuner* t) const
+    {
+        return _tuners.find(t) != _tuners.end();
+    }
+    size_t TunerCount() const
+    {
+        return _tuners.size();
+    }
+    String TunerListString() const;
 
     String   _url;
     bool     _hd       = false;
     bool     _drm      = false;
     bool     _favorite = false;
 
+private:
     // Tuners which can receive this channel.
     // Entries are owned by Lineup
     bool                       _has_next = false;
