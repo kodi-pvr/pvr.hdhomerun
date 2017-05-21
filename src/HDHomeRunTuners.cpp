@@ -466,6 +466,7 @@ void Lineup::UpdateLineup()
 }
 
 // Increment the first element until max is reached, then increment further indices.
+// Recursive function used in Lineup::UpdateGuide to find the minimal covering
 bool increment_index(
         std::vector<size_t>::iterator index,
         std::vector<size_t>::iterator end,
@@ -478,6 +479,7 @@ bool increment_index(
     (*index) ++;
     if ((*index) >= max)
     {
+        // Hit the max value, adjust the next slot
         if (!increment_index(index+1, end, max-1))
         {
             return false;
