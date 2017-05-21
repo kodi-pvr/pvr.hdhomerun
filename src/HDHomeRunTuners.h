@@ -207,6 +207,7 @@ public:
     {
         return _discover_device.ip_addr;
     }
+    uint32_t LocalIP() const;
     String GetVar(const String& name)
     {
         String retval;

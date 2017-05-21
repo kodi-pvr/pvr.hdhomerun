@@ -276,6 +276,29 @@ void Tuner::RefreshLineup()
     }
 }
 
+uint32_t Tuner::LocalIP() const
+{
+    uint32_t tunerip = IP();
+
+    const size_t max = 64;
+    struct hdhomerun_local_ip_info_t ip_info[max];
+    int ip_info_count = hdhomerun_local_ip_info(ip_info, max);
+
+    for (size_t i=0; i<ip_info_count; i++)
+    {
+        auto& info = ip_info[i];
+        uint32_t localip = info.ip_addr;
+        uint32_t mask    = info.subnet_mask;
+
+        if (IPSubnetMatch(localip, tunerip, mask))
+        {
+            return localip;
+        }
+    }
+
+    return 0;
+}
+
 void Lineup::DiscoverTuners()
 {
     struct hdhomerun_discover_device_t discover_devices[64];
@@ -768,20 +791,6 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
     Lock lock(this);
     std::cout << "Lineup::GetLiveStreamURL " << channel.iUniqueId << "\n";
 
-    struct hdhomerun_local_ip_info_t ip_info[64];
-    int ip_info_count = hdhomerun_local_ip_info(ip_info, 64);
-
-    std::cout << "ip_info_count: " << ip_info_count << "\n";
-
-    for (size_t i=0; i<ip_info_count; i++)
-    {
-        auto& info = ip_info[i];
-        std::cout
-                << "IP: "<< FormatIP(info.ip_addr)
-                << " Mask: " << FormatIP(info.subnet_mask)
-                << "\n";
-    }
-
     auto  id    = channel.iUniqueId;
     const auto& entry = _lineup.find(id);
     if (entry == _lineup.end())
@@ -802,7 +811,12 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         pass ++;
     } while (pass < 2);
 
-    std::cout << std::hex << tuner->DeviceID() << " " << FormatIP(tuner->IP()) << std::dec << "\n";
+    uint32_t localip = tuner->LocalIP();
+
+    std::cout << std::hex << tuner->DeviceID() << std::dec
+            << " " << FormatIP(tuner->IP())
+            << " " << FormatIP(localip)
+            << "\n";
 
     char cstr[32];
     if (channel.iSubChannelNumber)
