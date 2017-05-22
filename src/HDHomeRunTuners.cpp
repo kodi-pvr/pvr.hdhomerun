@@ -540,11 +540,11 @@ bool increment_index(
 
 void Lineup::UpdateGuide()
 {
-    // Find a minimal covering of the lineup
+    // Find a minimal covering of the lineup, to avoid duplicate guide requests.
 
     Lock lock(this);
 
-    // Create vector of tuners for channel search
+    // The _tuners std::set cannot be indexed by position, so copy to a vector.
     std::vector<Tuner*> tuners;
     std::copy(_tuners.begin(), _tuners.end(), std::back_inserter(tuners));
 
@@ -552,6 +552,7 @@ void Lineup::UpdateGuide()
     bool matched;
     for (int num_tuners = 1; num_tuners <= tuners.size(); num_tuners ++)
     {
+        // The index values will be incremented starting at begin().
         // Create index, reverse order
         index.clear();
         for (size_t i=0; i<num_tuners; i++)
@@ -561,7 +562,9 @@ void Lineup::UpdateGuide()
 
         matched = true;
         do {
-            // Unique combination of tuners in index
+            // index contains a combination of num_tuners entries.
+            // This loop is entered for each unique combination of tuners,
+            // until all channels are matched by at least one tuner in the list.
             matched = true;
             for (auto& number: _lineup)
             {
