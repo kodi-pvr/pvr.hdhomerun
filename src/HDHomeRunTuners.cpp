@@ -851,7 +851,8 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         sprintf(cstr, "%d",    channel.iChannelNumber);
     }
     static char buf[1024];
-    sprintf(buf, "http://%s:5004/auto/v%s", FormatIP(tuner->IP()).c_str(), cstr);
+    //sprintf(buf, "http://%s:5004/auto/v%s", FormatIP(tuner->IP()).c_str(), cstr);
+    sprintf(buf, "%s", info.URL(tuner).c_str());
 
     std::cout << buf << "\n";
 

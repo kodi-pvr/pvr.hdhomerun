@@ -285,6 +285,13 @@ public:
     {
         return _tuners.find(t) != _tuners.end();
     }
+    String URL(Tuner* t) const
+    {
+        auto it = _url.find(t);
+        if (it != _url.end())
+            return it->second;
+        return "";
+    }
     size_t TunerCount() const
     {
         return _tuners.size();
