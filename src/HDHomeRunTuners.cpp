@@ -145,7 +145,6 @@ Guide::Guide(const Json::Value& v)
 
 Info::Info(const Json::Value& v)
 {
-    _url = v["URL"].asString();
     _drm = v["DRM"].asBool();
     _hd  = v["HD"].asBool();
 
@@ -176,13 +175,14 @@ void Info::ResetNextTuner()
     _has_next = false;
 }
 
-bool Info::AddTuner(Tuner* t)
+bool Info::AddTuner(Tuner* t, const String& url)
 {
     if (HasTuner(t))
     {
         return false;
     }
     _tuners.insert(t);
+    _url[t] = url;
     ResetNextTuner();
 
     return true;
@@ -444,6 +444,22 @@ void Lineup::DiscoverTuners()
     }
 }
 
+void Lineup::AddLineupEntry(const Json::Value& v, Tuner* tuner)
+{
+    GuideNumber number = v;
+    if ((!g.Settings.bAllowUnknownChannels) && (number._guidename == "Unknown"))
+    {
+        return;
+    }
+    _lineup.insert(number);
+    if (_info.find(number) == _info.end())
+    {
+        Info info = v;
+        _info[number] = info;
+    }
+    _info[number].AddTuner(tuner, v["URL"].asString());
+}
+
 void Lineup::UpdateLineup()
 {
     KODI_LOG(LOG_DEBUG, "Lineup::UpdateLineup");
@@ -482,19 +498,7 @@ void Lineup::UpdateLineup()
         auto ptuner = const_cast<Tuner*>(tuner);
         for (auto& v : lineupJson)
         {
-            // TODO Check here for g.Settings.bAllowUnknownChannels
-            GuideNumber number = v;
-            if ((!g.Settings.bAllowUnknownChannels) && (number._guidename == "Unknown"))
-            {
-                continue;
-            }
-            _lineup.insert(number);
-            if (_info.find(number) == _info.end())
-            {
-                Info info = v;
-                _info[number] = info;
-            }
-            _info[number].AddTuner(ptuner);
+            AddLineupEntry(v, tuner);
         }
     }
 

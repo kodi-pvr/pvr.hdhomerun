@@ -104,7 +104,7 @@ public:
 
     uint32_t ID() const
     {
-        // _subchannel < 10000, _nameidx < 100
+        // _subchannel < 1000, _nameidx < 100
         return (_channel * SubchannelLimit) + _subchannel;
     }
     operator uint32_t() const
@@ -279,7 +279,7 @@ public:
     Info() = default;
     Tuner* GetNextTuner();
     void ResetNextTuner();
-    bool AddTuner(Tuner*);
+    bool AddTuner(Tuner*, const String& url);
     bool RemoveTuner(Tuner*);
     bool HasTuner(Tuner* t) const
     {
@@ -291,7 +291,6 @@ public:
     }
     String TunerListString() const;
 
-    String   _url;
     bool     _hd       = false;
     bool     _drm      = false;
     bool     _favorite = false;
@@ -302,6 +301,7 @@ private:
     bool                       _has_next = false;
     std::set<Tuner*>::iterator _next = _tuners.begin();
     std::set<Tuner*>           _tuners;
+    std::map<Tuner*, String>   _url;
 };
 
 class Lineup : public Lockable
@@ -325,6 +325,7 @@ public:
         UpdateLineup();
         UpdateGuide();
     }
+    void AddLineupEntry(const Json::Value&, Tuner*);
 
     PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
     int PvrGetChannelsAmount();
