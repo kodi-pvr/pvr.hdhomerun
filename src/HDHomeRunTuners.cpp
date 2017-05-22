@@ -606,9 +606,7 @@ void Lineup::UpdateGuide()
         sprintf(buf, " %08x", tuners[i]->DeviceID());
         idx += buf;
     }
-    KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuners - %s", index.size(), idx.c_str());
-
-    //return; // TODO - remove
+    KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuner(s) - %s", index.size(), idx.c_str());
 
     for (auto idx: index) {
         auto tuner = tuners[idx];
