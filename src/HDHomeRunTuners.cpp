@@ -139,14 +139,16 @@ GuideEntry::GuideEntry(const Json::Value& v)
 
 Guide::Guide(const Json::Value& v)
 {
+    _guidename = v["GuideName"].asString();
     _affiliate = v["Affiliate"].asString();
     _imageURL  = v["ImageURL"].asString();
 }
 
 Info::Info(const Json::Value& v)
 {
-    _drm = v["DRM"].asBool();
-    _hd  = v["HD"].asBool();
+    _guidename = v["GuideName"].asString();
+    _drm       = v["DRM"].asBool();
+    _hd        = v["HD"].asBool();
 
      //KODI_LOG(LOG_DEBUG, "LineupEntry::LineupEntry %s", toString().c_str());
 }
@@ -447,7 +449,7 @@ void Lineup::DiscoverTuners()
 void Lineup::AddLineupEntry(const Json::Value& v, Tuner* tuner)
 {
     GuideNumber number = v;
-    if ((!g.Settings.bAllowUnknownChannels) && (number._guidename == "Unknown"))
+    if ((g.Settings.bHideUnknownChannels) && (number._guidename == "Unknown"))
     {
         return;
     }
@@ -683,16 +685,27 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
     {
         PVR_CHANNEL pvrChannel = {0};
         auto& guide = _guide[number];
+        auto& info  = _info[number];
 
         pvrChannel.iUniqueId         = number.ID();
         pvrChannel.iChannelNumber    = number._channel;
         pvrChannel.iSubChannelNumber = number._subchannel;
 
-        const String* name = &number._guidename;
-        if (guide._affiliate.length())
+        const String* name;
+        if (g.Settings.eChannelName == SettingsType::AFFILIATE) {
             name = &guide._affiliate;
+        }
+        if (!name || !name->length() || (g.Settings.eChannelName == SettingsType::GUIDE_NAME))
+        {
+            // Lineup name from guide
+            name = &guide._guidename;
+        }
+        if (!name || !name->length() || (g.Settings.eChannelName == SettingsType::TUNER_NAME))
+        {
+            // Lineup name from tuner
+            name = &info._guidename;
+        }
         PVR_STRCPY(pvrChannel.strChannelName, name->c_str());
-
         PVR_STRCPY(pvrChannel.strIconPath, guide._imageURL.c_str());
 
         sprintf(pvrChannel.strStreamURL, "pvr://stream/%d", number.ID());

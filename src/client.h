@@ -38,14 +38,22 @@ typedef CStdString String;
 class HDHomeRunTuners;
 class Lineup;
 
+
 struct SettingsType
 {
+    enum CHANNEL_NAME {
+        TUNER_NAME,
+        GUIDE_NAME,
+        AFFILIATE
+    };
+
     bool bHideProtected         = true;
     bool bHideDuplicateChannels = true;
     bool bDebug                 = false;
     bool bMarkNew               = false;
-    bool bAllowUnknownChannels  = false;
     bool bUseLegacy             = false;
+    bool bHideUnknownChannels   = true;
+    CHANNEL_NAME eChannelName   = AFFILIATE;
 };
 
 struct GlobalsType

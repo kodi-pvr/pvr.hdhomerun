@@ -39,3 +39,12 @@ msgstr "Mark new show"
 msgctxt "#32006"
 msgid "Use legacy hardware"
 msgstr "Use legacy hardware"
+
+msgctxt "#32010"
+msgid "Hide unknown channels"
+msgstr "Hide unknown channels"
+
+msgctxt "#32007"
+msgid "Name to display"
+msgstr "Name to display"
+

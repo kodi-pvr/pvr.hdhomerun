@@ -67,6 +67,25 @@ UpdateThread g_UpdateThread;
 
 using namespace PVRHDHomeRun;
 
+void SetChannelName(const char* name)
+{
+    if (g.XBMC == nullptr)
+        return;
+
+    if (strcmp(name, "Tuner Name") == 0)
+    {
+        g.Settings.eChannelName = SettingsType::TUNER_NAME;
+    }
+    else if (strcmp(name, "Guide Name") == 0)
+    {
+        g.Settings.eChannelName = SettingsType::GUIDE_NAME;
+    }
+    else if (strcmp(name, "Affiliate") == 0)
+    {
+        g.Settings.eChannelName = SettingsType::AFFILIATE;
+    }
+}
+
 extern "C"
 {
 
@@ -75,23 +94,16 @@ void ADDON_ReadSettings(void)
     if (g.XBMC == nullptr)
         return;
 
-    if (!g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected))
-        g.Settings.bHideProtected = true;
+    g.XBMC->GetSetting("hide_protected", &g.Settings.bHideProtected);
+    g.XBMC->GetSetting("hide_duplicate", &g.Settings.bHideDuplicateChannels);
+    g.XBMC->GetSetting("mark_new",       &g.Settings.bMarkNew);
+    g.XBMC->GetSetting("debug",          &g.Settings.bDebug);
+    g.XBMC->GetSetting("hide_unknown",   &g.Settings.bHideUnknownChannels);
+    g.XBMC->GetSetting("use_legacy",     &g.Settings.bUseLegacy);
 
-    if (!g.XBMC->GetSetting("hide_duplicate",
-            &g.Settings.bHideDuplicateChannels))
-        g.Settings.bHideDuplicateChannels = true;
-
-    if (!g.XBMC->GetSetting("mark_new", &g.Settings.bMarkNew))
-        g.Settings.bMarkNew = true;
-
-    if (g.XBMC->GetSetting("debug", &g.Settings.bDebug))
-        g.Settings.bDebug = true;
-    else
-        g.Settings.bDebug = false;
-
-    //if (!g.XBMC->GetSetting("use_legacy", &g.Settings.bUseLegacy))
-    //    g.Settings.bUseLegacy = true;
+    char channel_name[64] = "Guide Name";
+    g.XBMC->GetSetting("channel_name", channel_name);
+    SetChannelName(channel_name);
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -189,11 +201,21 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
         g.Settings.bMarkNew = *(bool*) settingValue;
     else if (strcmp(settingName, "debug") == 0)
         g.Settings.bDebug = *(bool*) settingValue;
-    //else if (strcmp(settingName, "use_legacy") == 0)
-    //{
-    //    g.Settings.bUseLegacy = *(bool*) settingValue;
-    //    return ADDON_STATUS_NEED_RESTART;
-    //}
+    else if (strcmp(settingName, "use_legacy") == 0)
+    {
+        g.Settings.bUseLegacy = *(bool*) settingValue;
+        return ADDON_STATUS_NEED_RESTART;
+    }
+    else if (strcmp(settingName, "hide_unknown") == 0)
+    {
+        g.Settings.bHideUnknownChannels = *(bool*) settingValue;
+        return ADDON_STATUS_NEED_RESTART;
+    }
+    else if (strcmp(settingName, "channel_name") == 0)
+    {
+        SetChannelName((char*) settingValue);
+        return ADDON_STATUS_NEED_RESTART;
+    }
 
     return ADDON_STATUS_OK;
 }

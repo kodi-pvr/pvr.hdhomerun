@@ -167,6 +167,7 @@ public:
         }
     }
 
+    String               _guidename;
     String               _affiliate;
     String               _imageURL;
     std::set<GuideEntry> _entries;
@@ -298,6 +299,7 @@ public:
     }
     String TunerListString() const;
 
+    String   _guidename;
     bool     _hd       = false;
     bool     _drm      = false;
     bool     _favorite = false;
