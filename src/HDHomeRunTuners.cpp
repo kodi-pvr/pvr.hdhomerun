@@ -131,6 +131,7 @@ GuideEntry::GuideEntry(const Json::Value& v)
     _originalairdate = v["OriginalAirdate"].asUInt();
     _title           = v["Title"].asString();
     _episodenumber   = v["EpisodeNumber"].asString();
+    _episodetitle    = v["EpisodeTitle"].asString();
     _synopsis        = v["Synopsis"].asString();
     _imageURL        = v["ImageURL"].asString();
     _seriesID        = v["SeriesID"].asString();
@@ -662,11 +663,25 @@ void Lineup::UpdateGuide()
             {
                 channelguide.InsertEntry(jsonentry);
             }
-
-            // TODO age out old entries
         }
     }
 
+    // Age-out old entries, delete if more than one day old (make this configurable?)
+    uint32_t max_age = 86400;
+    time_t   now = time(nullptr);
+    for (auto& mapentry : _guide)
+    {
+        auto& guide = mapentry.second;
+
+        for (auto& entry : guide._entries)
+        {
+            time_t end = entry._endtime;
+            if ((now > end) && ((now - end) > max_age))
+            {
+                guide._entries.erase(entry);
+            }
+        }
+    }
 }
 
 int Lineup::PvrGetChannelsAmount()
@@ -743,6 +758,7 @@ PVR_ERROR Lineup::PvrGetEPGForChannel(ADDON_HANDLE handle,
 
         tag.iUniqueBroadcastId = ge._id;
         tag.strTitle           = ge._title.c_str();
+        tag.strEpisodeName     = ge._episodetitle.c_str();
         tag.iChannelNumber     = channel.iUniqueId;
         tag.startTime          = ge._starttime;
         tag.endTime            = ge._endtime;
