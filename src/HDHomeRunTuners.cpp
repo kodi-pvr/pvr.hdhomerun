@@ -678,7 +678,7 @@ void Lineup::UpdateGuide()
             time_t end = entry._endtime;
             if ((now > end) && ((now - end) > max_age))
             {
-                KODI_LOG(LOG_DEBUG, "Deleting guide entry for age %u: %s - %s", (now-end), entry._title, entry._episodetitle);
+                KODI_LOG(LOG_DEBUG, "Deleting guide entry for age %u: %s - %s", (now-end), entry._title.c_str(), entry._episodetitle.c_str());
 
                 guide._entries.erase(entry);
             }
