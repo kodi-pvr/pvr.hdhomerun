@@ -528,21 +528,21 @@ bool increment_index(
         std::vector<size_t>::iterator end,
         size_t max)
 {
-    if (index == end) {
-        return false;
-    }
-
-    (*index) ++;
-    if ((*index) >= max)
+    if (index != end)
     {
-        // Hit the max value, adjust the next slot
-        if (!increment_index(index+1, end, max-1))
+        (*index) ++;
+        if ((*index) >= max)
         {
-            return false;
+            // Hit the max value, adjust the next slot
+            if (!increment_index(index+1, end, max-1))
+            {
+                return false;
+            }
+            (*index) = (*(index+1)) + 1;
         }
-        (*index) = (*(index+1)) + 1;
+        return true;
     }
-    return true;
+    return false;
 }
 
 void Lineup::UpdateGuide()

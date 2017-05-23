@@ -308,7 +308,7 @@ private:
     // Tuners which can receive this channel.
     // Entries are owned by Lineup
     bool                       _has_next = false;
-    std::set<Tuner*>::iterator _next = _tuners.begin();
+    std::set<Tuner*>::iterator _next;
     std::set<Tuner*>           _tuners;
     std::map<Tuner*, String>   _url;
 };
