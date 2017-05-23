@@ -678,6 +678,8 @@ void Lineup::UpdateGuide()
             time_t end = entry._endtime;
             if ((now > end) && ((now - end) > max_age))
             {
+                KODI_LOG(LOG_DEBUG, "Deleting guide entry for age %u: %s - %s", (now-end), entry._title, entry._episodetitle);
+
                 guide._entries.erase(entry);
             }
         }
@@ -839,13 +841,11 @@ PVR_ERROR Lineup::PvrGetChannelGroupMembers(ADDON_HANDLE handle,
 const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
 {
     Lock lock(this);
-    std::cout << "Lineup::GetLiveStreamURL " << channel.iUniqueId << "\n";
 
     auto  id    = channel.iUniqueId;
     const auto& entry = _lineup.find(id);
     if (entry == _lineup.end())
     {
-        std::cout << "Not found\n";
         KODI_LOG(LOG_ERROR, "Channel %d not found!", id);
         return "";
     }
@@ -863,11 +863,6 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
 
     uint32_t localip = tuner->LocalIP();
 
-    std::cout << std::hex << tuner->DeviceID() << std::dec
-            << " " << FormatIP(tuner->IP())
-            << " " << FormatIP(localip)
-            << "\n";
-
     char cstr[32];
     if (channel.iSubChannelNumber)
     {
@@ -878,10 +873,7 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
         sprintf(cstr, "%d",    channel.iChannelNumber);
     }
     static char buf[1024];
-    //sprintf(buf, "http://%s:5004/auto/v%s", FormatIP(tuner->IP()).c_str(), cstr);
     sprintf(buf, "%s", info.URL(tuner).c_str());
-
-    std::cout << buf << "\n";
 
     return buf;
 }
