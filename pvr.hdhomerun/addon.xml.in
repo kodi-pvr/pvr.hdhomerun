@@ -4,10 +4,7 @@
   version="4.0.0"
   name="PVR HDHomeRun Client"
   provider-name="Matthew Lundberg and Zoltan Csizmadia">
-  <requires>
-    <c-pluff version="0.2"/>
-    <import addon="xbmc.pvr" version="5.2.1"/>
-  </requires>
+  <requires>@ADDON_DEPENDS@</requires>
   <extension
     point="xbmc.pvrclient"
     needs_configuration="false"

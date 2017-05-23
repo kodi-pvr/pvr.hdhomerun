@@ -29,6 +29,10 @@ set(PVRHDHOMERUN_SOURCES src/client.cpp
                          src/HDHomeRunTuners.cpp
                          src/Utils.cpp)
 
+set(PVRHDHOMERUN_HEADERS src/client.h
+                         src/HDHomeRunTuners.h
+                         src/Utils.h)
+
 if(WIN32)
   list(APPEND DEPLIBS ws2_32)
   list(APPEND DEPLIBS iphlpapi)

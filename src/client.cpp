@@ -177,11 +177,6 @@ bool ADDON_HasSettings()
     return true;
 }
 
-unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
-{
-    return 0;
-}
-
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
     if (g.lineup == nullptr)
@@ -220,14 +215,6 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
     return ADDON_STATUS_OK;
 }
 
-void ADDON_Stop()
-{
-}
-
-void ADDON_FreeSettings()
-{
-}
-
 /***********************************************************
  * PVR Client AddOn specific public library functions
  ***********************************************************/
@@ -251,28 +238,6 @@ void OnPowerSavingActivated()
 
 void OnPowerSavingDeactivated()
 {
-}
-
-const char* GetPVRAPIVersion(void)
-{
-    static const char *strApiVersion = XBMC_PVR_API_VERSION;
-    return strApiVersion;
-}
-
-const char* GetMininumPVRAPIVersion(void)
-{
-    static const char *strMinApiVersion = XBMC_PVR_MIN_API_VERSION;
-    return strMinApiVersion;
-}
-
-const char* GetGUIAPIVersion(void)
-{
-    return ""; // GUI API not used
-}
-
-const char* GetMininumGUIAPIVersion(void)
-{
-    return ""; // GUI API not used
 }
 
 PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
@@ -360,18 +325,15 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle,
 
 bool OpenLiveStream(const PVR_CHANNEL &channel)
 {
-    std::cout << "Client OpenLiveStream\n";
     return false;
 }
 
 void CloseLiveStream(void)
 {
-    std::cout << "Client CloseLiveStream\n";
 }
 
 bool SwitchChannel(const PVR_CHANNEL &channel)
 {
-    std::cout << "Client SwitchChannel\n";
     CloseLiveStream();
 
     return OpenLiveStream(channel);

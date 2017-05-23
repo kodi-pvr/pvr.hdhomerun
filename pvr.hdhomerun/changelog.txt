@@ -1,6 +1,21 @@
 v4.0.0
 - Use lineup-based channels, to show every channel exactly once while allowing multiple for reception
 
+v3.0.7
+- Remove of never used addon interface function
+
+v3.0.6
+- Update Debian package control
+- PVR addon callback way changes
+
+v3.0.5
+- Removed old no more needed version functions
+
+v3.0.4
+- set dependency versions automatic during build
+- removed never used kodi to addon functions
+- build system fixes
+
 v3.0.3
 - Fixed issue where if Guide's Affiliate is empty the channel would become an Unknown Channel
 
