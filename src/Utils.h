@@ -1,5 +1,8 @@
 #pragma once
 /*
+ *      Copyright (C) 2017 Matthew Lundberg <matthew.k.lundberg@gmail.com>
+ *      https://github.com/MatthewLundberg/pvr.hdhomerun
+ *
  *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
  *      https://github.com/zcsizmadia/pvr.hdhomerun
  *
@@ -38,17 +41,24 @@ int DbgPrintf(const char* szFormat, ...);
 
 #define KODI_LOG(level, ...)											\
     do																	\
-	{																	\
+    {																	\
         DbgPrintf("%-10s: ", #level);									\
         DbgPrintf(__VA_ARGS__);											\
         DbgPrintf("\n");												\
         if (g.XBMC && (level > ADDON::LOG_DEBUG || g.Settings.bDebug))  \
             g.XBMC->Log((ADDON::addon_log_t)level, __VA_ARGS__);		\
-	} while (0)
+    } while (0)
 
 #define PVR_STRCPY(dest, source) do { strncpy(dest, source, sizeof(dest)-1); dest[sizeof(dest)-1] = '\0'; } while(0)
 #define PVR_STRCLR(dest) memset(dest, 0, sizeof(dest))
 
+namespace PVRHDHomeRun {
+
+
 bool GetFileContents(const String& url, String& strContent);
 
 String EncodeURL(const String& strUrl);
+String FormatIP(uint32_t);
+bool IPSubnetMatch(uint32_t a, uint32_t b, uint32_t subnet_mask);
+
+};

@@ -1,5 +1,8 @@
 #pragma once
 /*
+ *      Copyright (C) 2017 Matthew Lundberg <matthew.k.lundberg@gmail.com>
+ *      https://github.com/MatthewLundberg/pvr.hdhomerun
+ *
  *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
  *      https://github.com/zcsizmadia/pvr.hdhomerun
  *
@@ -27,49 +30,45 @@
 #include <libXBMC_pvr.h>
 #include <p8-platform/util/StdString.h>
 
+namespace PVRHDHomeRun {
+
+
 typedef CStdString String;
 
 class HDHomeRunTuners;
+class Lineup;
+
 
 struct SettingsType
 {
-	SettingsType()
-	{
-		bHideProtected = true;
-		bHideDuplicateChannels = true;
-		bDebug = false;
-		bMarkNew = false;
-	}
+    enum CHANNEL_NAME {
+        TUNER_NAME,
+        GUIDE_NAME,
+        AFFILIATE
+    };
 
-	bool bHideProtected;
-	bool bHideDuplicateChannels;
-	bool bDebug;
-	bool bMarkNew;
+    bool bHideProtected         = true;
+    bool bHideDuplicateChannels = true;
+    bool bDebug                 = false;
+    bool bMarkNew               = false;
+    bool bUseLegacy             = false;
+    bool bHideUnknownChannels   = true;
+    CHANNEL_NAME eChannelName   = AFFILIATE;
 };
 
 struct GlobalsType
 {
-	GlobalsType()
-	{
-		bCreated = false;
-		currentStatus = ADDON_STATUS_UNKNOWN;
-		iCurrentChannelUniqueId = 0;
-		XBMC = NULL;
-		PVR = NULL;
-		Tuners = NULL;
-	}
+    bool         bCreated                = false;
+    ADDON_STATUS currentStatus           = ADDON_STATUS_UNKNOWN;
+    String       strUserPath;
+    String       strClientPath;
+    ADDON::CHelper_libXBMC_addon* XBMC   = nullptr;
+    CHelper_libXBMC_pvr*          PVR    = nullptr;
+    Lineup*                       lineup = nullptr;
 
-	bool bCreated;
-	ADDON_STATUS currentStatus;
-	unsigned int iCurrentChannelUniqueId;
-	String strUserPath;
-	String strClientPath;
-	ADDON::CHelper_libXBMC_addon* XBMC;
-	CHelper_libXBMC_pvr* PVR;
-
-	HDHomeRunTuners* Tuners;
-
-	SettingsType Settings;
+    SettingsType Settings;
 };
 
 extern GlobalsType g;
+
+};
