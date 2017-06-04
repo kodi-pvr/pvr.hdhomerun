@@ -55,10 +55,10 @@ int DbgPrintf(const char* szFormat, ...);
 namespace PVRHDHomeRun {
 
 
-bool GetFileContents(const String& url, String& strContent);
+bool GetFileContents(const std::string& url, std::string& strContent);
 
-String EncodeURL(const String& strUrl);
-String FormatIP(uint32_t);
+std::string EncodeURL(const std::string& strUrl);
+std::string FormatIP(uint32_t);
 bool IPSubnetMatch(uint32_t a, uint32_t b, uint32_t subnet_mask);
 
 };

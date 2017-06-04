@@ -39,6 +39,7 @@
 
 namespace PVRHDHomeRun {
 
+/*
 template<typename T>
 bool operator<(const T& a, const T& b)
 {
@@ -49,8 +50,7 @@ bool operator==(const T& a, const T& b)
 {
     return a.operator==(b);
 }
-bool operator==(const String& a, const String& b);
-bool operator==(const String& a, const char* b);
+*/
 
 class Lockable {
 public:
@@ -94,13 +94,13 @@ public:
     }
     virtual ~GuideNumber() = default;
 
-    String _guidenumber;
-    String _guidename;
+    std::string _guidenumber;
+    std::string _guidename;
 
     uint32_t _channel;
     uint32_t _subchannel;
 
-    String toString() const;
+    std::string toString() const;
 
     uint32_t ID() const
     {
@@ -124,12 +124,12 @@ public:
     time_t   _starttime;
     time_t   _endtime;
     time_t   _originalairdate;
-    String   _title;
-    String   _episodenumber;
-    String   _episodetitle;
-    String   _synopsis;
-    String   _imageURL;
-    String   _seriesID;
+    std::string   _title;
+    std::string   _episodenumber;
+    std::string   _episodetitle;
+    std::string   _synopsis;
+    std::string   _imageURL;
+    std::string   _seriesID;
     uint32_t _genre;
     uint32_t _id;
 
@@ -167,9 +167,9 @@ public:
         }
     }
 
-    String               _guidename;
-    String               _affiliate;
-    String               _imageURL;
+    std::string               _guidename;
+    std::string               _affiliate;
+    std::string               _imageURL;
     std::set<GuideEntry> _entries;
     uint32_t             _nextidx = 1;
 };
@@ -209,19 +209,19 @@ public:
         return _discover_device.ip_addr;
     }
     uint32_t LocalIP() const;
-    String GetVar(const String& name)
+    std::string GetVar(const std::string& name)
     {
-        String retval;
+        std::string retval;
         _get_var(retval, name.c_str());
         return retval;
     }
-    void SetVar(const String& name, const String& value)
+    void SetVar(const std::string& name, const std::string& value)
     {
         _set_var(value.c_str(), name.c_str());
     }
 
 private:
-    void _get_var(String& value, const char* name);
+    void _get_var(std::string& value, const char* name);
     void _set_var(const char*value, const char* name);
     // Called once
     void _get_api_data();
@@ -233,7 +233,7 @@ private:
     hdhomerun_device_t*         _device;
     hdhomerun_discover_device_t _discover_device;
     // Discover Data
-    String                      _lineupURL;
+    std::string                      _lineupURL;
     unsigned int                _tunercount;
     bool                        _legacy;
 public:
@@ -280,13 +280,13 @@ public:
     Info() = default;
     Tuner* GetNextTuner();
     void ResetNextTuner();
-    bool AddTuner(Tuner*, const String& url);
+    bool AddTuner(Tuner*, const std::string& url);
     bool RemoveTuner(Tuner*);
     bool HasTuner(Tuner* t) const
     {
         return _tuners.find(t) != _tuners.end();
     }
-    String URL(Tuner* t) const
+    std::string URL(Tuner* t) const
     {
         auto it = _url.find(t);
         if (it != _url.end())
@@ -297,9 +297,9 @@ public:
     {
         return _tuners.size();
     }
-    String TunerListString() const;
+    std::string TunerListString() const;
 
-    String   _guidename;
+    std::string   _guidename;
     bool     _hd       = false;
     bool     _drm      = false;
     bool     _favorite = false;
@@ -310,7 +310,7 @@ private:
     bool                       _has_next = false;
     std::set<Tuner*>::iterator _next;
     std::set<Tuner*>           _tuners;
-    std::map<Tuner*, String>   _url;
+    std::map<Tuner*, std::string>   _url;
 };
 
 class Lineup : public Lockable

@@ -54,14 +54,14 @@ int DbgPrintf(const char* szFormat, ...)
 
 namespace PVRHDHomeRun {
 
-bool GetFileContents(const String& url, String& strContent)
+bool GetFileContents(const std::string& url, std::string& strContent)
 {
     char buffer[1024];
     void* fileHandle;
 
     strContent.clear();
 
-    fileHandle = g.XBMC->OpenFile(url, 0);
+    fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
     if (fileHandle == nullptr)
     {
@@ -82,11 +82,11 @@ bool GetFileContents(const String& url, String& strContent)
     return true;
 }
 
-String EncodeURL(const String& strUrl)
+std::string EncodeURL(const std::string& strUrl)
 {
-    String str, strEsc;
+    std::string str, strEsc;
 
-    for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end();
+    for (std::string::const_iterator iter = strUrl.begin(); iter != strUrl.end();
             iter++)
     {
         char c = *iter;
@@ -95,16 +95,16 @@ String EncodeURL(const String& strUrl)
             str += c;
         else
         {
-            String strPercent;
-            strPercent.Format("%%%02X", (int) c);
-            str += strPercent;
+			char replacement[4];
+			sprintf(replacement, "%%%02X", (int)c);
+            str += replacement;
         }
     }
 
     return str;
 }
 
-String FormatIP(uint32_t ip)
+std::string FormatIP(uint32_t ip)
 {
     char buf[18];
     sprintf(buf, "%d.%d.%d.%d",

@@ -37,16 +37,6 @@ using namespace ADDON;
 
 namespace PVRHDHomeRun {
 
-bool operator==(const String& a, const String& b)
-{
-    return !strcmp(a.c_str(), b.c_str());
-}
-bool operator==(const String& a, const char* b)
-{
-    return !strcmp(a.c_str(), b);
-}
-
-
 GuideNumber::GuideNumber(const Json::Value& v)
 {
     _guidenumber = v["GuideNumber"].asString();
@@ -87,11 +77,11 @@ bool GuideNumber::operator==(const GuideNumber& rhs) const
             ;
     return ret;
 }
-String GuideNumber::toString() const
+std::string GuideNumber::toString() const
 {
     char channel[64];
     sprintf(channel, "%d.%d", _channel, _subchannel);
-    return String("") + channel + " "
+    return std::string("") + channel + " "
             + "_guidename("   + _guidename   + ") ";
 }
 
@@ -178,7 +168,7 @@ void Info::ResetNextTuner()
     _has_next = false;
 }
 
-bool Info::AddTuner(Tuner* t, const String& url)
+bool Info::AddTuner(Tuner* t, const std::string& url)
 {
     if (HasTuner(t))
     {
@@ -203,9 +193,9 @@ bool Info::RemoveTuner(Tuner* t)
     return true;
 }
 
-String Info::TunerListString() const
+std::string Info::TunerListString() const
 {
-    String tuners;
+    std::string tuners;
     for (auto tuner : _tuners)
     {
         char id[10];
@@ -232,7 +222,7 @@ Tuner::~Tuner()
 }
 
 
-void Tuner::_get_var(String& value, const char* name)
+void Tuner::_get_var(std::string& value, const char* name)
 {
     char *get_val;
     char *get_err;
@@ -292,11 +282,12 @@ void Tuner::_get_api_data()
 
 void Tuner::_get_discover_data()
 {
-    String discoverURL;
-    String discoverResults;
+    std::string discoverResults;
 
     // Ask the device for its lineup URL
-    discoverURL.Format("%s/discover.json", _discover_device.base_url);
+	std::string discoverURL{ _discover_device.base_url };
+	discoverURL.append("/discover.json");
+
     if (GetFileContents(discoverURL, discoverResults))
     {
         Json::Reader jsonReader;
@@ -327,7 +318,8 @@ void Tuner::_get_discover_data()
                 _discover_device.base_url
         );
 
-        _lineupURL.Format("%s/lineup.json", _discover_device.base_url);
+		_lineupURL.assign(_discover_device.base_url);
+		_lineupURL.append("/lineup.json");
     }
 }
 
@@ -347,7 +339,7 @@ uint32_t Tuner::LocalIP() const
     struct hdhomerun_local_ip_info_t ip_info[max];
     int ip_info_count = hdhomerun_local_ip_info(ip_info, max);
 
-    for (size_t i=0; i<ip_info_count; i++)
+    for (int i=0; i<ip_info_count; i++)
     {
         auto& info = ip_info[i];
         uint32_t localip = info.ip_addr;
@@ -477,7 +469,7 @@ void Lineup::UpdateLineup()
                 tuner->_discover_device.device_id, tuner->_lineupURL.c_str()
         );
 
-        String lineupStr;
+        std::string lineupStr;
         if (!GetFileContents(tuner->_lineupURL, lineupStr))
         {
             KODI_LOG(LOG_ERROR, "Cannot get lineup from %s", tuner->_lineupURL.c_str());
@@ -508,7 +500,7 @@ void Lineup::UpdateLineup()
     for (const auto& number: _lineup)
     {
         auto& info = _info[number];
-        String tuners = info.TunerListString();
+        std::string tuners = info.TunerListString();
 
         KODI_LOG(LOG_DEBUG,
                 "Lineup Entry: %d.%d - %s - %s - %s",
@@ -557,12 +549,12 @@ void Lineup::UpdateGuide()
 
     std::vector<size_t> index;
     bool matched;
-    for (int num_tuners = 1; num_tuners <= tuners.size(); num_tuners ++)
+    for (int num_tuners = 1; num_tuners <= (int)tuners.size(); num_tuners ++)
     {
         // The index values will be incremented starting at begin().
         // Create index, reverse order
         index.clear();
-        for (size_t i=0; i<num_tuners; i++)
+        for (int i=0; i<num_tuners; i++)
         {
             index.insert(index.begin(), i);
         }
@@ -601,7 +593,7 @@ void Lineup::UpdateGuide()
     {
         return;
     }
-    String idx;
+    std::string idx;
     for (auto& i : index) {
         char buf[10];
         sprintf(buf, " %08x", tuners[i]->DeviceID());
@@ -610,17 +602,15 @@ void Lineup::UpdateGuide()
     KODI_LOG(LOG_DEBUG, "UpateGuide - Need to scan %u tuner(s) - %s", index.size(), idx.c_str());
 
     for (auto idx: index) {
-        auto tuner = tuners[idx];
+		auto tuner = tuners[idx];
 
-        String URL;
-        URL.Format(
-                "http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s",
-                EncodeURL(tuner->Auth()).c_str()
-        );
+		std::string URL{"http://my.hdhomerun.com/api/guide.php?DeviceAuth="};
+		URL.append(EncodeURL(tuner->Auth()));
+
         KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide for %08x: %s",
                 tuner->DeviceID(), URL.c_str());
 
-        String guidedata;
+        std::string guidedata;
         if (!GetFileContents(URL.c_str(), guidedata))
         {
             KODI_LOG(LOG_ERROR, "Error requesting guide for %08x from %s",
@@ -706,7 +696,7 @@ PVR_ERROR Lineup::PvrGetChannels(ADDON_HANDLE handle, bool radio)
         pvrChannel.iChannelNumber    = number._channel;
         pvrChannel.iSubChannelNumber = number._subchannel;
 
-        const String* name;
+        const std::string* name;
         if (g.Settings.eChannelName == SettingsType::AFFILIATE) {
             name = &guide._affiliate;
         }
@@ -765,8 +755,8 @@ PVR_ERROR Lineup::PvrGetEPGForChannel(ADDON_HANDLE handle,
         tag.startTime          = ge._starttime;
         tag.endTime            = ge._endtime;
         tag.firstAired         = ge._originalairdate;
-        tag.strPlot            = ge._synopsis;
-        tag.strIconPath        = ge._imageURL;
+        tag.strPlot            = ge._synopsis.c_str();
+        tag.strIconPath        = ge._imageURL.c_str();
         //tag.iSeriesNumber
         //tag.iEpisodeNumber
         tag.iGenreType         = ge._genre;
@@ -782,9 +772,9 @@ int Lineup::PvrGetChannelGroupsAmount()
     return 3;
 }
 
-static const String FavoriteChannels = "Favorite channels";
-static const String HDChannels       = "HD channels";
-static const String SDChannels       = "SD channels";
+static const std::string FavoriteChannels = "Favorite channels";
+static const std::string HDChannels       = "HD channels";
+static const std::string SDChannels       = "SD channels";
 
 
 PVR_ERROR Lineup::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
@@ -853,7 +843,7 @@ const char* Lineup::GetLiveStreamURL(const PVR_CHANNEL& channel)
 
     Tuner* tuner = nullptr;
 
-    int pass;
+    int pass = 0;
     do {
         tuner = info.GetNextTuner();
         if (tuner)
