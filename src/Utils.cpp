@@ -1,4 +1,7 @@
 /*
+ *      Copyright (C) 2017 Matthew Lundberg <matthew.k.lundberg@gmail.com>
+ *      https://github.com/MatthewLundberg/pvr.hdhomerun
+ *
  *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
  *      https://github.com/zcsizmadia/pvr.hdhomerun
  *
@@ -28,72 +31,94 @@
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)
 {
-	static bool g_bDebugConsole = false;
-	char szBuffer[4096];
-	int nLen;
-	va_list args;
-	DWORD dwWritten;
-	
-	if (!g_bDebugConsole)
-	{
-		::AllocConsole();
-		g_bDebugConsole = true;
-	}
+    static bool g_bDebugConsole = false;
+    char szBuffer[4096];
+    int nLen;
+    va_list args;
+    DWORD dwWritten;
 
-	va_start(args, szFormat);
-	nLen = vsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, args);
-	::WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), szBuffer, nLen, &dwWritten, 0);
-	va_end(args);
+    if (!g_bDebugConsole)
+    {
+        ::AllocConsole();
+        g_bDebugConsole = true;
+    }
 
-	return nLen;
+    va_start(args, szFormat);
+    nLen = vsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, args);
+    ::WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), szBuffer, nLen, &dwWritten, 0);
+    va_end(args);
+
+    return nLen;
 }
 #endif
 
-bool GetFileContents(const String& url, String& strContent)
+namespace PVRHDHomeRun {
+
+bool GetFileContents(const std::string& url, std::string& strContent)
 {
-	char buffer[1024];
-	void* fileHandle;
-	
-	strContent.clear();
+    char buffer[1024];
+    void* fileHandle;
 
-	fileHandle = g.XBMC->OpenFile(url, 0);
+    strContent.clear();
 
-	if (fileHandle == NULL)
-	{
-		KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
-		return false;
-	}
-	
-	for (;;)
-	{
-		int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
-		if (bytesRead <= 0)
-			break;
-		strContent.append(buffer, bytesRead);
-	}
+    fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
-	g.XBMC->CloseFile(fileHandle);
+    if (fileHandle == nullptr)
+    {
+        KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
+        return false;
+    }
 
-	return true;
+    for (;;)
+    {
+        int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+        if (bytesRead <= 0)
+            break;
+        strContent.append(buffer, bytesRead);
+    }
+
+    g.XBMC->CloseFile(fileHandle);
+
+    return true;
 }
 
-String EncodeURL(const String& strUrl)
+std::string EncodeURL(const std::string& strUrl)
 {
-	String str, strEsc;
+    std::string str, strEsc;
 
-	for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
-	{
-		char c = *iter;
+    for (std::string::const_iterator iter = strUrl.begin(); iter != strUrl.end();
+            iter++)
+    {
+        char c = *iter;
 
-		if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
-			str += c;
-		else
-		{
-			String strPercent;
-			strPercent.Format("%%%02X", (int)c);
-			str += strPercent;
-		}
-	}
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+            str += c;
+        else
+        {
+			char replacement[4];
+			sprintf(replacement, "%%%02X", (int)c);
+            str += replacement;
+        }
+    }
 
-	return str;
+    return str;
 }
+
+std::string FormatIP(uint32_t ip)
+{
+    char buf[18];
+    sprintf(buf, "%d.%d.%d.%d",
+            ip >> 24,
+            (ip >> 16) & 0xff,
+            (ip >> 8) & 0xff,
+            (ip) & 0xff
+            );
+    return buf;
+}
+
+bool IPSubnetMatch(uint32_t a, uint32_t b, uint32_t subnet_mask)
+{
+    return (a & subnet_mask) == (b & subnet_mask);
+}
+
+};

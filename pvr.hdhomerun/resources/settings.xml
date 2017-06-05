@@ -3,10 +3,16 @@
 
   <!-- General -->
   <category label="32001">
+    <setting id="channel_name" type="select" label="32007" values="Tuner Name|Guide Name|Affiliate" default="Guide Name"/>
+
+    <setting id="hide_unknown"   type="bool" label="32010" default="true" />
+    <!--<setting id="hide_duplicate" type="bool" label="32004" default="true" /> -->
     <setting id="hide_protected" type="bool" label="32002" default="true" />
     <setting id="debug" type="bool" label="32003" default="false" />
-    <setting id="hide_duplicate" type="bool" label="32004" default="true" />
     <setting id="mark_new" type="bool" label="32005" default="true" />
+    
+    <!-- <setting id="use_legacy" type="bool" label="32006" default="false" /> -->
+
   </category>
 
 </settings>

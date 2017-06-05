@@ -2,6 +2,8 @@ project(pvr.hdhomerun)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
 enable_language(CXX)

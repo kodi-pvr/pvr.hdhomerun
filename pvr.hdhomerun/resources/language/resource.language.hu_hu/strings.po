@@ -1,7 +1,7 @@
 # Kodi Media Center language file
 # Addon Name: PVR HDHomeRun Client
 # Addon id: pvr.hdhomerun
-# Addon Provider: Zoltan Csizmadia (zcsizmadia@gmail.com)
+# Addon Provider: Matthew Lundberg (matthew.k.lundberg@gmail.com) and Zoltan Csizmadia (zcsizmadia@gmail.com)
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
