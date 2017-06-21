@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Orokorra"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Ezkutatu babestutako kanalak"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Gaitu debug saioa"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Ezkutatu bikoiztutako kanalak"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Markatu saio berria"

@@ -18,8 +18,20 @@ msgstr ""
 
 msgctxt "#32001"
 msgid "General"
-msgstr "General"
+msgstr "Асноўныя"
+
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Хаваць абароненыя каналы"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Enable debug logging"
+msgstr "Уключыць лог адладкі"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Хаваць падвоеныя каналы"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Пазначаць новае шоў"
