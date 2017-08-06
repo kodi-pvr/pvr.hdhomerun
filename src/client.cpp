@@ -300,7 +300,13 @@ bool CanSeekStream(void)
 { 
   return true; 
 }
-
+  
+const char * GetLiveStreamURL(const PVR_CHANNEL &channel) 
+{ 
+  static std::string urlreturn = g.Tuners->_GetLiveStreamURL(channel);
+  return urlreturn.c_str();
+}
+  
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -326,7 +332,6 @@ int ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize) { return 0;
 long long SeekLiveStream(long long iPosition, int iWhence /* = SEEK_SET */) { return -1; }
 long long PositionLiveStream(void) { return -1; }
 long long LengthLiveStream(void) { return -1; }
-const char * GetLiveStreamURL(const PVR_CHANNEL &channel) { return ""; }
 PVR_ERROR DeleteRecording(const PVR_RECORDING &recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR RenameRecording(const PVR_RECORDING &recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING &recording, int count) { return PVR_ERROR_NOT_IMPLEMENTED; }
