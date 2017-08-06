@@ -66,7 +66,7 @@ bool GetFileContents(const String& url, String& strContent)
 	
 	for (;;)
 	{
-		int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+		ssize_t bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
 		if (bytesRead <= 0)
 			break;
 		strContent.append(buffer, bytesRead);
