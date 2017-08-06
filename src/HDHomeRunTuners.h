@@ -76,6 +76,7 @@ public:
 	int PvrGetChannelGroupsAmount(void);
 	PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
 	PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+	std::string _GetLiveStreamURL(const PVR_CHANNEL &channel);
 	
 protected:
 	unsigned int PvrCalculateUniqueId(const String& str);
