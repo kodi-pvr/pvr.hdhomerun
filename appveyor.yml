@@ -1,22 +1,26 @@
 environment:
   ADDON: pvr.hdhomerun
   CONFIG: Release
+  ROOT: c:\projects
 
   matrix:
     - CMAKE_GENERATOR: Visual Studio 14 2015
     - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
 
 # clone directory
-clone_folder: c:\projects\%ADDON%
+clone_folder: %ROOT%\%ADDON%
 
-build_script:
+init:
+  - echo ADDON=%ADDON%
+  - echo CONFIG=%CONFIG%
+  - echo CMAKE_GENERATOR=%CMAKE_GENERATOR%
   - cmake --version
-  - cd c:\projects
-  - set ROOT=%cd%
-  - git clone --depth=1 https://github.com/xbmc/xbmc.git
-  - cd %ADDON%
-  - mkdir build
-  - cd build
-  # Must use absolute path for cmake to build depends correctly
+  - msbuild /version
+  - git --version
+  - git clone --depth=1 https://github.com/xbmc/xbmc.git %ROOT%\xbmc
+  
+build_script:
+  - mkdir %ROOT%\%ADDON%\build
+  - cd %ROOT%\%ADDON%\build
   - cmake -G "%CMAKE_GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DCMAKE_USER_MAKE_RULES_OVERRIDE=%ROOT%\xbmc\cmake\scripts\windows\CFlagOverrides.cmake -DCMAKE_USER_MAKE_RULES_OVERRIDE_CXX=%ROOT%\xbmc\cmake\scripts\windows\CXXFlagOverrides.cmake -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons
   - cmake --build . --config %CONFIG%
