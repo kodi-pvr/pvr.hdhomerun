@@ -1,18 +1,13 @@
-# clone directory
-clone_folder: c:\projects\pvr.hdhomerun
-
-# fetch repository as zip archive
-#shallow_clone: true                 # default is "false"
-
 environment:
   ADDON: pvr.hdhomerun
   CONFIG: Release
 
   matrix:
-    - CMAKE_GENERATOR: Visual Studio 12 2013
-    - CMAKE_GENERATOR: Visual Studio 12 2013 Win64
     - CMAKE_GENERATOR: Visual Studio 14 2015
     - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
+
+# clone directory
+clone_folder: c:\projects\%ADDON%
 
 build_script:
   - cmake --version
