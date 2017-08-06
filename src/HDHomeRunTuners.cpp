@@ -296,7 +296,6 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
       pvrChannel.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
       PVR_STRCPY(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str());
-      PVR_STRCPY(pvrChannel.strStreamURL, jsonChannel["URL"].asString().c_str());
       PVR_STRCPY(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str());
       
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
