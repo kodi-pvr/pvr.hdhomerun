@@ -15,10 +15,10 @@ environment:
   ADDON: pvr.hdhomerun
 
   matrix:
-    #- GENERATOR: "Visual Studio 14"
-    #  CONFIG: Debug
-
     - GENERATOR: "Visual Studio 14"
+      CONFIG: Release
+
+    - GENERATOR: "Visual Studio 14 Win64"
       CONFIG: Release
 
 build_script:
