@@ -422,3 +422,26 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 
   return PVR_ERROR_NO_ERROR;
 }
+
+std::string HDHomeRunTuners::_GetLiveStreamURL(const PVR_CHANNEL &channel) 
+{  
+    PVR_CHANNEL pvrChannel;
+    Json::Value::ArrayIndex nIndex;
+
+    AutoLock l(this);
+  
+    for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
+    {
+        for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
+        {
+            const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
+		
+            if (jsonChannel["_UID"].asUInt() == channel.iUniqueId)
+            {
+                std::string url = jsonChannel["URL"].asString();
+                return url;
+            }
+        }
+    }        
+    return "";
+}
