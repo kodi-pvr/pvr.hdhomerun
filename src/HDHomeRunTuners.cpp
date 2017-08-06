@@ -424,7 +424,6 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 
 std::string HDHomeRunTuners::_GetLiveStreamURL(const PVR_CHANNEL &channel) 
 {  
-    PVR_CHANNEL pvrChannel;
     Json::Value::ArrayIndex nIndex;
 
     AutoLock l(this);
