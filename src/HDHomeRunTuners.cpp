@@ -296,7 +296,6 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
       pvrChannel.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
       PVR_STRCPY(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str());
-      PVR_STRCPY(pvrChannel.strStreamURL, jsonChannel["URL"].asString().c_str());
       PVR_STRCPY(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str());
       
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
@@ -421,4 +420,27 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
     }
 
   return PVR_ERROR_NO_ERROR;
+}
+
+std::string HDHomeRunTuners::_GetLiveStreamURL(const PVR_CHANNEL &channel) 
+{  
+    PVR_CHANNEL pvrChannel;
+    Json::Value::ArrayIndex nIndex;
+
+    AutoLock l(this);
+  
+    for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
+    {
+        for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
+        {
+            const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
+		
+            if (jsonChannel["_UID"].asUInt() == channel.iUniqueId)
+            {
+                std::string url = jsonChannel["URL"].asString();
+                return url;
+            }
+        }
+    }        
+    return "";
 }
