@@ -110,6 +110,7 @@ bool HDHomeRunTuners::Update(int nMode)
     KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
     if (GetFileContents(strUrl.c_str(), strJson))
+    {
       if (jsonReader.parse(strJson, pTuner->Guide) &&
         pTuner->Guide.type() == Json::arrayValue)
       {
@@ -179,6 +180,7 @@ bool HDHomeRunTuners::Update(int nMode)
         KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
       }
     }
+  }
 
   //
   // Lineup
