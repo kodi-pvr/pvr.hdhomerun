@@ -25,9 +25,9 @@
 
 #include <libXBMC_addon.h>
 #include <libXBMC_pvr.h>
-#include <p8-platform/util/StdString.h>
+#include <p8-platform/util/StringUtils.h>
 
-typedef CStdString String;
+typedef std::string String;
 
 class HDHomeRunTuners;
 

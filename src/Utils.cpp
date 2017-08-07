@@ -56,7 +56,7 @@ bool GetFileContents(const String& url, String& strContent)
 	
 	strContent.clear();
 
-	fileHandle = g.XBMC->OpenFile(url, 0);
+	fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
 	if (fileHandle == NULL)
 	{
@@ -89,8 +89,7 @@ String EncodeURL(const String& strUrl)
 			str += c;
 		else
 		{
-			String strPercent;
-			strPercent.Format("%%%02X", (int)c);
+			String strPercent = StringUtils::Format("%%%02X", (int)c);
 			str += strPercent;
 		}
 	}
