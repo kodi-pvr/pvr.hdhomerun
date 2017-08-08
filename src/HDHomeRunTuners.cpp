@@ -105,11 +105,12 @@ bool HDHomeRunTuners::Update(int nMode)
     
   if (nMode & UpdateGuide)
   {
-    strUrl.Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
+    strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
 
     KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
     if (GetFileContents(strUrl.c_str(), strJson))
+    {
       if (jsonReader.parse(strJson, pTuner->Guide) &&
         pTuner->Guide.type() == Json::arrayValue)
       {
@@ -179,6 +180,7 @@ bool HDHomeRunTuners::Update(int nMode)
         KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
       }
     }
+  }
 
   //
   // Lineup
@@ -186,7 +188,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
   if (nMode & UpdateLineUp)
   {
-    strUrl.Format("%s/lineup.json", pTuner->Device.base_url);
+    strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
     KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
 
