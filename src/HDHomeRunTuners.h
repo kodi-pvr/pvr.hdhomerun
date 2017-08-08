@@ -58,7 +58,7 @@ public:
 	{
 	public:
 		AutoLock(HDHomeRunTuners* p) : m_p(p) { m_p->Lock(); }
-		AutoLock(HDHomeRunTuners& p) : m_p(&p) { m_p->Unlock(); }
+		AutoLock(HDHomeRunTuners& p) : m_p(&p) { m_p->Lock(); }
 		~AutoLock() { m_p->Unlock(); }
 	protected:
 		HDHomeRunTuners* m_p;
