@@ -300,12 +300,20 @@ bool CanSeekStream(void)
 { 
   return true; 
 }
-  
-const char * GetLiveStreamURL(const PVR_CHANNEL &channel) 
-{ 
-  static std::string urlreturn = g.Tuners->_GetLiveStreamURL(channel);
-  return urlreturn.c_str();
-}
+
+PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
+{
+    std::string strUrl = g.Tuners->_GetChannelStreamURL(channel->iUniqueId);
+    if (strUrl.empty()) {
+      return PVR_ERROR_FAILED;
+    }
+    strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName));
+    strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue));
+    
+    *iPropertiesCount = 1;
+    
+	return PVR_ERROR_NO_ERROR;
+} 
   
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -358,4 +366,5 @@ PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *times) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING* recording, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount) { return PVR_ERROR_NOT_IMPLEMENTED; }
 }
