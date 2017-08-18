@@ -346,7 +346,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 
         tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
         tag.strTitle = strTitle.c_str();
-        tag.iChannelNumber = channel.iUniqueId;
+        tag.iUniqueChannelId = channel.iUniqueId;
         tag.startTime = (time_t)jsonGuideItem["StartTime"].asUInt();
         tag.endTime = (time_t)jsonGuideItem["EndTime"].asUInt();
         tag.firstAired = (time_t)jsonGuideItem["OriginalAirdate"].asUInt();
