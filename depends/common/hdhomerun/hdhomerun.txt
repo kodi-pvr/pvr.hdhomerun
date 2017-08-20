@@ -1,1 +1,1 @@
-hdhomerun https://github.com/Silicondust/libhdhomerun 5a22c0fde9c58279641d30372ddbdbdd48e0a300
+hdhomerun https://github.com/Silicondust/libhdhomerun master
