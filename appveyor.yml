@@ -1,23 +1,21 @@
 environment:
   ADDON: pvr.hdhomerun
-  GENERATOR: Visual Studio 14 2015
   ROOT: c:\projects
 
   matrix:
-    - ARCH:
+    - CMAKE_GENERATOR: Visual Studio 14 2015
       CONFIG: Debug
-    - ARCH:
+    - CMAKE_GENERATOR: Visual Studio 14 2015
       CONFIG: Release
-    - ARCH: Win64
+    - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
       CONFIG: Debug
-    - ARCH: Win64
+    - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
       CONFIG: Release
 
 # clone directory
 clone_folder: c:\projects\%ADDON%
 
 init:
-  - set CMAKE_GENERATOR=%GENERATOR% %ARCH%
   - echo ADDON=%ADDON%
   - echo CONFIG=%CONFIG%
   - echo CMAKE_GENERATOR=%CMAKE_GENERATOR%
