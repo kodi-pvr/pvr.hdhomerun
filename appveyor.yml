@@ -4,19 +4,20 @@ environment:
   ROOT: c:\projects
 
   matrix:
-    - CMAKE_GENERATOR: %GENERATOR%
+    - ARCH:
       CONFIG: Debug
-    - CMAKE_GENERATOR: %GENERATOR%
+    - ARCH:
       CONFIG: Release
-    - CMAKE_GENERATOR: %GENERATOR% Win64
+    - ARCH: Win64
       CONFIG: Debug
-    - CMAKE_GENERATOR: %GENERATOR% Win64
+    - ARCH: Win64
       CONFIG: Release
 
 # clone directory
 clone_folder: c:\projects\%ADDON%
 
 init:
+  - set CMAKE_GENERATOR=%GENERATOR% %ARCH%
   - echo ADDON=%ADDON%
   - echo CONFIG=%CONFIG%
   - echo CMAKE_GENERATOR=%CMAKE_GENERATOR%
