@@ -20,6 +20,18 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Almennt"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Fela varðar rásir"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Virkja kembi viðburðaskráningu"
+msgstr "Virkja aflúsunarskráningu"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Fela tvíteknar rásir"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Merkja nýjan þátt"

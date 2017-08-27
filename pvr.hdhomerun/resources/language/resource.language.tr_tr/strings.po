@@ -30,7 +30,7 @@ msgstr "Hata ayıklama günlüğünü etkinleştir"
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
-msgstr "Tekrarlayan kanalları gizle"
+msgstr "Yinelenen kanalları gizle"
 
 msgctxt "#32005"
 msgid "Mark new show"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="3.1.4"
+  version="3.1.5"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>@ADDON_DEPENDS@</requires>
@@ -11,6 +11,7 @@
     library_@PLATFORM@="@LIBRARY_FILENAME@"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="af_ZA">HDHomeRun PVR Kliënt</summary>
+    <summary lang="be_BY">HDHomeRun PVR кліент </summary>
     <summary lang="bg_BG">HDHomeRun ПВР клиент</summary>
     <summary lang="ca_ES">Client PVR de HDHomeRun</summary>
     <summary lang="cs_CZ">Klient HDHomeRun PVR</summary>
@@ -21,6 +22,8 @@
     <summary lang="en_US">HDHomeRun PVR Client</summary>
     <summary lang="es_ES">Cliente PVR HDHomeRun</summary>
     <summary lang="es_MX">Cliente PVR HDHomeRun</summary>
+    <summary lang="et_EE">HDHomeRun PVR'i klient</summary>
+    <summary lang="eu_ES">HDHomeRun PVR Bezeroa</summary>
     <summary lang="fi_FI">Kodin HDHomeRun-asiakasohjelma</summary>
     <summary lang="fr_CA">Client de numériscope HDHomeRun</summary>
     <summary lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</summary>
@@ -28,6 +31,7 @@
     <summary lang="he_IL">לקוח טלוויזיה חיה עבור HDHomeRun</summary>
     <summary lang="hr_HR">HDHomeRun PVR klijent</summary>
     <summary lang="hu_HU">HDHomeRun PVR ügyfél</summary>
+    <summary lang="is_IS">HDHomeRun PVR-upptökuforrit</summary>
     <summary lang="it_IT">Client PVR HDHomeRun</summary>
     <summary lang="ja_JP">HDHomeRun用 PVR クライアント</summary>
     <summary lang="ko_KR">HDHomeRun PVR 클라이언트</summary>
@@ -50,6 +54,7 @@
     <summary lang="zh_CN">HDHomeRun PVR 客户端</summary>
     <summary lang="zh_TW">HDHomeRun PVR 用戶端</summary>
     <description lang="af_ZA">HDHomeRun PVR Kliënt</description>
+    <description lang="be_BY">HDHomeRun PVR кліент</description>
     <description lang="bg_BG">HDHomeRun ПВР клиент</description>
     <description lang="ca_ES">Client PVR de HDHomeRun</description>
     <description lang="cs_CZ">Klient HDHomeRun PVR</description>
@@ -60,6 +65,8 @@
     <description lang="en_US">HDHomeRun PVR Client</description>
     <description lang="es_ES">Cliente PVR HDHomeRun</description>
     <description lang="es_MX">Cliente PVR HDHomeRun</description>
+    <description lang="et_EE">HDHomeRun PVR'i klient</description>
+    <description lang="eu_ES">HDHomeRun PVR Bezeroa</description>
     <description lang="fi_FI">HDHomeRun-asiakasohjelma</description>
     <description lang="fr_CA">Client de numériscope HDHomeRun</description>
     <description lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</description>
@@ -67,6 +74,7 @@
     <description lang="he_IL">לקוח טלוויזיה חיה עבור HDHomeRun</description>
     <description lang="hr_HR">HDHomeRun PVR klijent</description>
     <description lang="hu_HU">HDHomeRun PVR ügyfél</description>
+    <description lang="is_IS">HDHomeRun PVR-upptökuforrit</description>
     <description lang="it_IT">Client PVR HDHomeRun</description>
     <description lang="ja_JP">HDHomeRun用 PVR クライアント</description>
     <description lang="ko_KR">HDHomeRun PVR 클라이언트</description>
