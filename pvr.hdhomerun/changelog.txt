@@ -1,3 +1,6 @@
+v3.5.0
+- Allow opening stream when multiple tuners are available
+
 v3.4.1
 - Update to PVR API v5.10.1
 

@@ -408,14 +408,48 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
   return PVR_ERROR_NO_ERROR;
 }
 
-std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
+std::string HDHomeRunTuners::_GetChannelStreamURL(const PVR_CHANNEL* channel)
 {
   AutoLock l(this);
 
   for (const auto& iterTuner : m_Tuners)
     for (const auto& jsonChannel : iterTuner.LineUp)
-      if (jsonChannel["_UID"].asUInt() == iUniqueId)
-        return jsonChannel["URL"].asString();
+    {
+      if (jsonChannel["_UID"].asUInt() == channel->iUniqueId)
+      {
+        if (CheckTunerAvailable(jsonChannel["URL"].asString()))
+          return jsonChannel["URL"].asString();
+        KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s", channel->iUniqueId, jsonChannel["URL"].asString().c_str());
+      }
+      else if (channel->iChannelNumber == jsonChannel["_ChannelNumber"].asUInt() &&
+               channel->iSubChannelNumber == jsonChannel["_SubChannelNumber"].asUInt() &&
+               strcmp(channel->strChannelName, jsonChannel["_ChannelName"].asString().c_str()) == 0)
+      {
+        if (CheckTunerAvailable(jsonChannel["URL"].asString()))
+          return jsonChannel["URL"].asString();
+        KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s", channel->iUniqueId, jsonChannel["URL"].asString().c_str());
+      }
+    }
 
   return "";
+}
+
+// With this approach, there is potential that between Videoplayer opening the stream and
+// the result of this function, that the tuner is locked by another.
+// Unable to find exact status code using XBMC->CURLOpen, as this fails with any status
+// >= 400, and only shows returns bool saying failed.
+bool HDHomeRunTuners::CheckTunerAvailable(const std::string& url)
+{
+  void* fileHandle = g.XBMC->CURLCreate(url.c_str());
+
+  if (fileHandle == nullptr)
+    return false;
+
+  // 503 error spits out here
+  // GetFilePropertyValue does not work as the CURLOpen has failed
+  if (!g.XBMC->CURLOpen(fileHandle, XFILE::READ_NO_CACHE))
+    return false;
+
+  g.XBMC->CloseFile(fileHandle);
+  return true;
 }
