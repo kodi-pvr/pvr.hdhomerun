@@ -58,17 +58,17 @@ bool HDHomeRunTuners::Update(int nMode)
   // Discover
   //
 
-  nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
-
-  KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
-
   AutoLock l(this);
 
-  if (nMode & UpdateDiscover)
-  m_Tuners.clear();
+  nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
   if (nTunerCount <= 0)
     return false;
+
+  KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
+
+  if (nMode & UpdateDiscover)
+    m_Tuners.clear();
 
   for (nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
   {
