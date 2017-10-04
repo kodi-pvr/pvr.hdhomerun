@@ -20,6 +20,10 @@ msgctxt "#32001"
 msgid "General"
 msgstr "Generelt"
 
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Skjul beskyttede kanaler"
+
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Aktiver fejlfindingslogning"
