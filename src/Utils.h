@@ -50,3 +50,4 @@ int DbgPrintf(const char* szFormat, ...);
 bool GetFileContents(const std::string& url, std::string& strContent);
 
 std::string EncodeURL(const std::string& strUrl);
+std::string MakeLegalFileName(const std::string &strFile);

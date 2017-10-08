@@ -9,4 +9,8 @@
     <setting id="mark_new" type="bool" label="32005" default="true" />
   </category>
 
+  <!-- Recording -->
+  <category label="32201">
+    <setting id="recpath" type="folder" label="32202" value="special://home/" />
+  </category>
 </settings>

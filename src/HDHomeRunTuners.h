@@ -76,6 +76,9 @@ public:
   PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
   std::string _GetChannelStreamURL(int iUniqueId);
+  std::vector<Tuner>& GetTuners();
+  PVR_ERROR GetEPGTagForChannel(EPG_TAG& tag, PVR_CHANNEL& channel, time_t startTime, time_t endTime);
+  Tuner* GetChannelTuners(PVR_CHANNEL& channel);
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);

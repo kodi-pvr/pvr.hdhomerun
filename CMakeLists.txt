@@ -13,6 +13,7 @@ find_package(JsonCpp REQUIRED)
 find_package(hdhomerun REQUIRED)
 
 include_directories(${kodiplatform_INCLUDE_DIRS}
+                    ${KODI_INCLUDE_DIR}/..
                     ${p8-platform_INCLUDE_DIRS}
                     ${KODI_INCLUDE_DIR}
                     ${JSONCPP_INCLUDE_DIRS}
@@ -25,10 +26,19 @@ set(DEPLIBS ${kodiplatform_LIBRARIES}
 
 set(PVRHDHOMERUN_SOURCES src/client.cpp
                          src/HDHomeRunTuners.cpp
+                         src/HDRecorder.cpp
+                         src/HDRecorderJob.cpp
+                         src/HDRecorderScheduler.cpp
+                         src/HDRecorderThread.cpp
                          src/Utils.cpp)
 
 set(PVRHDHOMERUN_HEADERS src/client.h
                          src/HDHomeRunTuners.h
+                         src/HDRecorder.h
+                         src/HDRecorderJob.h
+                         src/HDRecorderScheduler.h
+                         src/HDRecorderThread.h
+                         src/HDRecorderUtils.h
                          src/Utils.h)
 
 if(WIN32)

@@ -31,8 +31,10 @@
 #include <xbmc_pvr_dll.h>
 
 #include "HDHomeRunTuners.h"
+#include "HDRecorder.h"
 #include "Utils.h"
 
+HDRecorder *g_recorder = nullptr;
 GlobalsType g;
 
 class UpdateThread : public P8PLATFORM::CThread
@@ -79,6 +81,13 @@ void ADDON_ReadSettings(void)
 
   if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
     g.Settings.bDebug = false;
+
+  char buffer[2048];
+  g.XBMC->GetSetting("recpath", &buffer);
+  if (strcmp(buffer, "") == 0)
+    g.Settings.strRecPath = "special://recordings/";
+  else
+    g.Settings.strRecPath = buffer;
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -123,6 +132,17 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
+  if (g.Settings.bRecording)
+  {
+    g.RECORDER = new HDRecorder();
+    if (g.RECORDER == NULL)
+    {
+      KODI_LOG(ADDON::LOG_NOTICE, "PVR HDHomeRun Recorder thread failed to start");
+      KODI_LOG(ADDON::LOG_NOTICE, "Addon will continue to run without Recording capabilities");
+      g.Settings.bRecording = false;
+    }
+  }
+  
   g.currentStatus = ADDON_STATUS_OK;
 
   return ADDON_STATUS_OK;
@@ -135,8 +155,11 @@ ADDON_STATUS ADDON_GetStatus()
 
 void ADDON_Destroy()
 {
+  if (g.RECORDER != NULL)
+  {
+    SAFE_DELETE(g.RECORDER);
+  }
   g_UpdateThread.StopThread();
-
   SAFE_DELETE(g.Tuners);
   SAFE_DELETE(g.PVR);
   SAFE_DELETE(g.XBMC);
@@ -163,6 +186,8 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
     g.Settings.bMarkNew = *(bool*)settingValue;
   else if (strcmp(settingName, "debug") == 0)
     g.Settings.bDebug = *(bool*)settingValue;
+  else if (strcmp(settingName, "recpath") == 0)
+    g.Settings.strRecPath = *(char*)settingValue;
 
   return ADDON_STATUS_OK;
 }
@@ -198,11 +223,12 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
   pCapabilities->bSupportsTV = true;
   pCapabilities->bSupportsRadio = false;
   pCapabilities->bSupportsChannelGroups = true;
-  pCapabilities->bSupportsRecordings = false;
-  pCapabilities->bSupportsRecordingsUndelete = false;
-  pCapabilities->bSupportsTimers = false;
-  pCapabilities->bSupportsRecordingsRename = false;
+  pCapabilities->bSupportsTimers = true;
+  pCapabilities->bSupportsRecordings = true;
+  pCapabilities->bSupportsRecordingsRename = true;
   pCapabilities->bSupportsRecordingsLifetimeChange = false;
+  pCapabilities->bSupportsRecordingPlayCount = true;
+  pCapabilities->bSupportsRecordingsUndelete = false;
   pCapabilities->bSupportsDescrambleInfo = false;
 
   return PVR_ERROR_NO_ERROR;
@@ -312,6 +338,78 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
   return PVR_ERROR_NO_ERROR;
 }
 
+// Timers
+PVR_ERROR AddTimer(const PVR_TIMER &timer)
+{
+  return g.Settings.bRecording ? g.RECORDER->AddTimer(timer) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete)
+{
+  return g.Settings.bRecording ? g.RECORDER->DeleteTimer(timer,bForceDelete) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR UpdateTimer(const PVR_TIMER &timer)
+{
+  return g.Settings.bRecording ? g.RECORDER->UpdateTimer(timer) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR GetTimers(ADDON_HANDLE handle)
+{
+  return g.Settings.bRecording ? g.RECORDER->GetTimers(handle) : PVR_ERROR_FAILED;
+}
+
+int GetTimersAmount(void)
+{
+  return g.Settings.bRecording ? g.RECORDER->GetTimersAmount() : -1;
+}
+
+PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int* size)
+{
+  return g.Settings.bRecording ? g.RECORDER->GetTimerTypes(types, size) : PVR_ERROR_FAILED;
+}
+
+// Recordings
+PVR_ERROR DeleteRecording(const PVR_RECORDING& recording)
+{
+  return g.Settings.bRecording ? g.RECORDER->DeleteRecording(recording) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR RenameRecording(const PVR_RECORDING& recording)
+{
+  return g.Settings.bRecording ? g.RECORDER->RenameRecording(recording) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING& recording, int count)
+{
+  return g.Settings.bRecording ? g.RECORDER->SetRecordingPlayCount(recording, count) : PVR_ERROR_FAILED;
+}
+
+int GetRecordingsAmount(bool deleted)
+{
+  return g.Settings.bRecording ? g.RECORDER->GetRecordingsAmount() : -1;
+}
+
+PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
+{
+  return g.Settings.bRecording ? g.RECORDER->GetRecordings(handle) : PVR_ERROR_FAILED;
+}
+
+PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING* recording, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
+{
+  std::string strRecordingFile = g.RECORDER->GetRecordingFile(recording);
+  if (strRecordingFile.empty())
+    return PVR_ERROR_SERVER_ERROR;
+
+  strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
+  properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
+  strncpy(properties[0].strValue, strRecordingFile.c_str(), sizeof(properties[0].strValue) - 1);
+  properties[0].strValue[sizeof(properties[0].strValue) - 1] = '\0';
+
+  *iPropertiesCount = 1;
+  return PVR_ERROR_NO_ERROR;
+}
+
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -342,25 +440,12 @@ void CloseRecordedStream(void) {}
 int ReadRecordedStream(unsigned char*, unsigned int) { return 0; }
 long long SeekRecordedStream(long long, int) { return 0; }
 long long LengthRecordedStream(void) { return 0; }
-PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR DeleteRecording(const PVR_RECORDING&) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetRecordings(ADDON_HANDLE, bool) { return PVR_ERROR_NOT_IMPLEMENTED; }
-int GetRecordingsAmount(bool) { return -1; }
-PVR_ERROR RenameRecording(const PVR_RECORDING&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
-PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING&, int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 int GetRecordingLastPlayedPosition(const PVR_RECORDING&) { return -1; }
 PVR_ERROR SetRecordingLastPlayedPosition(const PVR_RECORDING&, int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR UndeleteRecording(const PVR_RECORDING&) { return PVR_ERROR_NOT_IMPLEMENTED; }
-// Timers
-PVR_ERROR AddTimer(const PVR_TIMER&) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR DeleteTimer(const PVR_TIMER&, bool) { return PVR_ERROR_NOT_IMPLEMENTED; }
-int GetTimersAmount(void) { return -1; }
-PVR_ERROR GetTimers(ADDON_HANDLE) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR UpdateTimer(const PVR_TIMER&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 // Timeshift
 void PauseStream(bool bPaused) {}
 void SetSpeed(int) {};

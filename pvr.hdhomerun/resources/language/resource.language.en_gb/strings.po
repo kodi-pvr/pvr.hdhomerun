@@ -35,3 +35,12 @@ msgstr ""
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr ""
+
+msgctxt "#32201"
+msgid "Recording Settings"
+msgstr "Recording Settings"
+
+msgctxt "#32202
+msgid "Save Recordings to Path"
+msgstr "Save Recordings to Path"
+

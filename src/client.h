@@ -27,6 +27,7 @@
 #include <libXBMC_pvr.h>
 
 class HDHomeRunTuners;
+class HDRecorder;
 
 struct SettingsType
 {
@@ -36,12 +37,16 @@ struct SettingsType
     bHideDuplicateChannels = true;
     bDebug = false;
     bMarkNew = false;
+    bRecording = true;
+    strRecPath = "special://recordings/";
   }
 
   bool bHideProtected;
   bool bHideDuplicateChannels;
   bool bDebug;
   bool bMarkNew;
+  bool bRecording;
+  std::string strRecPath;
 };
 
 struct GlobalsType
@@ -52,12 +57,13 @@ struct GlobalsType
     XBMC = NULL;
     PVR = NULL;
     Tuners = NULL;
+    RECORDER = NULL;
   }
 
   ADDON_STATUS currentStatus;
   ADDON::CHelper_libXBMC_addon* XBMC;
   CHelper_libXBMC_pvr* PVR;
-
+  HDRecorder* RECORDER;
   HDHomeRunTuners* Tuners;
 
   SettingsType Settings;

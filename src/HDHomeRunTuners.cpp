@@ -69,7 +69,7 @@ bool HDHomeRunTuners::Update(int nMode)
   AutoLock l(this);
 
   // if latest discovery found fewer devices than m_Tuners List, clear and start fresh
-  if (nMode & UpdateDiscover || nTunerCount < m_Tuners.size())
+  if (nMode & UpdateDiscover || nTunerCount < static_cast<int>(m_Tuners.size()))
   {
     bClearTuners = true;
     m_Tuners.clear();
@@ -411,11 +411,74 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
 {
   AutoLock l(this);
-
   for (const auto& iterTuner : m_Tuners)
     for (const auto& jsonChannel : iterTuner.LineUp)
       if (jsonChannel["_UID"].asUInt() == iUniqueId)
         return jsonChannel["URL"].asString();
 
   return "";
+}
+
+std::vector<HDHomeRunTuners::Tuner>& HDHomeRunTuners::GetTuners()
+{
+  return m_Tuners;
+}
+
+PVR_ERROR HDHomeRunTuners::GetEPGTagForChannel(EPG_TAG& tag, PVR_CHANNEL& channel, time_t startTime, time_t endTime)
+{
+  AutoLock l(this);
+
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
+    {
+      if (jsonChannel["_UID"].asUInt() != channel.iUniqueId)
+        continue;
+
+      for (const auto& iterGuide : iterTuner.Guide)
+        if (iterGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
+          for (const auto& jsonGuideItem : iterGuide["Guide"])
+          {
+            if (static_cast<time_t>(jsonGuideItem["StartTime"].asUInt()) == startTime &&
+                static_cast<time_t>(jsonGuideItem["EndTime"].asUInt()) == endTime)
+            {
+              std::string
+                strTitle(jsonGuideItem["Title"].asString()),
+                strSynopsis(jsonGuideItem["Synopsis"].asString()),
+                strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
+                strSeriesID(jsonGuideItem["SeriesID"].asString()),
+                strImageURL(jsonGuideItem["ImageURL"].asString());
+
+              tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
+              tag.strTitle = strTitle.c_str();
+              tag.iUniqueChannelId = channel.iUniqueId;
+              tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
+              tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
+              tag.firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
+              tag.strPlot = strSynopsis.c_str();
+              tag.strIconPath = strImageURL.c_str();
+              tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
+              tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
+              tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+              tag.strEpisodeName = strEpTitle.c_str();
+              tag.strSeriesLink = strSeriesID.c_str();
+
+              return PVR_ERROR_NO_ERROR;
+            }
+          }
+    }
+
+  return PVR_ERROR_FAILED;
+}
+
+HDHomeRunTuners::Tuner* HDHomeRunTuners::GetChannelTuners(PVR_CHANNEL& channel)
+{
+  for (auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
+      if (jsonChannel["_UID"].asUInt() == channel.iUniqueId)
+      {
+        static Tuner* foundChannelTuner = &iterTuner;
+        return foundChannelTuner;
+      }
+
+  return nullptr;
 }

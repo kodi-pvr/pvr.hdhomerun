@@ -95,3 +95,26 @@ std::string EncodeURL(const std::string& strUrl)
 
   return str;
 }
+
+std::string MakeLegalFileName(const std::string &strFile)
+{
+  std::string result = strFile;
+
+  StringUtils::Replace(result, '/', '_');
+  StringUtils::Replace(result, '\\', '_');
+  StringUtils::Replace(result, '?', '_');
+
+#if defined(TARGET_WINDOWS)
+  // just filter out some illegal characters on windows
+  StringUtils::Replace(result, ':', '_');
+  StringUtils::Replace(result, '*', '_');
+  StringUtils::Replace(result, '?', '_');
+  StringUtils::Replace(result, '\"', '_');
+  StringUtils::Replace(result, '<', '_');
+  StringUtils::Replace(result, '>', '_');
+  StringUtils::Replace(result, '|', '_');
+  StringUtils::TrimRight(result, ". ");
+#endif
+
+  return result;
+}
