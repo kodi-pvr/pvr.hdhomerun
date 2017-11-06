@@ -276,7 +276,6 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 
 PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 {
-  PVR_CHANNEL pvrChannel;
   Json::Value::ArrayIndex nIndex;
 
   if (bRadio)
@@ -292,7 +291,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       if (jsonChannel["_Hide"].asBool())
         continue;
 
-      memset(&pvrChannel, 0, sizeof(pvrChannel));
+      PVR_CHANNEL pvrChannel = { 0 };
 
       pvrChannel.iUniqueId = jsonChannel["_UID"].asUInt();
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
@@ -332,12 +331,11 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
       for (nGuideIndex = 0; nGuideIndex < jsonGuide.size(); nGuideIndex++)
       {
         const Json::Value& jsonGuideItem = jsonGuide[nGuideIndex];
-        EPG_TAG tag;
 
         if ((time_t)jsonGuideItem["EndTime"].asUInt() <= iStart || iEnd < (time_t)jsonGuideItem["StartTime"].asUInt())
           continue;
 
-        memset(&tag, 0, sizeof(tag));
+        EPG_TAG tag = { 0 };
 
         String
           strTitle(jsonGuideItem["Title"].asString()),
@@ -371,12 +369,10 @@ int HDHomeRunTuners::PvrGetChannelGroupsAmount()
 
 PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 {
-  PVR_CHANNEL_GROUP channelGroup;
-
   if (bRadio)
     return PVR_ERROR_NO_ERROR;
 
-  memset(&channelGroup, 0, sizeof(channelGroup));
+  PVR_CHANNEL_GROUP channelGroup = { 0 };
 
   channelGroup.iPosition = 1;
   PVR_STRCPY(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str());
@@ -410,9 +406,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
         (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName) == 0 && jsonChannel["HD"].asBool()))
         continue;
 
-      PVR_CHANNEL_GROUP_MEMBER channelGroupMember;
-
-      memset(&channelGroupMember, 0, sizeof(channelGroupMember));
+      PVR_CHANNEL_GROUP_MEMBER channelGroupMember = { 0 };
 
       PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
       channelGroupMember.iChannelUniqueId = jsonChannel["_UID"].asUInt();
