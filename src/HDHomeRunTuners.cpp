@@ -47,20 +47,15 @@ unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 bool HDHomeRunTuners::Update(int nMode)
 {
   struct hdhomerun_discover_device_t foundDevices[16];
-  Json::Value::ArrayIndex nIndex, nCount, nGuideIndex;
-  int nTunerCount, nTunerIndex;
   String strUrl, strJson;
   Json::Reader jsonReader;
-  Json::Value jsonResponse;
-  Tuner* pTuner;
-
   //
   // Discover
   //
 
   AutoLock l(this);
 
-  nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
+  int nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
   if (nTunerCount <= 0)
     return false;
@@ -70,9 +65,9 @@ bool HDHomeRunTuners::Update(int nMode)
   if (nMode & UpdateDiscover)
     m_Tuners.clear();
 
-  for (nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
+  for (int nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
   {
-    pTuner = NULL;
+    Tuner* pTuner = NULL;
 
     if (nMode & UpdateDiscover)
     {
@@ -114,16 +109,15 @@ bool HDHomeRunTuners::Update(int nMode)
         if (jsonReader.parse(strJson, pTuner->Guide) &&
           pTuner->Guide.type() == Json::arrayValue)
         {
-          for (nIndex = 0, nCount = 0; nIndex < pTuner->Guide.size(); nIndex++)
+          for (auto& tunerGuide : pTuner->Guide)
           {
-            Json::Value& jsonGuide = pTuner->Guide[nIndex]["Guide"];
+            Json::Value& jsonGuide = tunerGuide["Guide"];
 
             if (jsonGuide.type() != Json::arrayValue)
               continue;
 
-            for (Json::Value::ArrayIndex i = 0; i < jsonGuide.size(); i++, nCount++)
+            for (auto& jsonGuideItem : jsonGuide)
             {
-              Json::Value& jsonGuideItem = jsonGuide[i];
               int iSeriesNumber = 0, iEpisodeNumber = 0;
 
               jsonGuideItem["_UID"] = PvrCalculateUniqueId(jsonGuideItem["Title"].asString() + jsonGuideItem["EpisodeNumber"].asString() + jsonGuideItem["ImageURL"].asString());
@@ -134,11 +128,8 @@ bool HDHomeRunTuners::Update(int nMode)
                 jsonGuideItem["Title"] = "*" + jsonGuideItem["Title"].asString();
 
               unsigned int nGenreType = 0;
-              Json::Value& jsonFilter = jsonGuideItem["Filter"];
-              for (Json::Value::ArrayIndex nGenreIndex = 0; nGenreIndex < jsonFilter.size(); nGenreIndex++)
+              for (const auto& str : jsonGuideItem["Filter"])
               {
-                String str = jsonFilter[nGenreIndex].asString();
-
                 if (str == "News")
                   nGenreType = EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
                 else
@@ -173,7 +164,7 @@ bool HDHomeRunTuners::Update(int nMode)
             }
           }
 
-          KODI_LOG(LOG_DEBUG, "Found %u guide entries", nCount);
+          KODI_LOG(LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
         }
         else
         {
@@ -200,12 +191,9 @@ bool HDHomeRunTuners::Update(int nMode)
           std::set<String> guideNumberSet;
           int nChannelNumber = 1;
 
-          for (nIndex = 0; nIndex < pTuner->LineUp.size(); nIndex++)
+          for (auto& jsonChannel : pTuner->LineUp)
           {
-            Json::Value& jsonChannel = pTuner->LineUp[nIndex];
-            bool bHide;
-
-            bHide = 
+            bool bHide =
               ((jsonChannel["DRM"].asBool() && g.Settings.bHideProtected) ||
               (g.Settings.bHideDuplicateChannels && guideNumberSet.find(jsonChannel["GuideNumber"].asString()) != guideNumberSet.end()));
 
@@ -213,9 +201,8 @@ bool HDHomeRunTuners::Update(int nMode)
             jsonChannel["_ChannelName"] = jsonChannel["GuideName"].asString();
 
             // Find guide entry
-            for (nGuideIndex = 0; nGuideIndex < pTuner->Guide.size(); nGuideIndex++)
+            for (const auto& jsonGuide : pTuner->Guide)
             {
-              const Json::Value& jsonGuide = pTuner->Guide[nGuideIndex];
               if (jsonGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
               {
                 if (jsonGuide["Affiliate"].asString() != "")
@@ -266,9 +253,9 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 
   AutoLock l(this);
 
-  for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
-    for (Json::Value::ArrayIndex nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
-      if (!iterTuner->LineUp[nIndex]["_Hide"].asBool())
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
+      if (!jsonChannel["_Hide"].asBool())
         nCount++;
 
   return nCount;
@@ -276,18 +263,14 @@ int HDHomeRunTuners::PvrGetChannelsAmount()
 
 PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 {
-  Json::Value::ArrayIndex nIndex;
-
   if (bRadio)
     return PVR_ERROR_NO_ERROR;
 
   AutoLock l(this);
 
-  for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
-    for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
     {
-      const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
-
       if (jsonChannel["_Hide"].asBool())
         continue;
 
@@ -307,31 +290,24 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
-  Json::Value::ArrayIndex nChannelIndex, nGuideIndex;
-
   AutoLock l(this);
 
-  for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
+  for (const auto& iterTuner : m_Tuners)
   {
-    for (nChannelIndex = 0; nChannelIndex < iterTuner->LineUp.size(); nChannelIndex++)
+    for (const auto& jsonChannel : iterTuner.LineUp)
     {
-      const Json::Value& jsonChannel = iterTuner->LineUp[nChannelIndex];
-
       if (jsonChannel["_UID"].asUInt() != channel.iUniqueId)
         continue;
-
-      for (nGuideIndex = 0; nGuideIndex < iterTuner->Guide.size(); nGuideIndex++)
-        if (iterTuner->Guide[nGuideIndex]["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
+      int nGuideIndex;
+      for (nGuideIndex = 0; nGuideIndex < iterTuner.Guide.size(); nGuideIndex++)
+        if (iterTuner.Guide[nGuideIndex]["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
           break;
 
-      if (nGuideIndex == iterTuner->Guide.size())
+      if (nGuideIndex == iterTuner.Guide.size())
         continue;
 
-      const Json::Value& jsonGuide = iterTuner->Guide[nGuideIndex]["Guide"];
-      for (nGuideIndex = 0; nGuideIndex < jsonGuide.size(); nGuideIndex++)
+      for (const auto& jsonGuideItem : iterTuner.Guide[nGuideIndex]["Guide"])
       {
-        const Json::Value& jsonGuideItem = jsonGuide[nGuideIndex];
-
         if ((time_t)jsonGuideItem["EndTime"].asUInt() <= iStart || iEnd < (time_t)jsonGuideItem["StartTime"].asUInt())
           continue;
 
@@ -391,15 +367,11 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 
 PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group)
 {
-  int nCount = 0;
-
   AutoLock l(this);
 
-  for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
-    for (Json::Value::ArrayIndex nChannelIndex = 0; nChannelIndex < iterTuner->LineUp.size(); nChannelIndex++)
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
     {
-      const Json::Value& jsonChannel = iterTuner->LineUp[nChannelIndex];
-
       if (jsonChannel["_Hide"].asBool() ||
         (strcmp(g_strGroupFavoriteChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["Favorite"].asBool()) ||
         (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["HD"].asBool()) ||
@@ -419,23 +391,19 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 }
 
 std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId) 
-{  
-    Json::Value::ArrayIndex nIndex;
+{
+  AutoLock l(this);
 
-    AutoLock l(this);
-  
-    for (Tuners::const_iterator iterTuner = m_Tuners.begin(); iterTuner != m_Tuners.end(); iterTuner++)
+  for (const auto& iterTuner : m_Tuners)
+  {
+    for (const auto& jsonChannel : iterTuner.LineUp)
     {
-        for (nIndex = 0; nIndex < iterTuner->LineUp.size(); nIndex++)
-        {
-            const Json::Value& jsonChannel = iterTuner->LineUp[nIndex];
-		
-            if (jsonChannel["_UID"].asUInt() == iUniqueId)
-            {
-                std::string url = jsonChannel["URL"].asString();
-                return url;
-            }
-        }
-    }        
-    return "";
+      if (jsonChannel["_UID"].asUInt() == iUniqueId)
+      {
+        std::string url = jsonChannel["URL"].asString();
+        return url;
+      }
+    }
+  }        
+  return "";
 }
