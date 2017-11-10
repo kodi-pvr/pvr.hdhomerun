@@ -109,8 +109,12 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 
   g.Tuners = new HDHomeRunTuners;
   if (g.Tuners == NULL)
-      return ADDON_STATUS_PERMANENT_FAILURE;
-  
+  {
+    SAFE_DELETE(g.PVR);
+    SAFE_DELETE(g.XBMC);
+    return ADDON_STATUS_PERMANENT_FAILURE;
+  }
+
   ADDON_ReadSettings();
 
   if (g.Tuners)
