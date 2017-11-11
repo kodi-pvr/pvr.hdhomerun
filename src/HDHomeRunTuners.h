@@ -31,61 +31,61 @@
 class HDHomeRunTuners
 {
 public:
-	enum
-	{
-		UpdateDiscover = 1,
-		UpdateLineUp = 2,
-		UpdateGuide = 4
-	};
+  enum
+  {
+    UpdateDiscover = 1,
+    UpdateLineUp = 2,
+    UpdateGuide = 4
+  };
 
 public:
-	struct Tuner
-	{
-		Tuner()
-		{
-			memset(&Device, 0, sizeof(Device));
-		}
+  struct Tuner
+  {
+    Tuner()
+    {
+      memset(&Device, 0, sizeof(Device));
+  }
 
-		hdhomerun_discover_device_t Device;
+    hdhomerun_discover_device_t Device;
 
-		Json::Value LineUp;
-		Json::Value Guide;
-	};
+    Json::Value LineUp;
+    Json::Value Guide;
+  };
 
-	typedef std::vector<Tuner> Tuners;
+  typedef std::vector<Tuner> Tuners;
 
-	class AutoLock
-	{
-	public:
-		AutoLock(HDHomeRunTuners* p) : m_p(p) { m_p->Lock(); }
-		AutoLock(HDHomeRunTuners& p) : m_p(&p) { m_p->Lock(); }
-		~AutoLock() { m_p->Unlock(); }
-	protected:
-		HDHomeRunTuners* m_p;
-	};
-
-public:
-	HDHomeRunTuners();
-
-	bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
+  class AutoLock
+  {
+  public:
+    AutoLock(HDHomeRunTuners* p) : m_p(p) { m_p->Lock(); }
+    AutoLock(HDHomeRunTuners& p) : m_p(&p) { m_p->Lock(); }
+    ~AutoLock() { m_p->Unlock(); }
+  protected:
+    HDHomeRunTuners* m_p;
+  };
 
 public:
-	PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
-	int PvrGetChannelsAmount();
-	PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd);
-	int PvrGetChannelGroupsAmount(void);
-	PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
-	PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
-	std::string _GetChannelStreamURL(int iUniqueId);
-	
-protected:
-	unsigned int PvrCalculateUniqueId(const String& str);
+  HDHomeRunTuners();
+
+  bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
 
 public:
-	void Lock() { m_Lock.Lock(); }
-	void Unlock() { m_Lock.Unlock(); }
+  PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
+  int PvrGetChannelsAmount();
+  PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd);
+  int PvrGetChannelGroupsAmount(void);
+  PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
+  PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+  std::string _GetChannelStreamURL(int iUniqueId);
 
 protected:
-	Tuners m_Tuners;
-	P8PLATFORM::CMutex m_Lock;
+  unsigned int PvrCalculateUniqueId(const String& str);
+
+public:
+  void Lock() { m_Lock.Lock(); }
+  void Unlock() { m_Lock.Unlock(); }
+
+protected:
+  Tuners m_Tuners;
+  P8PLATFORM::CMutex m_Lock;
 };

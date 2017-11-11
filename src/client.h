@@ -33,43 +33,43 @@ class HDHomeRunTuners;
 
 struct SettingsType
 {
-	SettingsType()
-	{
-		bHideProtected = true;
-		bHideDuplicateChannels = true;
-		bDebug = false;
-		bMarkNew = false;
-	}
+  SettingsType()
+  {
+    bHideProtected = true;
+    bHideDuplicateChannels = true;
+    bDebug = false;
+    bMarkNew = false;
+  }
 
-	bool bHideProtected;
-	bool bHideDuplicateChannels;
-	bool bDebug;
-	bool bMarkNew;
+  bool bHideProtected;
+  bool bHideDuplicateChannels;
+  bool bDebug;
+  bool bMarkNew;
 };
 
 struct GlobalsType
 {
-	GlobalsType()
-	{
-		bCreated = false;
-		currentStatus = ADDON_STATUS_UNKNOWN;
-		iCurrentChannelUniqueId = 0;
-		XBMC = NULL;
-		PVR = NULL;
-		Tuners = NULL;
-	}
+  GlobalsType()
+  {
+    bCreated = false;
+    currentStatus = ADDON_STATUS_UNKNOWN;
+    iCurrentChannelUniqueId = 0;
+    XBMC = NULL;
+    PVR = NULL;
+    Tuners = NULL;
+  }
 
-	bool bCreated;
-	ADDON_STATUS currentStatus;
-	unsigned int iCurrentChannelUniqueId;
-	String strUserPath;
-	String strClientPath;
-	ADDON::CHelper_libXBMC_addon* XBMC;
-	CHelper_libXBMC_pvr* PVR;
+  bool bCreated;
+  ADDON_STATUS currentStatus;
+  unsigned int iCurrentChannelUniqueId;
+  String strUserPath;
+  String strClientPath;
+  ADDON::CHelper_libXBMC_addon* XBMC;
+  CHelper_libXBMC_pvr* PVR;
 
-	HDHomeRunTuners* Tuners;
+  HDHomeRunTuners* Tuners;
 
-	SettingsType Settings;
+  SettingsType Settings;
 };
 
 extern GlobalsType g;

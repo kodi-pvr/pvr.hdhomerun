@@ -1,3 +1,8 @@
+v3.1.8
+- Whitespace changes (tabs to spaces to make all files uniform)
+- jsoncpp 0.10.6 Update
+- code cleanup
+
 v3.1.4
 - Update to PVR API 5.7.0
 - Stub IsEPGTagPlayable as not implemented
