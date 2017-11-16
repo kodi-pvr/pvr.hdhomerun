@@ -63,6 +63,7 @@ bool HDHomeRunTuners::Update(int nMode)
   std::string strUrl, strJson, jsonReaderError;
   Json::CharReaderBuilder jsonReaderBuilder;
   std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
+  std::set<std::string> guideNumberSet;
 
   if (nMode & UpdateDiscover)
     m_Tuners.clear();
@@ -186,7 +187,6 @@ bool HDHomeRunTuners::Update(int nMode)
         if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &pTuner->LineUp, &jsonReaderError) &&
           pTuner->LineUp.type() == Json::arrayValue)
         {
-          std::set<std::string> guideNumberSet;
           int nChannelNumber = 1;
 
           for (auto& jsonChannel : pTuner->LineUp)
