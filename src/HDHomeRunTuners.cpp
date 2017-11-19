@@ -134,23 +134,26 @@ bool HDHomeRunTuners::Update(int nMode)
               unsigned int nGenreType = 0;
               for (const auto& str : jsonGuideItem["Filter"])
               {
+                if (str == "Kids")
+                  nGenreType = EPG_EVENT_CONTENTMASK_CHILDRENYOUTH;
+                else
+                if (str == "Food")
+                  nGenreType = EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
+                else
+                if (str == "Movie" || str == "Movies" ||
+                  str == "Drama")
+                  nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
+                else
                 if (str == "News")
                   nGenreType = EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
                 else
                 if (str == "Comedy")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
-                if (str == "Movie" ||
-                  str == "Drama")
-                  nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
-                else
-                if (str == "Food")
-                  nGenreType = EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
-                else
-                if (str == "Talk Show")
+                if (str == "Game Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
-                if (str == "Game Show")
+                if (str == "Talk Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
                 if (str == "Sport" ||
