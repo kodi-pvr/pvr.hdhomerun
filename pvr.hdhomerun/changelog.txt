@@ -1,3 +1,7 @@
+v3.1.10
+- guide filters updated
+- additional epg_tag fields added
+
 v3.1.9
 - Bump jsoncpp to version 1.8.3
 - Json::CharReaderBuilder implementation

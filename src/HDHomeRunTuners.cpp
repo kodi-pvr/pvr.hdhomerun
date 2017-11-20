@@ -323,6 +323,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
         String
           strTitle(jsonGuideItem["Title"].asString()),
           strSynopsis(jsonGuideItem["Synopsis"].asString()),
+          strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
+          strSeriesID(jsonGuideItem["SeriesID"].asString()),
           strImageURL(jsonGuideItem["ImageURL"].asString());
 
         tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
@@ -331,6 +333,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
         tag.startTime = (time_t)jsonGuideItem["StartTime"].asUInt();
         tag.endTime = (time_t)jsonGuideItem["EndTime"].asUInt();
         tag.firstAired = (time_t)jsonGuideItem["OriginalAirdate"].asUInt();
+        tag.strEpisodeName = strEpTitle.c_str();
+        tag.strSeriesLink = strSeriesID.c_str();
         tag.strPlot = strSynopsis.c_str();
         tag.strIconPath = strImageURL.c_str();
         tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
