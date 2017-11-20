@@ -136,7 +136,9 @@ bool HDHomeRunTuners::Update(int nMode)
                   nGenreType = EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
                 else if (str == "Comedy")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
-                else if (str == "Movie" ||
+                else if (str == "Kids")
+                  nGenreType = EPG_EVENT_CONTENTMASK_CHILDRENYOUTH;
+                else if (str == "Movie" || str == "Movies" ||
                          str == "Drama")
                   nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
                 else if (str == "Food")
@@ -307,6 +309,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
             std::string
               strTitle(jsonGuideItem["Title"].asString()),
               strSynopsis(jsonGuideItem["Synopsis"].asString()),
+              strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
+              strSeriesID(jsonGuideItem["SeriesID"].asString()),
               strImageURL(jsonGuideItem["ImageURL"].asString());
 
             tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
@@ -320,6 +324,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
             tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
             tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
             tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+            tag.strEpisodeName = strEpTitle.c_str();
+            tag.strSeriesLink = strSeriesID.c_str();
 
             g.PVR->TransferEpgEntry(handle, &tag);
           }
