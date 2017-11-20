@@ -1,3 +1,7 @@
+v3.1.9
+- Bump jsoncpp to version 1.8.3
+- Json::CharReaderBuilder implementation
+
 v3.1.8
 - Whitespace changes (tabs to spaces to make all files uniform)
 - jsoncpp 0.10.6 Update

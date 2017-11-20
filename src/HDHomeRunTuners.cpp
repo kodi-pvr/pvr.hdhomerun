@@ -25,6 +25,8 @@
 #include "client.h"
 #include "Utils.h"
 #include "HDHomeRunTuners.h"
+
+#include <memory>
 #include <set>
 #include <functional>
 
@@ -47,8 +49,10 @@ unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 bool HDHomeRunTuners::Update(int nMode)
 {
   struct hdhomerun_discover_device_t foundDevices[16];
-  String strUrl, strJson;
-  Json::Reader jsonReader;
+  String strUrl, strJson, jsonReaderError;
+  Json::CharReaderBuilder jsonReaderBuilder;
+  std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
+
   //
   // Discover
   //
@@ -106,7 +110,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
-        if (jsonReader.parse(strJson, pTuner->Guide) &&
+        if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &pTuner->Guide, &jsonReaderError) &&
           pTuner->Guide.type() == Json::arrayValue)
         {
           for (auto& tunerGuide : pTuner->Guide)
@@ -185,7 +189,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
-        if (jsonReader.parse(strJson, pTuner->LineUp) &&
+        if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &pTuner->LineUp, &jsonReaderError) &&
           pTuner->LineUp.type() == Json::arrayValue)
         {
           std::set<String> guideNumberSet;
