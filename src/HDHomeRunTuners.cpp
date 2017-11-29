@@ -134,23 +134,26 @@ bool HDHomeRunTuners::Update(int nMode)
               unsigned int nGenreType = 0;
               for (const auto& str : jsonGuideItem["Filter"])
               {
+                if (str == "Kids")
+                  nGenreType = EPG_EVENT_CONTENTMASK_CHILDRENYOUTH;
+                else
+                if (str == "Food")
+                  nGenreType = EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
+                else
+                if (str == "Movie" || str == "Movies" ||
+                  str == "Drama")
+                  nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
+                else
                 if (str == "News")
                   nGenreType = EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
                 else
                 if (str == "Comedy")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
-                if (str == "Movie" ||
-                  str == "Drama")
-                  nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
-                else
-                if (str == "Food")
-                  nGenreType = EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
-                else
-                if (str == "Talk Show")
+                if (str == "Game Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
-                if (str == "Game Show")
+                if (str == "Talk Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
                 else
                 if (str == "Sport" ||
@@ -320,6 +323,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
         String
           strTitle(jsonGuideItem["Title"].asString()),
           strSynopsis(jsonGuideItem["Synopsis"].asString()),
+          strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
+          strSeriesID(jsonGuideItem["SeriesID"].asString()),
           strImageURL(jsonGuideItem["ImageURL"].asString());
 
         tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
@@ -328,6 +333,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
         tag.startTime = (time_t)jsonGuideItem["StartTime"].asUInt();
         tag.endTime = (time_t)jsonGuideItem["EndTime"].asUInt();
         tag.firstAired = (time_t)jsonGuideItem["OriginalAirdate"].asUInt();
+        tag.strEpisodeName = strEpTitle.c_str();
+        tag.strSeriesLink = strSeriesID.c_str();
         tag.strPlot = strSynopsis.c_str();
         tag.strIconPath = strImageURL.c_str();
         tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
