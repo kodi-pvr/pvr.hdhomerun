@@ -23,10 +23,14 @@
  *
  */
 
-#include "client.h"
-#include <p8-platform/threads/mutex.h>
-#include <hdhomerun.h>
+#include <string>
+#include <vector>
+
+#include "hdhomerun.h"
 #include <json/json.h>
+#include <p8-platform/threads/mutex.h>
+
+#include "client.h"
 
 class HDHomeRunTuners
 {

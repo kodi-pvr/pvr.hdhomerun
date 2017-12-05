@@ -23,8 +23,9 @@
  *
  */
 
+#include <string>
+
 #include "client.h"
-#include <stdlib.h>
 
 #if defined(TARGET_WINDOWS) && defined(DEBUG)
 #define USE_DBG_CONSOLE

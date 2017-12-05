@@ -23,9 +23,13 @@
  */
 
 #include "client.h"
-#include <xbmc_pvr_dll.h>
-#include <p8-platform/util/util.h>
+
+#include <cstring>
+#include <string>
 #include <p8-platform/threads/threads.h>
+#include <p8-platform/util/util.h>
+#include <xbmc_pvr_dll.h>
+
 #include "HDHomeRunTuners.h"
 #include "Utils.h"
 

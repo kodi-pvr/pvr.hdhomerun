@@ -22,8 +22,12 @@
  *
  */
 
-#include "client.h"
 #include "Utils.h"
+
+#include <string>
+#include <p8-platform/util/StringUtils.h>
+
+#include "client.h"
 
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)

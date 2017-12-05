@@ -22,13 +22,20 @@
  *
  */
 
-#include "client.h"
-#include "Utils.h"
 #include "HDHomeRunTuners.h"
 
+#include <cstring>
+#include <ctime>
+#include <functional>
 #include <memory>
 #include <set>
-#include <functional>
+#include <string>
+#include <vector>
+
+#include <p8-platform/util/StringUtils.h>
+
+#include "client.h"
+#include "Utils.h"
 
 using namespace ADDON;
 
