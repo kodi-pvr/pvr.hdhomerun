@@ -37,8 +37,6 @@
 #include "client.h"
 #include "Utils.h"
 
-using namespace ADDON;
-
 static const std::string g_strGroupFavoriteChannels("Favorite channels");
 static const std::string g_strGroupHDChannels("HD channels");
 static const std::string g_strGroupSDChannels("SD channels");
@@ -71,7 +69,7 @@ bool HDHomeRunTuners::Update(int nMode)
   if (nTunerCount <= 0)
     return false;
 
-  KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
+  KODI_LOG(ADDON::LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
 
   if (nMode & UpdateDiscover)
     m_Tuners.clear();
@@ -113,7 +111,7 @@ bool HDHomeRunTuners::Update(int nMode)
     {
       strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
 
-      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
+      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
@@ -175,11 +173,11 @@ bool HDHomeRunTuners::Update(int nMode)
             }
           }
 
-          KODI_LOG(LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
+          KODI_LOG(ADDON::LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
         }
         else
         {
-          KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
+          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse guide", strUrl.c_str());
         }
       }
     }
@@ -192,7 +190,7 @@ bool HDHomeRunTuners::Update(int nMode)
     {
       strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
-      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
+      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
@@ -247,10 +245,10 @@ bool HDHomeRunTuners::Update(int nMode)
             }
           }
 
-          KODI_LOG(LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
+          KODI_LOG(ADDON::LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
         }
         else
-          KODI_LOG(LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
+          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
       }
     }
   }

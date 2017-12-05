@@ -33,7 +33,6 @@
 #include "HDHomeRunTuners.h"
 #include "Utils.h"
 
-using namespace ADDON;
 
 GlobalsType g;
 
@@ -90,7 +89,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 
   PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
 
-  g.XBMC = new CHelper_libXBMC_addon;
+  g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
   SAFE_DELETE(g.XBMC);
@@ -105,7 +104,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
-  KODI_LOG(LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
+  KODI_LOG(ADDON::LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
 
   g.currentStatus = ADDON_STATUS_UNKNOWN;
   g.strUserPath = pvrprops->strUserPath;
