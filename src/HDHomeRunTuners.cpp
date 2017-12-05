@@ -41,10 +41,6 @@ static const std::string g_strGroupFavoriteChannels("Favorite channels");
 static const std::string g_strGroupHDChannels("HD channels");
 static const std::string g_strGroupSDChannels("SD channels");
 
-HDHomeRunTuners::HDHomeRunTuners()
-{
-}
-
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
 {
   int nHash = (int)std::hash<std::string>()(str);
