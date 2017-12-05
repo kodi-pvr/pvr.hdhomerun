@@ -273,8 +273,12 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       pvrChannel.iUniqueId = jsonChannel["_UID"].asUInt();
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
       pvrChannel.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
-      PVR_STRCPY(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str());
-      PVR_STRCPY(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str());
+      strncpy(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str(),
+              sizeof(pvrChannel.strChannelName) - 1);
+      pvrChannel.strChannelName[sizeof(pvrChannel.strChannelName) - 1] = '\0';
+      strncpy(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str(),
+              sizeof(pvrChannel.strIconPath) - 1);
+      pvrChannel.strIconPath[sizeof(pvrChannel.strIconPath) - 1] = '\0';
 
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
     }
@@ -345,15 +349,21 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
   PVR_CHANNEL_GROUP channelGroup = { 0 };
 
   channelGroup.iPosition = 1;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   channelGroup.iPosition++;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupHDChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupHDChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   channelGroup.iPosition++;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupSDChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupSDChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   return PVR_ERROR_NO_ERROR;
@@ -374,7 +384,9 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
 
       PVR_CHANNEL_GROUP_MEMBER channelGroupMember = { 0 };
 
-      PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
+      strncpy(channelGroupMember.strGroupName, group.strGroupName,
+              sizeof(channelGroupMember.strGroupName) - 1);
+      channelGroupMember.strGroupName[sizeof(channelGroupMember.strGroupName) - 1] = '\0';
       channelGroupMember.iChannelUniqueId = jsonChannel["_UID"].asUInt();
       channelGroupMember.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
 

@@ -292,9 +292,13 @@ void CloseLiveStream(void)
 
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 {
-  PVR_STRCPY(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1");
-  PVR_STRCPY(signalStatus.strAdapterStatus, "OK");
-  
+  strncpy(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1",
+          sizeof(signalStatus.strAdapterName) - 1);
+  signalStatus.strAdapterName[sizeof(signalStatus.strAdapterName) - 1] = '\0';
+  strncpy(signalStatus.strAdapterStatus, "OK",
+          sizeof(signalStatus.strAdapterStatus) - 1);
+  signalStatus.strAdapterStatus[sizeof(signalStatus.strAdapterStatus) - 1] = '\0';
+
   return PVR_ERROR_NO_ERROR;
 }
 
@@ -315,7 +319,9 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
     return PVR_ERROR_FAILED;
   }
   strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
+  properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
   strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue) - 1);
+  properties[0].strValue[sizeof(properties[0].strValue) - 1] = '\0';
 
   *iPropertiesCount = 1;
 
