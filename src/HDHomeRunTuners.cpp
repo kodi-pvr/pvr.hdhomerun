@@ -292,39 +292,38 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
     {
       if (jsonChannel["_UID"].asUInt() != channel.iUniqueId)
         continue;
-      int nGuideIndex;
-      for (nGuideIndex = 0; nGuideIndex < iterTuner.Guide.size(); nGuideIndex++)
-        if (iterTuner.Guide[nGuideIndex]["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
-          break;
 
-      if (nGuideIndex == iterTuner.Guide.size())
-        continue;
-
-      for (const auto& jsonGuideItem : iterTuner.Guide[nGuideIndex]["Guide"])
+      for (const auto& iterGuide : iterTuner.Guide)
       {
-        if ((time_t)jsonGuideItem["EndTime"].asUInt() <= iStart || iEnd < (time_t)jsonGuideItem["StartTime"].asUInt())
-          continue;
+        if (iterGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
+        {
+          for (const auto& jsonGuideItem : iterGuide["Guide"])
+          {
+            if (static_cast<time_t>(jsonGuideItem["EndTime"].asUInt()) <= iStart || iEnd < static_cast<time_t>(jsonGuideItem["StartTime"].asUInt()))
+              continue;
 
-        EPG_TAG tag = { 0 };
+            EPG_TAG tag = { 0 };
 
-        std::string
-          strTitle(jsonGuideItem["Title"].asString()),
-          strSynopsis(jsonGuideItem["Synopsis"].asString()),
-          strImageURL(jsonGuideItem["ImageURL"].asString());
+            std::string
+              strTitle(jsonGuideItem["Title"].asString()),
+              strSynopsis(jsonGuideItem["Synopsis"].asString()),
+              strImageURL(jsonGuideItem["ImageURL"].asString());
 
-        tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
-        tag.strTitle = strTitle.c_str();
-        tag.iUniqueChannelId = channel.iUniqueId;
-        tag.startTime = (time_t)jsonGuideItem["StartTime"].asUInt();
-        tag.endTime = (time_t)jsonGuideItem["EndTime"].asUInt();
-        tag.firstAired = (time_t)jsonGuideItem["OriginalAirdate"].asUInt();
-        tag.strPlot = strSynopsis.c_str();
-        tag.strIconPath = strImageURL.c_str();
-        tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
-        tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
-        tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+            tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
+            tag.strTitle = strTitle.c_str();
+            tag.iUniqueChannelId = channel.iUniqueId;
+            tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
+            tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
+            tag.firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
+            tag.strPlot = strSynopsis.c_str();
+            tag.strIconPath = strImageURL.c_str();
+            tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
+            tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
+            tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
 
-        g.PVR->TransferEpgEntry(handle, &tag);
+            g.PVR->TransferEpgEntry(handle, &tag);
+          }
+        }
       }
     }
   }
