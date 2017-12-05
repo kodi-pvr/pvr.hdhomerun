@@ -53,7 +53,7 @@ int DbgPrintf(const char* szFormat, ...)
 }
 #endif
 
-bool GetFileContents(const String& url, String& strContent)
+bool GetFileContents(const std::string& url, std::string& strContent)
 {
   char buffer[1024];
   void* fileHandle;
@@ -81,11 +81,11 @@ bool GetFileContents(const String& url, String& strContent)
   return true;
 }
 
-String EncodeURL(const String& strUrl)
+std::string EncodeURL(const std::string& strUrl)
 {
-  String str, strEsc;
+  std::string str, strEsc;
 
-  for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
+  for (std::string::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
   {
     char c = *iter;
 
@@ -93,7 +93,7 @@ String EncodeURL(const String& strUrl)
       str += c;
     else
     {
-      String strPercent = StringUtils::Format("%%%02X", (int)c);
+      std::string strPercent = StringUtils::Format("%%%02X", (int)c);
       str += strPercent;
     }
   }

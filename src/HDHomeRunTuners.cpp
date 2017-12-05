@@ -39,15 +39,15 @@
 
 using namespace ADDON;
 
-static const String g_strGroupFavoriteChannels("Favorite channels");
-static const String g_strGroupHDChannels("HD channels");
-static const String g_strGroupSDChannels("SD channels");
+static const std::string g_strGroupFavoriteChannels("Favorite channels");
+static const std::string g_strGroupHDChannels("HD channels");
+static const std::string g_strGroupSDChannels("SD channels");
 
 HDHomeRunTuners::HDHomeRunTuners()
 {
 }
 
-unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
+unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
 {
   int nHash = (int)std::hash<std::string>()(str);
   return (unsigned int)abs(nHash);
@@ -56,7 +56,7 @@ unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 bool HDHomeRunTuners::Update(int nMode)
 {
   struct hdhomerun_discover_device_t foundDevices[16];
-  String strUrl, strJson, jsonReaderError;
+  std::string strUrl, strJson, jsonReaderError;
   Json::CharReaderBuilder jsonReaderBuilder;
   std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
 
@@ -199,7 +199,7 @@ bool HDHomeRunTuners::Update(int nMode)
         if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &pTuner->LineUp, &jsonReaderError) &&
           pTuner->LineUp.type() == Json::arrayValue)
         {
-          std::set<String> guideNumberSet;
+          std::set<std::string> guideNumberSet;
           int nChannelNumber = 1;
 
           for (auto& jsonChannel : pTuner->LineUp)
@@ -324,7 +324,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 
         EPG_TAG tag = { 0 };
 
-        String
+        std::string
           strTitle(jsonGuideItem["Title"].asString()),
           strSynopsis(jsonGuideItem["Synopsis"].asString()),
           strImageURL(jsonGuideItem["ImageURL"].asString());

@@ -56,8 +56,6 @@ public:
     Json::Value Guide;
   };
 
-  typedef std::vector<Tuner> Tuners;
-
   class AutoLock
   {
   public:
@@ -83,13 +81,13 @@ public:
   std::string _GetChannelStreamURL(int iUniqueId);
 
 protected:
-  unsigned int PvrCalculateUniqueId(const String& str);
+  unsigned int PvrCalculateUniqueId(const std::string& str);
 
 public:
   void Lock() { m_Lock.Lock(); }
   void Unlock() { m_Lock.Unlock(); }
 
 protected:
-  Tuners m_Tuners;
+  std::vector<Tuner> m_Tuners;
   P8PLATFORM::CMutex m_Lock;
 };

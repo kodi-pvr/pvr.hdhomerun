@@ -50,6 +50,6 @@ int DbgPrintf(const char* szFormat, ...);
 #define PVR_STRCPY(dest, source) do { strncpy(dest, source, sizeof(dest)-1); dest[sizeof(dest)-1] = '\0'; } while(0)
 #define PVR_STRCLR(dest) memset(dest, 0, sizeof(dest))
 
-bool GetFileContents(const String& url, String& strContent);
+bool GetFileContents(const std::string& url, std::string& strContent);
 
-String EncodeURL(const String& strUrl);
+std::string EncodeURL(const std::string& strUrl);
