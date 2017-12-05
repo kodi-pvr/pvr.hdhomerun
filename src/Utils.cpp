@@ -55,18 +55,16 @@ int DbgPrintf(const char* szFormat, ...)
 
 bool GetFileContents(const std::string& url, std::string& strContent)
 {
-  char buffer[1024];
-  void* fileHandle;
-
-  strContent.clear();
-
-  fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
+  void* fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
   if (fileHandle == NULL)
   {
     KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
     return false;
   }
+
+  char buffer[1024];
+  strContent.clear();
 
   for (;;)
   {
@@ -83,12 +81,9 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 
 std::string EncodeURL(const std::string& strUrl)
 {
-  std::string str, strEsc;
-
-  for (std::string::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
+  std::string str;
+  for (const auto& c : strUrl)
   {
-    char c = *iter;
-
     if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
       str += c;
     else
