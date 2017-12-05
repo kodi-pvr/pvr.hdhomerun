@@ -33,7 +33,6 @@
 #include "HDHomeRunTuners.h"
 #include "Utils.h"
 
-
 GlobalsType g;
 
 class UpdateThread : public P8PLATFORM::CThread
@@ -90,7 +89,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
-  SAFE_DELETE(g.XBMC);
+    SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
@@ -153,17 +152,14 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
     g.Settings.bHideProtected = *(bool*)settingValue;
     return ADDON_STATUS_NEED_RESTART;
   }
-  else
-  if (strcmp(settingName, "hide_duplicate") == 0)
+  else if (strcmp(settingName, "hide_duplicate") == 0)
   {
     g.Settings.bHideDuplicateChannels = *(bool*)settingValue;
     return ADDON_STATUS_NEED_RESTART;
   }
-  else
-  if (strcmp(settingName, "mark_new") == 0)
+  else if (strcmp(settingName, "mark_new") == 0)
     g.Settings.bMarkNew = *(bool*)settingValue;
-  else
-  if (strcmp(settingName, "debug") == 0)
+  else if (strcmp(settingName, "debug") == 0)
     g.Settings.bDebug = *(bool*)settingValue;
 
   return ADDON_STATUS_OK;
@@ -255,18 +251,18 @@ PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
   return g.Tuners ? g.Tuners->PvrGetChannels(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
-int GetChannelGroupsAmount(void) 
-{ 
+int GetChannelGroupsAmount(void)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
-PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) 
-{ 
+PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroups(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
-PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group) 
-{ 
+PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
 }
 
@@ -283,21 +279,21 @@ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 }
 
 bool CanPauseStream(void) 
-{ 
+{
   return true; 
 }
 
 bool CanSeekStream(void) 
-{ 
+{
   return true; 
 }
 
 PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
 {
   std::string strUrl = g.Tuners->_GetChannelStreamURL(channel->iUniqueId);
-  if (strUrl.empty()) {
+  if (strUrl.empty())
     return PVR_ERROR_FAILED;
-  }
+
   strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
   properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
   strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue) - 1);
@@ -306,8 +302,8 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
   *iPropertiesCount = 1;
 
   return PVR_ERROR_NO_ERROR;
-} 
-  
+}
+
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES*) { return PVR_ERROR_NOT_IMPLEMENTED; }

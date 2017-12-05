@@ -373,9 +373,9 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
     for (const auto& jsonChannel : iterTuner.LineUp)
     {
       if (jsonChannel["_Hide"].asBool() ||
-        (strcmp(g_strGroupFavoriteChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["Favorite"].asBool()) ||
-        (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["HD"].asBool()) ||
-        (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName) == 0 && jsonChannel["HD"].asBool()))
+          (strcmp(g_strGroupFavoriteChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["Favorite"].asBool()) ||
+          (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["HD"].asBool()) ||
+          (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName) == 0 && jsonChannel["HD"].asBool()))
         continue;
 
       PVR_CHANNEL_GROUP_MEMBER channelGroupMember = { 0 };
@@ -392,20 +392,14 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
   return PVR_ERROR_NO_ERROR;
 }
 
-std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId) 
+std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
 {
   AutoLock l(this);
 
   for (const auto& iterTuner : m_Tuners)
-  {
     for (const auto& jsonChannel : iterTuner.LineUp)
-    {
       if (jsonChannel["_UID"].asUInt() == iUniqueId)
-      {
-        std::string url = jsonChannel["URL"].asString();
-        return url;
-      }
-    }
-  }        
+        return jsonChannel["URL"].asString();
+
   return "";
 }
