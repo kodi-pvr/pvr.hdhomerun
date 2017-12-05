@@ -1,3 +1,9 @@
+v3.2.0
+- code cleanup
+- guide filters updated
+- additional epg_tag fields added, another episode number format added
+- handle discovering new tuners without an addon restart
+
 v3.1.9
 - Bump jsoncpp to version 1.8.3
 - Json::CharReaderBuilder implementation
