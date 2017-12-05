@@ -87,8 +87,6 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   if (!hdl || !props)
     return ADDON_STATUS_UNKNOWN;
 
-  PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
-
   g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
@@ -99,16 +97,14 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   g.PVR = new CHelper_libXBMC_pvr;
   if (!g.PVR->RegisterMe(hdl))
   {
-  SAFE_DELETE(g.PVR);
-  SAFE_DELETE(g.XBMC);
+    SAFE_DELETE(g.PVR);
+    SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
   KODI_LOG(ADDON::LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
 
   g.currentStatus = ADDON_STATUS_UNKNOWN;
-  g.strUserPath = pvrprops->strUserPath;
-  g.strClientPath = pvrprops->strClientPath;
 
   g.Tuners = new HDHomeRunTuners;
   if (g.Tuners == NULL)
@@ -125,9 +121,8 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     g.Tuners->Update();
     g_UpdateThread.CreateThread(false);
   }
-  
+
   g.currentStatus = ADDON_STATUS_OK;
-  g.bCreated = true;
 
   return ADDON_STATUS_OK;
 }
@@ -145,7 +140,6 @@ void ADDON_Destroy()
   SAFE_DELETE(g.PVR);
   SAFE_DELETE(g.XBMC);
 
-  g.bCreated = false;
   g.currentStatus = ADDON_STATUS_UNKNOWN;
 }
 
@@ -276,20 +270,6 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &g
   return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
 }
 
-bool OpenLiveStream(const PVR_CHANNEL &channel)
-{
-  CloseLiveStream();
-
-  g.iCurrentChannelUniqueId = channel.iUniqueId;
-
-  return true;
-}
-
-void CloseLiveStream(void)
-{
-  g.iCurrentChannelUniqueId = 0;
-}
-
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 {
   strncpy(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1",
@@ -349,6 +329,8 @@ long long PositionRecordedStream(void) { return -1; }
 long long LengthRecordedStream(void) { return 0; }
 void DemuxReset(void) {}
 void DemuxFlush(void) {}
+void CloseLiveStream(void) {}
+bool OpenLiveStream(const PVR_CHANNEL&) { return false; }
 int ReadLiveStream(unsigned char*, unsigned int) { return 0; }
 long long SeekLiveStream(long long, int) { return -1; }
 long long PositionLiveStream(void) { return -1; }
