@@ -154,8 +154,9 @@ bool HDHomeRunTuners::Update(int nMode)
               jsonGuideItem["_GenreType"] = nGenreType;
 
               if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "S%dE%d", &iSeriesNumber, &iEpisodeNumber) != 2)
-                if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d", &iEpisodeNumber) == 1)
-                  iSeriesNumber = 0;
+                if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d-%d", &iSeriesNumber, &iEpisodeNumber) != 2)
+                  if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d", &iEpisodeNumber) == 1)
+                    iSeriesNumber = 0;
 
               jsonGuideItem["_SeriesNumber"] = iSeriesNumber;
               jsonGuideItem["_EpisodeNumber"] = iEpisodeNumber;
