@@ -114,11 +114,13 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   }
 
   ADDON_ReadSettings();
-
-  if (g.Tuners)
+  g.Tuners->Update();
+  if (!g_UpdateThread.CreateThread(false))
   {
-    g.Tuners->Update();
-    g_UpdateThread.CreateThread(false);
+    SAFE_DELETE(g.Tuners);
+    SAFE_DELETE(g.PVR);
+    SAFE_DELETE(g.XBMC);
+    return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
   g.currentStatus = ADDON_STATUS_OK;
