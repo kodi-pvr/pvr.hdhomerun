@@ -72,7 +72,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
   for (int nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
   {
-    Tuner* pTuner = NULL;
+    Tuner* pTuner = nullptr;
 
     if (nMode & UpdateDiscover)
     {
@@ -91,7 +91,7 @@ bool HDHomeRunTuners::Update(int nMode)
         }
     }
 
-    if (pTuner == NULL)
+    if (pTuner == nullptr)
       continue;
 
     //
