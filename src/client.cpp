@@ -51,8 +51,8 @@ public:
 
       if (g.Tuners)
       {
-        g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
-        g.PVR->TriggerChannelUpdate();
+        if (g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide))
+          g.PVR->TriggerChannelUpdate();
       }
     }
     return NULL;

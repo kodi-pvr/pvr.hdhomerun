@@ -64,17 +64,22 @@ bool HDHomeRunTuners::Update(int nMode)
   Json::CharReaderBuilder jsonReaderBuilder;
   std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
   std::set<std::string> guideNumberSet;
-
-  if (nMode & UpdateDiscover)
-    m_Tuners.clear();
+  bool bClearTuners = false;
 
   AutoLock l(this);
+
+  // if latest discovery found fewer devices than m_Tuners List, clear and start fresh
+  if (nMode & UpdateDiscover || nTunerCount < m_Tuners.size())
+  {
+    bClearTuners = true;
+    m_Tuners.clear();
+  }
 
   for (int nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
   {
     Tuner* pTuner = nullptr;
 
-    if (nMode & UpdateDiscover)
+    if (bClearTuners)
     {
       // New device
       Tuner tuner;
@@ -89,10 +94,14 @@ bool HDHomeRunTuners::Update(int nMode)
           pTuner = &iter;
           break;
         }
-    }
 
-    if (pTuner == nullptr)
-      continue;
+      // Device not found in m_Tuners, Add it.
+      if (pTuner == nullptr)
+      {
+        Tuner tuner;
+        pTuner = &*m_Tuners.insert(m_Tuners.end(), tuner);
+      }
+    }
 
     //
     // Update device
