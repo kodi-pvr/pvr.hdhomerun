@@ -23,8 +23,9 @@
  *
  */
 
+#include <string>
+
 #include "client.h"
-#include <stdlib.h>
 
 #if defined(TARGET_WINDOWS) && defined(DEBUG)
 #define USE_DBG_CONSOLE
@@ -46,9 +47,6 @@ int DbgPrintf(const char* szFormat, ...);
             g.XBMC->Log((ADDON::addon_log_t)level, __VA_ARGS__);        \
   } while (0)
 
-#define PVR_STRCPY(dest, source) do { strncpy(dest, source, sizeof(dest)-1); dest[sizeof(dest)-1] = '\0'; } while(0)
-#define PVR_STRCLR(dest) memset(dest, 0, sizeof(dest))
+bool GetFileContents(const std::string& url, std::string& strContent);
 
-bool GetFileContents(const String& url, String& strContent);
-
-String EncodeURL(const String& strUrl);
+std::string EncodeURL(const std::string& strUrl);

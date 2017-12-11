@@ -25,9 +25,6 @@
 
 #include <libXBMC_addon.h>
 #include <libXBMC_pvr.h>
-#include <p8-platform/util/StringUtils.h>
-
-typedef std::string String;
 
 class HDHomeRunTuners;
 
@@ -51,19 +48,13 @@ struct GlobalsType
 {
   GlobalsType()
   {
-    bCreated = false;
     currentStatus = ADDON_STATUS_UNKNOWN;
-    iCurrentChannelUniqueId = 0;
     XBMC = NULL;
     PVR = NULL;
     Tuners = NULL;
   }
 
-  bool bCreated;
   ADDON_STATUS currentStatus;
-  unsigned int iCurrentChannelUniqueId;
-  String strUserPath;
-  String strClientPath;
   ADDON::CHelper_libXBMC_addon* XBMC;
   CHelper_libXBMC_pvr* PVR;
 

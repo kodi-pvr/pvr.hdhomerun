@@ -22,8 +22,12 @@
  *
  */
 
-#include "client.h"
 #include "Utils.h"
+
+#include <string>
+#include <p8-platform/util/StringUtils.h>
+
+#include "client.h"
 
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)
@@ -49,20 +53,18 @@ int DbgPrintf(const char* szFormat, ...)
 }
 #endif
 
-bool GetFileContents(const String& url, String& strContent)
+bool GetFileContents(const std::string& url, std::string& strContent)
 {
-  char buffer[1024];
-  void* fileHandle;
-
-  strContent.clear();
-
-  fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
+  void* fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
   if (fileHandle == NULL)
   {
     KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
     return false;
   }
+
+  char buffer[1024];
+  strContent.clear();
 
   for (;;)
   {
@@ -77,19 +79,16 @@ bool GetFileContents(const String& url, String& strContent)
   return true;
 }
 
-String EncodeURL(const String& strUrl)
+std::string EncodeURL(const std::string& strUrl)
 {
-  String str, strEsc;
-
-  for (String::const_iterator iter = strUrl.begin(); iter != strUrl.end(); iter++)
+  std::string str;
+  for (const auto& c : strUrl)
   {
-    char c = *iter;
-
     if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
       str += c;
     else
     {
-      String strPercent = StringUtils::Format("%%%02X", (int)c);
+      std::string strPercent = StringUtils::Format("%%%02X", (int)c);
       str += strPercent;
     }
   }

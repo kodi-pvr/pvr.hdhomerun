@@ -22,25 +22,26 @@
  *
  */
 
-#include "client.h"
-#include "Utils.h"
 #include "HDHomeRunTuners.h"
 
+#include <cstring>
+#include <ctime>
+#include <functional>
 #include <memory>
 #include <set>
-#include <functional>
+#include <string>
+#include <vector>
 
-using namespace ADDON;
+#include <p8-platform/util/StringUtils.h>
 
-static const String g_strGroupFavoriteChannels("Favorite channels");
-static const String g_strGroupHDChannels("HD channels");
-static const String g_strGroupSDChannels("SD channels");
+#include "client.h"
+#include "Utils.h"
 
-HDHomeRunTuners::HDHomeRunTuners()
-{
-}
+static const std::string g_strGroupFavoriteChannels("Favorite channels");
+static const std::string g_strGroupHDChannels("HD channels");
+static const std::string g_strGroupSDChannels("SD channels");
 
-unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
+unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
 {
   int nHash = (int)std::hash<std::string>()(str);
   return (unsigned int)abs(nHash);
@@ -48,32 +49,37 @@ unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const String& str)
 
 bool HDHomeRunTuners::Update(int nMode)
 {
-  struct hdhomerun_discover_device_t foundDevices[16];
-  String strUrl, strJson, jsonReaderError;
-  Json::CharReaderBuilder jsonReaderBuilder;
-  std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
-
   //
   // Discover
   //
-
-  AutoLock l(this);
-
+  struct hdhomerun_discover_device_t foundDevices[16];
   int nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
   if (nTunerCount <= 0)
     return false;
 
-  KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
+  KODI_LOG(ADDON::LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
 
-  if (nMode & UpdateDiscover)
+  std::string strUrl, strJson, jsonReaderError;
+  Json::CharReaderBuilder jsonReaderBuilder;
+  std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
+  std::set<std::string> guideNumberSet;
+  bool bClearTuners = false;
+
+  AutoLock l(this);
+
+  // if latest discovery found fewer devices than m_Tuners List, clear and start fresh
+  if (nMode & UpdateDiscover || nTunerCount < m_Tuners.size())
+  {
+    bClearTuners = true;
     m_Tuners.clear();
+  }
 
   for (int nTunerIndex = 0; nTunerIndex < nTunerCount; nTunerIndex++)
   {
-    Tuner* pTuner = NULL;
+    Tuner* pTuner = nullptr;
 
-    if (nMode & UpdateDiscover)
+    if (bClearTuners)
     {
       // New device
       Tuner tuner;
@@ -82,16 +88,20 @@ bool HDHomeRunTuners::Update(int nMode)
     else
     {
       // Find existing device
-      for (Tuners::iterator iter = m_Tuners.begin(); iter != m_Tuners.end(); iter++)
-        if (iter->Device.ip_addr == foundDevices[nTunerIndex].ip_addr)
+      for (auto& iter : m_Tuners)
+        if (iter.Device.ip_addr == foundDevices[nTunerIndex].ip_addr)
         {
-          pTuner = &*iter;
+          pTuner = &iter;
           break;
         }
-    }
 
-    if (pTuner == NULL)
-      continue;
+      // Device not found in m_Tuners, Add it.
+      if (pTuner == nullptr)
+      {
+        Tuner tuner;
+        pTuner = &*m_Tuners.insert(m_Tuners.end(), tuner);
+      }
+    }
 
     //
     // Update device
@@ -101,12 +111,10 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     // Guide
     //
-
     if (nMode & UpdateGuide)
     {
       strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
-
-      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
+      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
@@ -136,43 +144,40 @@ bool HDHomeRunTuners::Update(int nMode)
               {
                 if (str == "News")
                   nGenreType = EPG_EVENT_CONTENTMASK_NEWSCURRENTAFFAIRS;
-                else
-                if (str == "Comedy")
+                else if (str == "Comedy")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
-                else
-                if (str == "Movie" ||
-                  str == "Drama")
+                else if (str == "Kids")
+                  nGenreType = EPG_EVENT_CONTENTMASK_CHILDRENYOUTH;
+                else if (str == "Movie" || str == "Movies" ||
+                         str == "Drama")
                   nGenreType = EPG_EVENT_CONTENTMASK_MOVIEDRAMA;
-                else
-                if (str == "Food")
+                else if (str == "Food")
                   nGenreType = EPG_EVENT_CONTENTMASK_LEISUREHOBBIES;
-                else
-                if (str == "Talk Show")
+                else if (str == "Talk Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
-                else
-                if (str == "Game Show")
+                else if (str == "Game Show")
                   nGenreType = EPG_EVENT_CONTENTMASK_SHOW;
-                else
-                if (str == "Sport" ||
-                  str == "Sports")
+                else if (str == "Sport" ||
+                         str == "Sports")
                   nGenreType = EPG_EVENT_CONTENTMASK_SPORTS;
               }
               jsonGuideItem["_GenreType"] = nGenreType;
 
               if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "S%dE%d", &iSeriesNumber, &iEpisodeNumber) != 2)
-                if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d", &iEpisodeNumber) == 1)
-                  iSeriesNumber = 0;
+                if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d-%d", &iSeriesNumber, &iEpisodeNumber) != 2)
+                  if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d", &iEpisodeNumber) == 1)
+                    iSeriesNumber = 0;
 
               jsonGuideItem["_SeriesNumber"] = iSeriesNumber;
               jsonGuideItem["_EpisodeNumber"] = iEpisodeNumber;
             }
           }
 
-          KODI_LOG(LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
+          KODI_LOG(ADDON::LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
         }
         else
         {
-          KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
+          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse guide", strUrl.c_str());
         }
       }
     }
@@ -180,26 +185,24 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     // Lineup
     //
-
     if (nMode & UpdateLineUp)
     {
       strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
-      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
+      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
         if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &pTuner->LineUp, &jsonReaderError) &&
           pTuner->LineUp.type() == Json::arrayValue)
         {
-          std::set<String> guideNumberSet;
           int nChannelNumber = 1;
 
           for (auto& jsonChannel : pTuner->LineUp)
           {
             bool bHide =
               ((jsonChannel["DRM"].asBool() && g.Settings.bHideProtected) ||
-              (g.Settings.bHideDuplicateChannels && guideNumberSet.find(jsonChannel["GuideNumber"].asString()) != guideNumberSet.end()));
+               (g.Settings.bHideDuplicateChannels && guideNumberSet.find(jsonChannel["GuideNumber"].asString()) != guideNumberSet.end()));
 
             jsonChannel["_UID"] = PvrCalculateUniqueId(jsonChannel["GuideName"].asString() + jsonChannel["URL"].asString());
             jsonChannel["_ChannelName"] = jsonChannel["GuideName"].asString();
@@ -217,13 +220,10 @@ bool HDHomeRunTuners::Update(int nMode)
             }
 
             jsonChannel["_Hide"] = bHide;
+            jsonChannel["_ChannelNumber"] = 0;
+            jsonChannel["_SubChannelNumber"] = 0;
 
-            if (bHide)
-            {
-              jsonChannel["_ChannelNumber"] = 0;
-              jsonChannel["_SubChannelNumber"] = 0;
-            }
-            else
+            if (!bHide)
             {
               int nChannel = 0, nSubChannel = 0;
               if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d.%d", &nChannel, &nSubChannel) != 2)
@@ -239,15 +239,13 @@ bool HDHomeRunTuners::Update(int nMode)
               nChannelNumber++;
             }
           }
-
-          KODI_LOG(LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
+          KODI_LOG(ADDON::LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
         }
         else
-          KODI_LOG(LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
+          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
       }
     }
   }
-
   return true;
 }
 
@@ -283,8 +281,12 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       pvrChannel.iUniqueId = jsonChannel["_UID"].asUInt();
       pvrChannel.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
       pvrChannel.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
-      PVR_STRCPY(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str());
-      PVR_STRCPY(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str());
+      strncpy(pvrChannel.strChannelName, jsonChannel["_ChannelName"].asString().c_str(),
+              sizeof(pvrChannel.strChannelName) - 1);
+      pvrChannel.strChannelName[sizeof(pvrChannel.strChannelName) - 1] = '\0';
+      strncpy(pvrChannel.strIconPath, jsonChannel["_IconPath"].asString().c_str(),
+              sizeof(pvrChannel.strIconPath) - 1);
+      pvrChannel.strIconPath[sizeof(pvrChannel.strIconPath) - 1] = '\0';
 
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
     }
@@ -302,39 +304,42 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
     {
       if (jsonChannel["_UID"].asUInt() != channel.iUniqueId)
         continue;
-      int nGuideIndex;
-      for (nGuideIndex = 0; nGuideIndex < iterTuner.Guide.size(); nGuideIndex++)
-        if (iterTuner.Guide[nGuideIndex]["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
-          break;
 
-      if (nGuideIndex == iterTuner.Guide.size())
-        continue;
-
-      for (const auto& jsonGuideItem : iterTuner.Guide[nGuideIndex]["Guide"])
+      for (const auto& iterGuide : iterTuner.Guide)
       {
-        if ((time_t)jsonGuideItem["EndTime"].asUInt() <= iStart || iEnd < (time_t)jsonGuideItem["StartTime"].asUInt())
-          continue;
+        if (iterGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
+        {
+          for (const auto& jsonGuideItem : iterGuide["Guide"])
+          {
+            if (static_cast<time_t>(jsonGuideItem["EndTime"].asUInt()) <= iStart || iEnd < static_cast<time_t>(jsonGuideItem["StartTime"].asUInt()))
+              continue;
 
-        EPG_TAG tag = { 0 };
+            EPG_TAG tag = { 0 };
 
-        String
-          strTitle(jsonGuideItem["Title"].asString()),
-          strSynopsis(jsonGuideItem["Synopsis"].asString()),
-          strImageURL(jsonGuideItem["ImageURL"].asString());
+            std::string
+              strTitle(jsonGuideItem["Title"].asString()),
+              strSynopsis(jsonGuideItem["Synopsis"].asString()),
+              strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
+              strSeriesID(jsonGuideItem["SeriesID"].asString()),
+              strImageURL(jsonGuideItem["ImageURL"].asString());
 
-        tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
-        tag.strTitle = strTitle.c_str();
-        tag.iUniqueChannelId = channel.iUniqueId;
-        tag.startTime = (time_t)jsonGuideItem["StartTime"].asUInt();
-        tag.endTime = (time_t)jsonGuideItem["EndTime"].asUInt();
-        tag.firstAired = (time_t)jsonGuideItem["OriginalAirdate"].asUInt();
-        tag.strPlot = strSynopsis.c_str();
-        tag.strIconPath = strImageURL.c_str();
-        tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
-        tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
-        tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+            tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
+            tag.strTitle = strTitle.c_str();
+            tag.iUniqueChannelId = channel.iUniqueId;
+            tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
+            tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
+            tag.firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
+            tag.strPlot = strSynopsis.c_str();
+            tag.strIconPath = strImageURL.c_str();
+            tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
+            tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
+            tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
+            tag.strEpisodeName = strEpTitle.c_str();
+            tag.strSeriesLink = strSeriesID.c_str();
 
-        g.PVR->TransferEpgEntry(handle, &tag);
+            g.PVR->TransferEpgEntry(handle, &tag);
+          }
+        }
       }
     }
   }
@@ -355,15 +360,21 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio)
   PVR_CHANNEL_GROUP channelGroup = { 0 };
 
   channelGroup.iPosition = 1;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupFavoriteChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   channelGroup.iPosition++;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupHDChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupHDChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   channelGroup.iPosition++;
-  PVR_STRCPY(channelGroup.strGroupName, g_strGroupSDChannels.c_str());
+  strncpy(channelGroup.strGroupName, g_strGroupSDChannels.c_str(),
+          sizeof(channelGroup.strGroupName) - 1);
+  channelGroup.strGroupName[sizeof(channelGroup.strGroupName) - 1] = '\0';
   g.PVR->TransferChannelGroup(handle, &channelGroup);
 
   return PVR_ERROR_NO_ERROR;
@@ -377,14 +388,16 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
     for (const auto& jsonChannel : iterTuner.LineUp)
     {
       if (jsonChannel["_Hide"].asBool() ||
-        (strcmp(g_strGroupFavoriteChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["Favorite"].asBool()) ||
-        (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["HD"].asBool()) ||
-        (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName) == 0 && jsonChannel["HD"].asBool()))
+          (strcmp(g_strGroupFavoriteChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["Favorite"].asBool()) ||
+          (strcmp(g_strGroupHDChannels.c_str(), group.strGroupName) == 0 && !jsonChannel["HD"].asBool()) ||
+          (strcmp(g_strGroupSDChannels.c_str(), group.strGroupName) == 0 && jsonChannel["HD"].asBool()))
         continue;
 
       PVR_CHANNEL_GROUP_MEMBER channelGroupMember = { 0 };
 
-      PVR_STRCPY(channelGroupMember.strGroupName, group.strGroupName);
+      strncpy(channelGroupMember.strGroupName, group.strGroupName,
+              sizeof(channelGroupMember.strGroupName) - 1);
+      channelGroupMember.strGroupName[sizeof(channelGroupMember.strGroupName) - 1] = '\0';
       channelGroupMember.iChannelUniqueId = jsonChannel["_UID"].asUInt();
       channelGroupMember.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
 
@@ -394,20 +407,14 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
   return PVR_ERROR_NO_ERROR;
 }
 
-std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId) 
+std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
 {
   AutoLock l(this);
 
   for (const auto& iterTuner : m_Tuners)
-  {
     for (const auto& jsonChannel : iterTuner.LineUp)
-    {
       if (jsonChannel["_UID"].asUInt() == iUniqueId)
-      {
-        std::string url = jsonChannel["URL"].asString();
-        return url;
-      }
-    }
-  }        
+        return jsonChannel["URL"].asString();
+
   return "";
 }

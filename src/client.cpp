@@ -23,13 +23,15 @@
  */
 
 #include "client.h"
-#include <xbmc_pvr_dll.h>
-#include <p8-platform/util/util.h>
+
+#include <cstring>
+#include <string>
 #include <p8-platform/threads/threads.h>
+#include <p8-platform/util/util.h>
+#include <xbmc_pvr_dll.h>
+
 #include "HDHomeRunTuners.h"
 #include "Utils.h"
-
-using namespace ADDON;
 
 GlobalsType g;
 
@@ -49,8 +51,8 @@ public:
 
       if (g.Tuners)
       {
-        g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
-        g.PVR->TriggerChannelUpdate();
+        if (g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide))
+          g.PVR->TriggerChannelUpdate();
       }
     }
     return NULL;
@@ -84,28 +86,24 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   if (!hdl || !props)
     return ADDON_STATUS_UNKNOWN;
 
-  PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
-
-  g.XBMC = new CHelper_libXBMC_addon;
+  g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
-  SAFE_DELETE(g.XBMC);
+    SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
   g.PVR = new CHelper_libXBMC_pvr;
   if (!g.PVR->RegisterMe(hdl))
   {
-  SAFE_DELETE(g.PVR);
-  SAFE_DELETE(g.XBMC);
+    SAFE_DELETE(g.PVR);
+    SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
-  KODI_LOG(LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
+  KODI_LOG(ADDON::LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
 
   g.currentStatus = ADDON_STATUS_UNKNOWN;
-  g.strUserPath = pvrprops->strUserPath;
-  g.strClientPath = pvrprops->strClientPath;
 
   g.Tuners = new HDHomeRunTuners;
   if (g.Tuners == NULL)
@@ -116,15 +114,16 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   }
 
   ADDON_ReadSettings();
-
-  if (g.Tuners)
+  g.Tuners->Update();
+  if (!g_UpdateThread.CreateThread(false))
   {
-    g.Tuners->Update();
-    g_UpdateThread.CreateThread(false);
+    SAFE_DELETE(g.Tuners);
+    SAFE_DELETE(g.PVR);
+    SAFE_DELETE(g.XBMC);
+    return ADDON_STATUS_PERMANENT_FAILURE;
   }
-  
+
   g.currentStatus = ADDON_STATUS_OK;
-  g.bCreated = true;
 
   return ADDON_STATUS_OK;
 }
@@ -142,7 +141,6 @@ void ADDON_Destroy()
   SAFE_DELETE(g.PVR);
   SAFE_DELETE(g.XBMC);
 
-  g.bCreated = false;
   g.currentStatus = ADDON_STATUS_UNKNOWN;
 }
 
@@ -156,17 +154,14 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
     g.Settings.bHideProtected = *(bool*)settingValue;
     return ADDON_STATUS_NEED_RESTART;
   }
-  else
-  if (strcmp(settingName, "hide_duplicate") == 0)
+  else if (strcmp(settingName, "hide_duplicate") == 0)
   {
     g.Settings.bHideDuplicateChannels = *(bool*)settingValue;
     return ADDON_STATUS_NEED_RESTART;
   }
-  else
-  if (strcmp(settingName, "mark_new") == 0)
+  else if (strcmp(settingName, "mark_new") == 0)
     g.Settings.bMarkNew = *(bool*)settingValue;
-  else
-  if (strcmp(settingName, "debug") == 0)
+  else if (strcmp(settingName, "debug") == 0)
     g.Settings.bDebug = *(bool*)settingValue;
 
   return ADDON_STATUS_OK;
@@ -258,67 +253,59 @@ PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
   return g.Tuners ? g.Tuners->PvrGetChannels(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
-int GetChannelGroupsAmount(void) 
-{ 
+int GetChannelGroupsAmount(void)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroupsAmount() : PVR_ERROR_SERVER_ERROR;
 }
 
-PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) 
-{ 
+PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroups(handle, bRadio) : PVR_ERROR_SERVER_ERROR;
 }
 
-PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group) 
-{ 
+PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group)
+{
   return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
-}
-
-bool OpenLiveStream(const PVR_CHANNEL &channel)
-{
-  CloseLiveStream();
-
-  g.iCurrentChannelUniqueId = channel.iUniqueId;
-
-  return true;
-}
-
-void CloseLiveStream(void)
-{
-  g.iCurrentChannelUniqueId = 0;
 }
 
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 {
-  PVR_STRCPY(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1");
-  PVR_STRCPY(signalStatus.strAdapterStatus, "OK");
-  
+  strncpy(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1",
+          sizeof(signalStatus.strAdapterName) - 1);
+  signalStatus.strAdapterName[sizeof(signalStatus.strAdapterName) - 1] = '\0';
+  strncpy(signalStatus.strAdapterStatus, "OK",
+          sizeof(signalStatus.strAdapterStatus) - 1);
+  signalStatus.strAdapterStatus[sizeof(signalStatus.strAdapterStatus) - 1] = '\0';
+
   return PVR_ERROR_NO_ERROR;
 }
 
 bool CanPauseStream(void) 
-{ 
+{
   return true; 
 }
 
 bool CanSeekStream(void) 
-{ 
+{
   return true; 
 }
 
 PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
 {
   std::string strUrl = g.Tuners->_GetChannelStreamURL(channel->iUniqueId);
-  if (strUrl.empty()) {
+  if (strUrl.empty())
     return PVR_ERROR_FAILED;
-  }
+
   strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
+  properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
   strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue) - 1);
+  properties[0].strValue[sizeof(properties[0].strValue) - 1] = '\0';
 
   *iPropertiesCount = 1;
 
   return PVR_ERROR_NO_ERROR;
-} 
-  
+}
+
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -340,6 +327,8 @@ long long PositionRecordedStream(void) { return -1; }
 long long LengthRecordedStream(void) { return 0; }
 void DemuxReset(void) {}
 void DemuxFlush(void) {}
+void CloseLiveStream(void) {}
+bool OpenLiveStream(const PVR_CHANNEL&) { return false; }
 int ReadLiveStream(unsigned char*, unsigned int) { return 0; }
 long long SeekLiveStream(long long, int) { return -1; }
 long long PositionLiveStream(void) { return -1; }

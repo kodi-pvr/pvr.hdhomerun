@@ -23,10 +23,14 @@
  *
  */
 
-#include "client.h"
-#include <p8-platform/threads/mutex.h>
-#include <hdhomerun.h>
+#include <string>
+#include <vector>
+
+#include "hdhomerun.h"
 #include <json/json.h>
+#include <p8-platform/threads/mutex.h>
+
+#include "client.h"
 
 class HDHomeRunTuners
 {
@@ -38,21 +42,17 @@ public:
     UpdateGuide = 4
   };
 
-public:
   struct Tuner
   {
     Tuner()
     {
-      memset(&Device, 0, sizeof(Device));
-  }
+      Device = { 0 };
+    }
 
     hdhomerun_discover_device_t Device;
-
     Json::Value LineUp;
     Json::Value Guide;
   };
-
-  typedef std::vector<Tuner> Tuners;
 
   class AutoLock
   {
@@ -64,12 +64,11 @@ public:
     HDHomeRunTuners* m_p;
   };
 
-public:
-  HDHomeRunTuners();
+  HDHomeRunTuners() {};
+  void Lock() { m_Lock.Lock(); }
+  void Unlock() { m_Lock.Unlock(); }
 
   bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
-
-public:
   PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
   int PvrGetChannelsAmount();
   PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd);
@@ -78,14 +77,8 @@ public:
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
   std::string _GetChannelStreamURL(int iUniqueId);
 
-protected:
-  unsigned int PvrCalculateUniqueId(const String& str);
-
-public:
-  void Lock() { m_Lock.Lock(); }
-  void Unlock() { m_Lock.Unlock(); }
-
-protected:
-  Tuners m_Tuners;
+private:
+  unsigned int PvrCalculateUniqueId(const std::string& str);
+  std::vector<Tuner> m_Tuners;
   P8PLATFORM::CMutex m_Lock;
 };
