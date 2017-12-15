@@ -22,7 +22,7 @@ msgstr "Algemeen"
 
 msgctxt "#32002"
 msgid "Hide protected channels"
-msgstr "Verberg dubbele kanalen"
+msgstr "Verberg beschermde kanalen"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
