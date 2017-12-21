@@ -1,3 +1,6 @@
+v3.3.0
+- PVR API 5.8.0 changes implemented
+
 v3.2.0
 - code cleanup
 - guide filters updated
