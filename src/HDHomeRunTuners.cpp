@@ -32,8 +32,11 @@
 #include <string>
 #include <vector>
 
+#include <AddonBase.h>
+//#include <hdhomerun.h> // Cant include as it causes redefinition from inclusion in header
 #include <libXBMC_addon.h>
 #include <p8-platform/util/StringUtils.h>
+#include <xbmc_pvr_types.h>
 
 #include "client.h"
 #include "Utils.h"
@@ -44,8 +47,8 @@ static const std::string g_strGroupSDChannels("SD channels");
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
 {
-  int nHash = (int)std::hash<std::string>()(str);
-  return (unsigned int)abs(nHash);
+  int nHash = static_cast<int>(std::hash<std::string>()(str));
+  return static_cast<unsigned int>(abs(nHash));
 }
 
 bool HDHomeRunTuners::Update(int nMode)
@@ -70,7 +73,7 @@ bool HDHomeRunTuners::Update(int nMode)
   AutoLock l(this);
 
   // if latest discovery found fewer devices than m_Tuners List, clear and start fresh
-  if (nMode & UpdateDiscover || nTunerCount < m_Tuners.size())
+  if (nMode & UpdateDiscover || nTunerCount < static_cast<int>(m_Tuners.size()))
   {
     bClearTuners = true;
     m_Tuners.clear();

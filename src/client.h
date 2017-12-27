@@ -23,10 +23,12 @@
  *
  */
 
+#include <AddonBase.h>
 #include <libXBMC_addon.h>
 #include <libXBMC_pvr.h>
 
 class HDHomeRunTuners;
+extern struct GlobalsType g;
 
 struct SettingsType
 {
@@ -57,10 +59,7 @@ struct GlobalsType
   ADDON_STATUS currentStatus;
   ADDON::CHelper_libXBMC_addon* XBMC;
   CHelper_libXBMC_pvr* PVR;
-
   HDHomeRunTuners* Tuners;
 
   SettingsType Settings;
 };
-
-extern GlobalsType g;

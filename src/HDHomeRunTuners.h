@@ -26,22 +26,18 @@
 #include <string>
 #include <vector>
 
-#include "hdhomerun.h"
+#include <AddonBase.h>
+#include <hdhomerun.h>
 #include <json/json.h>
 #include <p8-platform/threads/mutex.h>
+#include <xbmc_pvr_types.h>
 
 #include "client.h"
 
 class HDHomeRunTuners
 {
-public:
-  enum
-  {
-    UpdateDiscover = 1,
-    UpdateLineUp = 2,
-    UpdateGuide = 4
-  };
 
+private:
   struct Tuner
   {
     Tuner()
@@ -62,6 +58,14 @@ public:
     ~AutoLock() { m_p->Unlock(); }
   protected:
     HDHomeRunTuners* m_p;
+  };
+
+public:
+  enum
+  {
+    UpdateDiscover = 1,
+    UpdateLineUp = 2,
+    UpdateGuide = 4
   };
 
   HDHomeRunTuners() {};

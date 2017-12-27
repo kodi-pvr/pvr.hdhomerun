@@ -24,6 +24,10 @@
 
 #include "Utils.h"
 
+#if defined(TARGET_WINDOWS)
+#include <cstdio>
+#endif
+
 #include <string>
 #include <p8-platform/util/StringUtils.h>
 
@@ -57,7 +61,7 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 {
   void* fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
-  if (fileHandle == NULL)
+  if (fileHandle == nullptr)
   {
     KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
     return false;
@@ -68,7 +72,7 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 
   for (;;)
   {
-    ssize_t bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+    int bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
     if (bytesRead <= 0)
       break;
     strContent.append(buffer, bytesRead);
@@ -88,8 +92,7 @@ std::string EncodeURL(const std::string& strUrl)
       str += c;
     else
     {
-      std::string strPercent = StringUtils::Format("%%%02X", (int)c);
-      str += strPercent;
+      str.append(StringUtils::Format("%%%02X", static_cast<int>(c)));
     }
   }
 

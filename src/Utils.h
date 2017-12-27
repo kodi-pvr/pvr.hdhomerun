@@ -25,7 +25,9 @@
 
 #include <string>
 
-#include "client.h"
+#include <libXBMC_addon.h>
+
+extern struct GlobalsType g;
 
 #if defined(TARGET_WINDOWS) && defined(DEBUG)
 #define USE_DBG_CONSOLE

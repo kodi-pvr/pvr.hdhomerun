@@ -1,3 +1,6 @@
+v3.5.1
+- further code cleanup
+
 v3.5.0
 - Allow opening stream when multiple tuners are available
 
