@@ -400,7 +400,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
       channelGroupMember.strGroupName[sizeof(channelGroupMember.strGroupName) - 1] = '\0';
       channelGroupMember.iChannelUniqueId = jsonChannel["_UID"].asUInt();
       channelGroupMember.iChannelNumber = jsonChannel["_ChannelNumber"].asUInt();
-      channelGroupMember.iSubChanneNumber = jsonChannel["_SubChannelNumber"].asUInt();
+      channelGroupMember.iSubChannelNumber = jsonChannel["_SubChannelNumber"].asUInt();
 
       g.PVR->TransferChannelGroupMember(handle, &channelGroupMember);
     }
