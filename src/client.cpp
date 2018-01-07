@@ -26,6 +26,7 @@
 
 #include <cstring>
 #include <string>
+
 #include <p8-platform/threads/threads.h>
 #include <p8-platform/util/util.h>
 #include <xbmc_pvr_dll.h>
@@ -94,6 +95,9 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 {
   if (!hdl || !props)
     return ADDON_STATUS_UNKNOWN;
+
+  PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
+  g.strUserPath = pvrprops->strUserPath;
 
   g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
@@ -259,9 +263,7 @@ const char *GetBackendHostname(void)
 
 PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
 {
-  *iTotal = 1024 * 1024 * 1024;
-  *iUsed  = 0;
-  return PVR_ERROR_NO_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetDriveSpace(iTotal, iUsed) : PVR_ERROR_SERVER_ERROR;
 }
 
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)

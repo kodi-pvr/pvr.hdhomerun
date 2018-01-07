@@ -79,6 +79,7 @@ public:
   std::vector<Tuner>& GetTuners();
   PVR_ERROR GetEPGTagForChannel(EPG_TAG& tag, PVR_CHANNEL& channel, time_t startTime, time_t endTime);
   Tuner* GetChannelTuners(PVR_CHANNEL& channel);
+  PVR_ERROR PvrGetDriveSpace(long long *iTotal, long long *iUsed);
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);

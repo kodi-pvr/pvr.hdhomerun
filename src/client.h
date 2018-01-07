@@ -65,6 +65,7 @@ struct GlobalsType
   CHelper_libXBMC_pvr* PVR;
   HDRecorder* RECORDER;
   HDHomeRunTuners* Tuners;
+  std::string strUserPath;
 
   SettingsType Settings;
 };
