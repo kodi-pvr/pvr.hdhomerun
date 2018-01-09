@@ -35,6 +35,9 @@
 
 GlobalsType g;
 
+#define MENUHOOK_SETTING_UPDATEGUIDE 1
+#define MENUHOOK_SETTING_UPDATEDEVICE 2
+
 class UpdateThread : public P8PLATFORM::CThread
 {
 public:
@@ -122,6 +125,17 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     SAFE_DELETE(g.XBMC);
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
+
+  PVR_MENUHOOK hook;
+  hook.iHookId = MENUHOOK_SETTING_UPDATEGUIDE;
+  hook.category = PVR_MENUHOOK_ALL;
+  hook.iLocalizedStringId = 32101;
+  g.PVR->AddMenuHook(&hook);
+
+  hook.iHookId = MENUHOOK_SETTING_UPDATEDEVICE;
+  hook.category = PVR_MENUHOOK_ALL;
+  hook.iLocalizedStringId = 32102;
+  g.PVR->AddMenuHook(&hook);
 
   g.currentStatus = ADDON_STATUS_OK;
 
@@ -312,8 +326,33 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
   return PVR_ERROR_NO_ERROR;
 }
 
+PVR_ERROR CallMenuHook(const PVR_MENUHOOK& menuhook, const PVR_MENUHOOK_DATA&)
+{
+  int iMsg;
+  switch (menuhook.iHookId)
+  {
+    case MENUHOOK_SETTING_UPDATEGUIDE:
+      iMsg = 32111;
+      g.Tuners->Update(HDHomeRunTuners::UpdateGuide);
+      g.Tuners->TriggerEPGUpdate();
+      break;
+    case MENUHOOK_SETTING_UPDATEDEVICE:
+      iMsg = 32112;
+      g.Tuners->Update(HDHomeRunTuners::UpdateDiscover | HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide);
+      g.PVR->TriggerChannelUpdate();
+      g.Tuners->TriggerEPGUpdate();
+      break;
+    default:
+      return PVR_ERROR_INVALID_PARAMETERS;
+  }
+  char* msg = g.XBMC->GetLocalizedString(iMsg);
+  g.XBMC->QueueNotification(ADDON::QUEUE_INFO, msg);
+  g.XBMC->FreeString(msg);
+
+  return PVR_ERROR_NO_ERROR;
+}
+
 /* UNUSED API FUNCTIONS */
-PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 // Channel
 PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }

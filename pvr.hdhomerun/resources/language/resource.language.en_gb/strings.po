@@ -35,3 +35,19 @@ msgstr ""
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr ""
+
+msgctxt "#32101"
+msgid "Refresh Guide Data"
+msgstr ""
+
+msgctxt "#32102"
+msgid "Refresh HDHomerun device list"
+msgstr ""
+
+msgctxt "#32111"
+msgid "Guide Data is refreshing"
+msgstr ""
+
+msgctxt "#32112"
+msgid "Refresh HD Homerun Devices started"
+msgstr ""
