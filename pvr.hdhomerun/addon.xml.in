@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="3.3.0"
+  version="3.3.1"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>@ADDON_DEPENDS@</requires>
@@ -12,7 +12,7 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="af_ZA">HDHomeRun PVR Kliënt</summary>
     <summary lang="be_BY">HDHomeRun PVR кліент </summary>
-    <summary lang="bg_BG">HDHomeRun ПВР клиент</summary>
+    <summary lang="bg_BG">Клиент за ПВР HDHomeRun</summary>
     <summary lang="ca_ES">Client PVR de HDHomeRun</summary>
     <summary lang="cs_CZ">Klient HDHomeRun PVR</summary>
     <summary lang="de_DE">HDHomeRun PVR Client</summary>
@@ -55,7 +55,7 @@
     <summary lang="zh_TW">HDHomeRun PVR 用戶端</summary>
     <description lang="af_ZA">HDHomeRun PVR Kliënt</description>
     <description lang="be_BY">HDHomeRun PVR кліент</description>
-    <description lang="bg_BG">HDHomeRun ПВР клиент</description>
+    <description lang="bg_BG">Клиент за ПВР HDHomeRun</description>
     <description lang="ca_ES">Client PVR de HDHomeRun</description>
     <description lang="cs_CZ">Klient HDHomeRun PVR</description>
     <description lang="de_DE">HDHomeRun PVR Client</description>
