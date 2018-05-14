@@ -26,7 +26,7 @@ msgstr "Скриване на защитените канали"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Включване на журнала за дебъгване"
+msgstr "Включи дебъг журнала"
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
@@ -34,4 +34,4 @@ msgstr "Скриване на дублираните канали"
 
 msgctxt "#32005"
 msgid "Mark new show"
-msgstr "Отбелязване като ново"
+msgstr "Отбелязване на новите предавания"
