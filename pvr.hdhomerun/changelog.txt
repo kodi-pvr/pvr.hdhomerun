@@ -1,3 +1,6 @@
+v3.4.1
+- Update to PVR API v5.10.1
+
 v3.4.0
 - Update to PVR API v5.10.0
 
