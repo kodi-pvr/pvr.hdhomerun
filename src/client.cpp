@@ -292,16 +292,22 @@ bool CanSeekStream(void)
 
 PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
 {
+  if (!channel || !properties || !iPropertiesCount)
+    return PVR_ERROR_SERVER_ERROR;
+
+  if (*iPropertiesCount < 2)
+    return PVR_ERROR_INVALID_PARAMETERS;
+
   std::string strUrl = g.Tuners->_GetChannelStreamURL(channel->iUniqueId);
   if (strUrl.empty())
     return PVR_ERROR_FAILED;
 
   strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
-  properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
   strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue) - 1);
-  properties[0].strValue[sizeof(properties[0].strValue) - 1] = '\0';
+  strncpy(properties[1].strName, PVR_STREAM_PROPERTY_ISREALTIMESTREAM, sizeof(properties[1].strName) - 1);
+  strncpy(properties[1].strValue, "true", sizeof(properties[1].strValue) - 1);
 
-  *iPropertiesCount = 1;
+  *iPropertiesCount = 2;
 
   return PVR_ERROR_NO_ERROR;
 }
