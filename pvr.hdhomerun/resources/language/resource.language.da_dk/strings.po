@@ -27,3 +27,11 @@ msgstr "Skjul beskyttede kanaler"
 msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr "Aktiver fejlfindingslogning"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Skjul dobbelte kanaler"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Marker nyt show"
