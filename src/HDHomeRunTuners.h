@@ -75,11 +75,10 @@ public:
   int PvrGetChannelGroupsAmount(void);
   PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
-  std::string _GetChannelStreamURL(const PVR_CHANNEL* channel);
+  std::string GetChannelStreamURL(const PVR_CHANNEL* channel);
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);
-  bool CheckTunerAvailable(const std::string& url);
   std::vector<Tuner> m_Tuners;
   P8PLATFORM::CMutex m_Lock;
 };

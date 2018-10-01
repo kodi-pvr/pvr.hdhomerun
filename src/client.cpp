@@ -298,7 +298,7 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
   if (*iPropertiesCount < 2)
     return PVR_ERROR_INVALID_PARAMETERS;
 
-  std::string strUrl = g.Tuners->_GetChannelStreamURL(channel);
+  std::string strUrl = g.Tuners->GetChannelStreamURL(channel);
   if (strUrl.empty())
     return PVR_ERROR_FAILED;
 
