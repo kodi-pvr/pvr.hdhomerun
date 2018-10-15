@@ -408,6 +408,18 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
   return PVR_ERROR_NO_ERROR;
 }
 
+void HDHomeRunTuners::TriggerEPGUpdate()
+{
+  AutoLock l(this);
+
+  KODI_LOG(ADDON::LOG_DEBUG, "Trigger EPG Update All Channels");
+
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonChannel : iterTuner.LineUp)
+      g.PVR->TriggerEpgUpdate(jsonChannel["_UID"].asUInt());
+
+}
+
 std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
 {
   AutoLock l(this);

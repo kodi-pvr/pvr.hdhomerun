@@ -76,6 +76,7 @@ public:
   PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
   std::string _GetChannelStreamURL(int iUniqueId);
+  void TriggerEPGUpdate();
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);
