@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include <libXBMC_addon.h>
 #include <p8-platform/util/StringUtils.h>
 
 #include "client.h"
@@ -220,22 +221,20 @@ bool HDHomeRunTuners::Update(int nMode)
             }
 
             jsonChannel["_Hide"] = bHide;
-            jsonChannel["_ChannelNumber"] = 0;
-            jsonChannel["_SubChannelNumber"] = 0;
+
+            int nChannel = 0, nSubChannel = 0;
+            if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d.%d", &nChannel, &nSubChannel) != 2)
+            {
+              nSubChannel = 0;
+              if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d", &nChannel) != 1)
+                nChannel = nChannelNumber;
+            }
+            jsonChannel["_ChannelNumber"] = nChannel;
+            jsonChannel["_SubChannelNumber"] = nSubChannel;
 
             if (!bHide)
             {
-              int nChannel = 0, nSubChannel = 0;
-              if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d.%d", &nChannel, &nSubChannel) != 2)
-              {
-                nSubChannel = 0;
-                if (sscanf(jsonChannel["GuideNumber"].asString().c_str(), "%d", &nChannel) != 1)
-                  nChannel = nChannelNumber;
-              }
-              jsonChannel["_ChannelNumber"] = nChannel;
-              jsonChannel["_SubChannelNumber"] = nSubChannel;
               guideNumberSet.insert(jsonChannel["GuideNumber"].asString());
-
               nChannelNumber++;
             }
           }
@@ -408,14 +407,62 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannelGroupMembers(ADDON_HANDLE handle, const 
   return PVR_ERROR_NO_ERROR;
 }
 
-std::string HDHomeRunTuners::_GetChannelStreamURL(int iUniqueId)
+// Function to return stream url from any available device.
+// Potential issue: Still possible race condition between test and player start. Without
+//        using libhdhomerun and actively managing tuner locks and using *livestream functions
+//        this race condition cannot be worked around as i see it.
+// ToDo: Potentially implement preferred tuner. At the moment as long as the tuner can
+//       show the channel requested, it will test in an unknown* order
+//       *unknown = device discovery order, which is not guaranteed to be the same from
+//                  startup to startup
+std::string HDHomeRunTuners::GetChannelStreamURL(const PVR_CHANNEL* channel)
 {
   AutoLock l(this);
 
   for (const auto& iterTuner : m_Tuners)
+  {
     for (const auto& jsonChannel : iterTuner.LineUp)
-      if (jsonChannel["_UID"].asUInt() == iUniqueId)
-        return jsonChannel["URL"].asString();
+    {
+      if (jsonChannel["_UID"].asUInt() == channel->iUniqueId ||
+           (channel->iChannelNumber == jsonChannel["_ChannelNumber"].asUInt() &&
+            channel->iSubChannelNumber == jsonChannel["_SubChannelNumber"].asUInt() &&
+            strcmp(channel->strChannelName, jsonChannel["_ChannelName"].asString().c_str()) == 0))
+      {
+        void* fileHandle = g.XBMC->CURLCreate(jsonChannel["URL"].asString().c_str());
 
+        if (fileHandle != nullptr)
+        {
+          g.XBMC->CURLAddOption(fileHandle, XFILE::CURL_OPTION_PROTOCOL , "failonerror", "false");
+          int returnCode = -1;
+
+          if (g.XBMC->CURLOpen(fileHandle, XFILE::READ_NO_CACHE))
+          {
+            std::string proto = g.XBMC->GetFilePropertyValue(fileHandle, XFILE::FILE_PROPERTY_RESPONSE_PROTOCOL, "");
+            std::string::size_type posResponseCode = proto.find(' ');
+            if (posResponseCode != std::string::npos)
+              returnCode = atoi(proto.c_str() + (posResponseCode + 1));
+          }
+          g.XBMC->CloseFile(fileHandle);
+
+          if (returnCode <= 400)
+          {
+            return jsonChannel["URL"].asString();
+          }
+          else if (returnCode == 403)
+          {
+            KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d, All tuners in use on device", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
+          }
+          else
+          {
+            // ToDo: Not an oversubscription error, implement a count against specific tuners. If > x non 403 failures, blacklist tuner??
+            //       potentially flag date/time of last failure, move tuner to blacklist, retry blacklist device y hours after last failure (24?)
+            KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
+          }
+        }
+      }
+    }
+  }
+
+  KODI_LOG(ADDON::LOG_DEBUG, "No Tuners available");
   return "";
 }
