@@ -23,6 +23,7 @@
  *
  */
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -76,9 +77,10 @@ public:
   PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
   std::string GetChannelStreamURL(const PVR_CHANNEL* channel);
+  bool UpdateChannelLineUp(Tuner *pTuner, std::set<std::string> &guideNumberSet);
+  unsigned int PvrCalculateUniqueId(const std::string& str);
 
 private:
-  unsigned int PvrCalculateUniqueId(const std::string& str);
   std::vector<Tuner> m_Tuners;
   P8PLATFORM::CMutex m_Lock;
 };

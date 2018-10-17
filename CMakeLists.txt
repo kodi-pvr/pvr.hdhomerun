@@ -10,24 +10,35 @@ find_package(Kodi REQUIRED)
 find_package(kodiplatform REQUIRED)
 find_package(p8-platform REQUIRED)
 find_package(JsonCpp REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(Rapidxml REQUIRED)
 find_package(hdhomerun REQUIRED)
 
 include_directories(${kodiplatform_INCLUDE_DIRS}
                     ${p8-platform_INCLUDE_DIRS}
                     ${KODI_INCLUDE_DIR}
                     ${JSONCPP_INCLUDE_DIRS}
+                    ${RAPIDXML_INCLUDE_DIRS}
+                    ${ZLIB_INCLUDE_DIRS}
                     ${HDHOMERUN_INCLUDE_DIRS})
 
 set(DEPLIBS ${kodiplatform_LIBRARIES}
             ${p8-platform_LIBRARIES}
             ${JSONCPP_LIBRARIES}
+            ${ZLIB_LIBRARIES}
             ${HDHOMERUN_LIBRARIES})
 
 set(PVRHDHOMERUN_SOURCES src/client.cpp
+                         src/EPG.cpp
+                         src/EPG_SD.cpp
+                         src/EPG_XML.cpp
                          src/HDHomeRunTuners.cpp
                          src/Utils.cpp)
 
 set(PVRHDHOMERUN_HEADERS src/client.h
+                         src/EPG.h
+                         src/EPG_SD.h
+                         src/EPG_XML.h
                          src/HDHomeRunTuners.h
                          src/Utils.h)
 

@@ -9,4 +9,18 @@
     <setting id="mark_new" type="bool" label="32005" default="true" />
   </category>
 
+  <!-- EPG -->
+  <category label="32101">
+    <setting id="epg_type" type="enum" label="32102" lvalues="32121|32124" />
+    <setting type="sep"/>
+	<!-- No settings for SiliconDust EPG -->
+    <setting id="sd_extended" type="bool" label="32103" visible="eq(-2,0)" default="false" />
+    <setting id="sd_extendedinterval" type="enum" label="32108" values="1|2|3|4|5|6|7|8|9|10|11|12"visible="eq(-1,true)" default="3" />
+    <!-- XMLTV local File -->
+    <setting id="xmltv_type" type="enum" label="32106" value="" visible="eq(-4,1)" lvalues="32110|32111" default="1"/>
+    <setting id="xmltv_file" type="file" label="32107" value="" visible="eq(-5,1) + eq(-1,1)" source="local" />
+    <setting id="xmltv_URL" type="text" label="32105" value="" visible="eq(-6,1) + eq(-2,0)" default="" />
+    <setting id="xmltv_channelicon" type="bool" label="32109" visible="eq(-7,1)" default="false" />
+  </category>
+
 </settings>

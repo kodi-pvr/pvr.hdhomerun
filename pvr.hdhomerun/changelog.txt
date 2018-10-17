@@ -1,3 +1,8 @@
+v3.6.0
+- Abstract out EPG to its own Factory class
+- Implement 24hr SiliconDust EPG (extended guide option)
+- Implement importing xmltv EPG data
+
 v3.5.0
 - Allow opening stream when multiple tuners are available
 

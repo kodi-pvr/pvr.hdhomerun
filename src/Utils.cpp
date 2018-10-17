@@ -57,7 +57,7 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 {
   void* fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
 
-  if (fileHandle == NULL)
+  if (fileHandle == nullptr)
   {
     KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
     return false;

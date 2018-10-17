@@ -18,20 +18,72 @@ msgstr ""
 
 msgctxt "#32001"
 msgid "General"
-msgstr ""
+msgstr "General"
 
 msgctxt "#32002"
 msgid "Hide protected channels"
-msgstr ""
+msgstr "Hide protected channels"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr ""
+msgstr "Enable debug logging"
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
-msgstr ""
+msgstr "Hide duplicate channels"
 
 msgctxt "#32005"
 msgid "Mark new show"
-msgstr ""
+msgstr "Mark new show"
+
+msgctxt "#32010"
+msgid "Feature not implemented yet"
+msgstr "Feature not implemented yet"
+
+msgctxt "#32101"
+msgid "EPG Settings"
+msgstr "EPG Settings"
+
+msgctxt "#32102"
+msgid "Choose EPG type"
+msgstr "Choose EPG type"
+
+msgctxt "#32103"
+msgid "Extended SiliconDust EPG"
+msgstr "Extended SiliconDust EPG"
+
+msgctxt "#32105"
+msgid "Enter XMLTV URL"
+msgstr "Enter XMLTV URL"
+
+msgctxt "#32106"
+msgid "XMLTV URL or Local File"
+msgstr "XMLTV URL or Local File"
+
+msgctxt "#32107"
+msgid "Select XMLTV file"
+msgstr "Select XMLTV file"
+
+msgctxt "#32108"
+msgid "Extended Guide Check Interval (hrs)"
+msgstr "Extended Guide Check Interval (hrs)"
+
+msgctxt "#32109"
+msgid "Use SD Channel Icons if no icon data in guide"
+msgstr "Use SD Channel Icons if no icon data in guide"
+
+msgctxt "#32110"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "#32111"
+msgid "File"
+msgstr "File"
+
+msgctxt "#32121"
+msgid "SiliconDust EPG"
+msgstr "SiliconDust EPG"
+
+msgctxt "#32124"
+msgid "Local XMLTV file"
+msgstr "Local XMLTV file"

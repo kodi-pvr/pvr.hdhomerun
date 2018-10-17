@@ -23,6 +23,8 @@
  *
  */
 
+#include <string>
+
 #include <libXBMC_addon.h>
 #include <libXBMC_pvr.h>
 
@@ -36,12 +38,28 @@ struct SettingsType
     bHideDuplicateChannels = true;
     bDebug = false;
     bMarkNew = false;
+    bXML_icons = false;
+    iEPG = 0;
+    iUpdateinterval = 4*60*60;
+    bSD_EPGAdvanced = false;
+    iXML_Type = 1;
+    sXMLTV = "";
+    sXMLTVfile = "";
+    sXMLTVurl = "";
   }
 
   bool bHideProtected;
   bool bHideDuplicateChannels;
   bool bDebug;
   bool bMarkNew;
+  bool bXML_icons;
+  int iEPG;
+  int iUpdateinterval;
+  bool bSD_EPGAdvanced;
+  int iXML_Type;
+  std::string sXMLTV;
+  std::string sXMLTVfile;
+  std::string sXMLTVurl;
 };
 
 struct GlobalsType

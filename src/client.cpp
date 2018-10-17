@@ -42,7 +42,7 @@ public:
   {
     for (;;)
     {
-      for (int i = 0; i < 60*60; i++)
+      for (int i = 0; i < (g.Settings.iUpdateinterval); i++)
         if (P8PLATFORM::CThread::Sleep(1000))
           break;
       
@@ -65,6 +65,8 @@ extern "C" {
 
 void ADDON_ReadSettings(void)
 {
+
+  char buffer[1024];
   if (g.XBMC == NULL)
     return;
 
@@ -79,6 +81,47 @@ void ADDON_ReadSettings(void)
 
   if (!g.XBMC->GetSetting("debug", &g.Settings.bDebug))
     g.Settings.bDebug = false;
+
+  if (!g.XBMC->GetSetting("epg_type", &g.Settings.iEPG))
+    g.Settings.iEPG = 0;
+
+  if (g.Settings.iEPG == 0)
+  {
+    if (!g.XBMC->GetSetting("sd_extended", &g.Settings.bSD_EPGAdvanced))
+      g.Settings.bSD_EPGAdvanced = false;
+
+    if (!g.XBMC->GetSetting("sd_extendedinterval", &g.Settings.iUpdateinterval))
+      g.Settings.iUpdateinterval = 12 * 60 * 60;
+    else
+      g.Settings.iUpdateinterval = ((int)g.Settings.iUpdateinterval + 1) * 60 * 60;
+  }
+  else if (g.Settings.iEPG == 1)
+  {
+    if (!g.XBMC->GetSetting("xmltv_type", &g.Settings.iXML_Type))
+      g.Settings.iXML_Type = 1;
+
+    if (!g.XBMC->GetSetting("xmltv_channelicon", &g.Settings.bXML_icons))
+      g.Settings.bXML_icons = 0;
+
+    if (g.Settings.iXML_Type == 0)
+    {
+      if (g.XBMC->GetSetting("xmltv_url", &buffer))
+      {
+        g.Settings.sXMLTVurl = buffer;
+        g.Settings.sXMLTVfile = "";
+        g.Settings.sXMLTV = g.Settings.sXMLTVurl;
+      }
+    }
+    else if (g.Settings.iXML_Type == 1)
+    {
+      if (g.XBMC->GetSetting("xmltv_file", &buffer))
+      {
+        g.Settings.sXMLTVfile = buffer;
+        g.Settings.sXMLTVurl = "";
+        g.Settings.sXMLTV = g.Settings.sXMLTVfile;
+      }
+    }
+  }
 }
 
 ADDON_STATUS ADDON_Create(void* hdl, void* props)
@@ -163,6 +206,20 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
     g.Settings.bMarkNew = *(bool*)settingValue;
   else if (strcmp(settingName, "debug") == 0)
     g.Settings.bDebug = *(bool*)settingValue;
+  else if (strcmp(settingName, "epg_type") == 0)
+    g.Settings.iEPG = *(int*)settingValue;
+  else if (strcmp(settingName, "xmltv_file") == 0)
+    g.Settings.sXMLTVfile = *(char*)settingValue;
+  else if (strcmp(settingName, "sd_extended") == 0)
+    g.Settings.bSD_EPGAdvanced = *(bool*)settingValue;
+  else if (strcmp(settingName, "xmltv_channelicon") == 0)
+    g.Settings.bXML_icons = *(bool*)settingValue;
+  else if (strcmp(settingName, "sd_extendedinterval") == 0)
+    g.Settings.iUpdateinterval = *(int*)settingValue;
+  else if (strcmp(settingName, "xmltv_url") == 0)
+    g.Settings.sXMLTVurl = *(char*)settingValue;
+  else if (strcmp(settingName, "xmltv_type") == 0)
+    g.Settings.iXML_Type = *(int*)settingValue;
 
   return ADDON_STATUS_OK;
 }
@@ -280,14 +337,14 @@ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
   return PVR_ERROR_NO_ERROR;
 }
 
-bool CanPauseStream(void) 
+bool CanPauseStream(void)
 {
-  return true; 
+  return true;
 }
 
-bool CanSeekStream(void) 
+bool CanSeekStream(void)
 {
-  return true; 
+  return true;
 }
 
 PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)

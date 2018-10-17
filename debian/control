@@ -2,7 +2,8 @@ Source: kodi-pvr-hdhomerun
 Priority: extra
 Maintainer: Nobody <nobody@kodi.tv>
 Build-Depends: debhelper (>= 9.0.0), cmake, libkodiplatform-dev (>= 16.0.0),
-               kodi-addon-dev, libhdhomerun-dev (>= 20150826), libjsoncpp-dev
+               kodi-addon-dev, libhdhomerun-dev (>= 20150826), libjsoncpp-dev,
+               librapidxml-dev
 Standards-Version: 3.9.5
 Section: libs
 
