@@ -15,7 +15,7 @@ HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
 ### Windows 
 
 1. `set ROOT=%CD%`
-2. `git clone --branch Matrix https://github.com/xbmc/xbmc.git`
+2. `git clone --branch master https://github.com/xbmc/xbmc.git`
 3. `git clone https://github.com/kodi-pvr/pvr.hdhomerun.git`
 4. `cd pvr.hdhomerun`
 5. `mkdir build`
