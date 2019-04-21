@@ -22,7 +22,7 @@ init:
   - cmake --version
   - msbuild /version
   - git --version
-  - git clone --branch Leia --depth=1 https://github.com/xbmc/xbmc.git %ROOT%\xbmc
+  - git clone --branch Matrix --depth=1 https://github.com/xbmc/xbmc.git %ROOT%\xbmc
   
 build_script:
   - mkdir %ROOT%\%ADDON%\build
