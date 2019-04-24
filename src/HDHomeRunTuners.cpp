@@ -293,7 +293,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
+PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
   AutoLock l(this);
 
@@ -301,7 +301,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
   {
     for (const auto& jsonChannel : iterTuner.LineUp)
     {
-      if (jsonChannel["_UID"].asUInt() != channel.iUniqueId)
+      if (jsonChannel["_UID"].asUInt() != iChannelUid)
         continue;
 
       for (const auto& iterGuide : iterTuner.Guide)
@@ -324,7 +324,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, const PVR_CH
 
             tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
             tag.strTitle = strTitle.c_str();
-            tag.iUniqueChannelId = channel.iUniqueId;
+            tag.iUniqueChannelId = iChannelUid;
             tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
             tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
             tag.firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());

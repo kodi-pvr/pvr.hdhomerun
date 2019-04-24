@@ -238,9 +238,9 @@ PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
+PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
-  return g.Tuners ? g.Tuners->PvrGetEPGForChannel(handle, channel, iStart, iEnd) : PVR_ERROR_SERVER_ERROR;
+  return g.Tuners ? g.Tuners->PvrGetEPGForChannel(handle, iChannelUid, iStart, iEnd) : PVR_ERROR_SERVER_ERROR;
 }
 
 int GetChannelsAmount(void)
@@ -330,6 +330,7 @@ void DemuxAbort(void) {}
 void DemuxFlush(void) {}
 DemuxPacket* DemuxRead(void) { return NULL; }
 void DemuxReset(void) {}
+void FillBuffer(bool mode) {}
 // LiveStream
 void CloseLiveStream(void) {}
 bool OpenLiveStream(const PVR_CHANNEL&) { return false; }
@@ -368,7 +369,6 @@ PVR_ERROR UpdateTimer(const PVR_TIMER&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 // Timeshift
 void PauseStream(bool bPaused) {}
 void SetSpeed(int) {};
-bool IsTimeshifting(void) { return false; }
 // EPG
 PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR IsEPGTagPlayable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
