@@ -1,31 +1,33 @@
+version: BuildNr.{build}
+
+image: Visual Studio 2017
+
+shallow_clone: true
+
+clone_folder: c:\projects\pvr.hdhomerun
+
 environment:
-  ADDON: pvr.hdhomerun
-  ROOT: c:\projects
+  app_id: pvr.hdhomerun
 
   matrix:
-    - CMAKE_GENERATOR: Visual Studio 14 2015
-      CONFIG: Debug
-    - CMAKE_GENERATOR: Visual Studio 14 2015
+    - GENERATOR: "Visual Studio 15"
       CONFIG: Release
-    - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
-      CONFIG: Debug
-    - CMAKE_GENERATOR: Visual Studio 14 2015 Win64
+    - GENERATOR: "Visual Studio 15 Win64"
       CONFIG: Release
+    - GENERATOR: "Visual Studio 15 Win64"
+      CONFIG: Release
+      WINSTORE: -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0.17763.0"
+    - GENERATOR: "Visual Studio 15 ARM"
+      CONFIG: Release
+      WINSTORE: -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0.17763.0"
 
-# clone directory
-clone_folder: c:\projects\%ADDON%
-
-init:
-  - echo ADDON=%ADDON%
-  - echo CONFIG=%CONFIG%
-  - echo CMAKE_GENERATOR=%CMAKE_GENERATOR%
-  - cmake --version
-  - msbuild /version
-  - git --version
-  - git clone --branch master --depth=1 https://github.com/xbmc/xbmc.git %ROOT%\xbmc
-  
 build_script:
-  - mkdir %ROOT%\%ADDON%\build
-  - cd %ROOT%\%ADDON%\build
-  - cmake -G "%CMAKE_GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DCMAKE_USER_MAKE_RULES_OVERRIDE=%ROOT%\xbmc\cmake\scripts\windows\CFlagOverrides.cmake -DCMAKE_USER_MAKE_RULES_OVERRIDE_CXX=%ROOT%\xbmc\cmake\scripts\windows\CXXFlagOverrides.cmake -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons
-  - cmake --build . --config %CONFIG%
+  - cd ..
+  - git clone --branch master --depth=1 https://github.com/xbmc/xbmc.git
+  - cd %app_id%
+  - mkdir build
+  - cd build
+  - mkdir -p definition\%app_id%
+  - echo %app_id% %APPVEYOR_BUILD_FOLDER% %APPVEYOR_REPO_COMMIT% > definition\%app_id%\%app_id%.txt
+  - cmake -T host=x64 -G "%GENERATOR%" %WINSTORE% -DADDONS_TO_BUILD=%app_id% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDONS_DEFINITION_DIR=%APPVEYOR_BUILD_FOLDER%/build/definition -DADDON_SRC_PREFIX=../.. -DCMAKE_INSTALL_PREFIX=../../xbmc/addons -DPACKAGE_ZIP=1 ../../xbmc/cmake/addons
+  - cmake --build . --config %CONFIG% --target %app_id%
