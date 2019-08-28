@@ -28,6 +28,7 @@ set(PVRHDHOMERUN_HEADERS src/client.h
 if(WIN32)
   list(APPEND DEPLIBS ws2_32)
   list(APPEND DEPLIBS iphlpapi)
+  add_compile_options(/wd4996)
   if(CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
     # if _WIN32_WINNT isn't defined before including hdhomerun.h then 
     # it's defined as _WIN32_WINNT_VISTA which breaks build on UWP
