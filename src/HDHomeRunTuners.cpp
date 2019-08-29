@@ -32,7 +32,7 @@
 #include <string>
 #include <vector>
 
-#include <libXBMC_addon.h>
+#include <kodi/libXBMC_addon.h>
 #include <p8-platform/util/StringUtils.h>
 
 #include "client.h"

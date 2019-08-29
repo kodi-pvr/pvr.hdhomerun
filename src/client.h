@@ -23,8 +23,8 @@
  *
  */
 
-#include <libXBMC_addon.h>
-#include <libXBMC_pvr.h>
+#include <kodi/libXBMC_addon.h>
+#include <kodi/libXBMC_pvr.h>
 
 class HDHomeRunTuners;
 
