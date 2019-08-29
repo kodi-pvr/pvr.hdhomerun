@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Kodi Translation Team\n"
@@ -18,8 +18,20 @@ msgstr ""
 
 msgctxt "#32001"
 msgid "General"
-msgstr "Të përgjithshëm"
+msgstr "T'përgjithshëm"
+
+msgctxt "#32002"
+msgid "Hide protected channels"
+msgstr "Fsheh kanalet e mbrojtura"
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Aktivoni debug logging"
+msgstr "Mundëso shënime rregullimesh"
+
+msgctxt "#32004"
+msgid "Hide duplicate channels"
+msgstr "Fsheh kanale dublikatë"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Shëno shfaqjen e re"
