@@ -1,3 +1,6 @@
+v4.1.0
+- Update: Recompile for 6.1.0 PVR Addon API compatibility
+
 v4.0.1
 - Update build system version and cleanup
 - Fix package check for JsonCpp and HDHomerun
