@@ -54,7 +54,8 @@ bool HDHomeRunTuners::Update(int nMode)
   // Discover
   //
   struct hdhomerun_discover_device_t foundDevices[16];
-  int nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
+  int nTunerCount = hdhomerun_discover_find_devices_custom_v2(
+      0, HDHOMERUN_DEVICE_TYPE_WILDCARD, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
   if (nTunerCount <= 0)
     return false;
@@ -112,7 +113,7 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     // Guide
     //
-    if (nMode & UpdateGuide)
+    if (nMode & UpdateGuide && pTuner->Device.device_type == HDHOMERUN_DEVICE_TYPE_TUNER)
     {
       strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
       KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
@@ -186,7 +187,7 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     // Lineup
     //
-    if (nMode & UpdateLineUp)
+    if (nMode & UpdateLineUp && pTuner->Device.device_type == HDHOMERUN_DEVICE_TYPE_TUNER)
     {
       strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
@@ -244,7 +245,36 @@ bool HDHomeRunTuners::Update(int nMode)
           KODI_LOG(ADDON::LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
       }
     }
+
+    //
+    // Recordings
+    //
+    if (nMode & UpdateRecordings && pTuner->Device.device_type == HDHOMERUN_DEVICE_TYPE_STORAGE)
+    {
+      strUrl = StringUtils::Format("%s/recorded_files.json", pTuner->Device.base_url);
+
+      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun recording: %s", strUrl.c_str());
+
+      if (GetFileContents(strUrl.c_str(), strJson))
+      {
+        if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(),
+                              &pTuner->Recordings, &jsonReaderError) &&
+            pTuner->Recordings.type() == Json::arrayValue)
+        {
+          for (auto& jsonRecording : pTuner->Recordings)
+          {
+            jsonRecording["_UID"] = EncodeURL(jsonRecording["CmdURL"].asString());
+            jsonRecording["_Duration"] =
+                jsonRecording["RecordEndTime"].asUInt() - jsonRecording["RecordStartTime"].asUInt();
+          }
+          KODI_LOG(ADDON::LOG_DEBUG, "Found %u recordings", pTuner->Recordings.size());
+        }
+        else
+          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse recordings", strUrl.c_str());
+      }
+    }
   }
+  
   return true;
 }
 
@@ -289,6 +319,75 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
     }
+
+  return PVR_ERROR_NO_ERROR;
+}
+
+int HDHomeRunTuners::PvrGetRecordingsAmount(bool /*deleted*/)
+{
+  int nCount = 0;
+
+  AutoLock l(this);
+
+  for (const auto& iterTuner : m_Tuners)
+    for (const auto& jsonRecording : iterTuner.Recordings)
+      nCount++;
+
+  return nCount;
+}
+
+PVR_ERROR HDHomeRunTuners::PvrGetRecordings(ADDON_HANDLE handle, bool /*deleted*/)
+{
+  AutoLock l(this);
+
+  for (const auto& iterTuner : m_Tuners)
+  {
+    for (const auto& jsonRecording : iterTuner.Recordings)
+    {
+      PVR_RECORDING pvrRecording = {0};
+
+      pvrRecording.strRecordingId[sizeof(pvrRecording.strRecordingId) - 1] = '\0';
+      strncpy(pvrRecording.strRecordingId, jsonRecording["_UID"].asString().c_str(),
+              sizeof(pvrRecording.strRecordingId) - 1);
+
+      pvrRecording.strTitle[sizeof(pvrRecording.strTitle) - 1] = '\0';
+      strncpy(pvrRecording.strTitle, jsonRecording["Title"].asString().c_str(),
+              sizeof(pvrRecording.strTitle) - 1);
+
+      pvrRecording.strEpisodeName[sizeof(pvrRecording.strEpisodeName) - 1] = '\0';
+      strncpy(pvrRecording.strEpisodeName, jsonRecording["EpisodeTitle"].asString().c_str(),
+              sizeof(pvrRecording.strEpisodeName) - 1);
+
+      if (sscanf(jsonRecording["EpisodeNumber"].asString().c_str(), "S%dE%d",
+                 &pvrRecording.iSeriesNumber, &pvrRecording.iEpisodeNumber) != 2)
+        if (sscanf(jsonRecording["EpisodeNumber"].asString().c_str(), "EP%d-%d",
+                   &pvrRecording.iSeriesNumber, &pvrRecording.iEpisodeNumber) != 2)
+          if (sscanf(jsonRecording["EpisodeNumber"].asString().c_str(), "EP%d",
+                     &pvrRecording.iEpisodeNumber) == 1)
+            pvrRecording.iSeriesNumber = 0;
+
+      pvrRecording.strDirectory[sizeof(pvrRecording.strDirectory) - 1] = '\0';
+      strncpy(pvrRecording.strDirectory, jsonRecording["Title"].asString().c_str(),
+              sizeof(pvrRecording.strDirectory) - 1);
+
+      pvrRecording.strPlot[sizeof(pvrRecording.strPlot) - 1] = '\0';
+      strncpy(pvrRecording.strPlot, jsonRecording["Synopsis"].asString().c_str(),
+              sizeof(pvrRecording.strPlot) - 1);
+
+      pvrRecording.strChannelName[sizeof(pvrRecording.strChannelName) - 1] = '\0';
+      strncpy(pvrRecording.strChannelName, jsonRecording["ChannelName"].asString().c_str(),
+              sizeof(pvrRecording.strChannelName) - 1);
+
+      pvrRecording.strThumbnailPath[sizeof(pvrRecording.strThumbnailPath) - 1] = '\0';
+      strncpy(pvrRecording.strThumbnailPath, jsonRecording["ImageURL"].asString().c_str(),
+              sizeof(pvrRecording.strThumbnailPath) - 1);
+
+      pvrRecording.recordingTime = jsonRecording["RecordStartTime"].asUInt();
+      pvrRecording.iDuration = jsonRecording["_Duration"].asUInt();
+
+      g.PVR->TransferRecordingEntry(handle, &pvrRecording);
+    }
+  }
 
   return PVR_ERROR_NO_ERROR;
 }
@@ -464,5 +563,24 @@ std::string HDHomeRunTuners::GetChannelStreamURL(const PVR_CHANNEL* channel)
   }
 
   KODI_LOG(ADDON::LOG_DEBUG, "No Tuners available");
+  return "";
+}
+
+std::string HDHomeRunTuners::GetRecordingStreamURL(const PVR_RECORDING* recording)
+{
+  AutoLock l(this);
+
+  for (const auto& iterTuner : m_Tuners)
+  {
+    for (const auto& jsonRecording : iterTuner.Recordings)
+    {
+      if (strcmp(recording->strRecordingId, jsonRecording["_UID"].asString().c_str()) == 0)
+      {
+        return jsonRecording["PlayURL"].asString();
+      }
+    }
+  }
+
+  KODI_LOG(ADDON::LOG_DEBUG, "Recording not found");
   return "";
 }

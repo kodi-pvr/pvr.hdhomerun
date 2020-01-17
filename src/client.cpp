@@ -51,8 +51,12 @@ public:
 
       if (g.Tuners)
       {
-        if (g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide))
+        if (g.Tuners->Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide |
+                             HDHomeRunTuners::UpdateRecordings))
+        {
           g.PVR->TriggerChannelUpdate();
+          g.PVR->TriggerRecordingUpdate();
+        }
       }
     }
     return NULL;
@@ -198,7 +202,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
   pCapabilities->bSupportsTV = true;
   pCapabilities->bSupportsRadio = false;
   pCapabilities->bSupportsChannelGroups = true;
-  pCapabilities->bSupportsRecordings = false;
+  pCapabilities->bSupportsRecordings = true;
   pCapabilities->bSupportsRecordingsUndelete = false;
   pCapabilities->bSupportsTimers = false;
   pCapabilities->bSupportsRecordingsRename = false;
@@ -316,6 +320,46 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
   return PVR_ERROR_NO_ERROR;
 }
 
+int GetRecordingsAmount(bool deleted)
+{
+  return g.Tuners ? g.Tuners->PvrGetRecordingsAmount(deleted) : PVR_ERROR_SERVER_ERROR;
+}
+
+PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
+{
+  return g.Tuners ? g.Tuners->PvrGetRecordings(handle, deleted) : PVR_ERROR_SERVER_ERROR;
+}
+
+PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING* recording,
+                                       PVR_NAMED_VALUE* properties,
+                                       unsigned int* iPropertiesCount)
+{
+  if (!recording || !properties || !iPropertiesCount)
+    return PVR_ERROR_SERVER_ERROR;
+
+  if (*iPropertiesCount < 2)
+    return PVR_ERROR_INVALID_PARAMETERS;
+
+  std::string strUrl = g.Tuners->GetRecordingStreamURL(recording);
+  if (strUrl.empty())
+    return PVR_ERROR_FAILED;
+
+  strncpy(properties[0].strName, PVR_STREAM_PROPERTY_STREAMURL, sizeof(properties[0].strName) - 1);
+  properties[0].strName[sizeof(properties[0].strName) - 1] = '\0';
+  strncpy(properties[0].strValue, strUrl.c_str(), sizeof(properties[0].strValue) - 1);
+  properties[0].strValue[sizeof(properties[0].strValue) - 1] = '\0';
+
+  strncpy(properties[1].strName, PVR_STREAM_PROPERTY_ISREALTIMESTREAM,
+          sizeof(properties[1].strName) - 1);
+  properties[1].strName[sizeof(properties[1].strName) - 1] = '\0';
+  strncpy(properties[1].strValue, "false", sizeof(properties[1].strValue) - 1);
+  properties[1].strValue[sizeof(properties[1].strValue) - 1] = '\0';
+
+  *iPropertiesCount = 2;
+
+  return PVR_ERROR_NO_ERROR;
+}
+
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -347,10 +391,7 @@ void CloseRecordedStream(void) {}
 int ReadRecordedStream(unsigned char*, unsigned int) { return 0; }
 long long SeekRecordedStream(long long, int) { return 0; }
 long long LengthRecordedStream(void) { return 0; }
-PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR DeleteRecording(const PVR_RECORDING&) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetRecordings(ADDON_HANDLE, bool) { return PVR_ERROR_NOT_IMPLEMENTED; }
-int GetRecordingsAmount(bool) { return -1; }
 PVR_ERROR RenameRecording(const PVR_RECORDING&) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING&, int) { return PVR_ERROR_NOT_IMPLEMENTED; }

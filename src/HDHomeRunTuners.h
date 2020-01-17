@@ -39,7 +39,8 @@ public:
   {
     UpdateDiscover = 1,
     UpdateLineUp = 2,
-    UpdateGuide = 4
+    UpdateGuide = 4,
+    UpdateRecordings = 8
   };
 
   struct Tuner
@@ -52,6 +53,7 @@ public:
     hdhomerun_discover_device_t Device;
     Json::Value LineUp;
     Json::Value Guide;
+    Json::Value Recordings;
   };
 
   class AutoLock
@@ -68,7 +70,7 @@ public:
   void Lock() { m_Lock.Lock(); }
   void Unlock() { m_Lock.Unlock(); }
 
-  bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
+  bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide | UpdateRecordings);
   PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
   int PvrGetChannelsAmount();
   PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd);
@@ -76,6 +78,9 @@ public:
   PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
   PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
   std::string GetChannelStreamURL(const PVR_CHANNEL* channel);
+  PVR_ERROR PvrGetRecordings(ADDON_HANDLE handle, bool deleted);
+  int PvrGetRecordingsAmount(bool deleted);
+  std::string GetRecordingStreamURL(const PVR_RECORDING* recording);
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);
