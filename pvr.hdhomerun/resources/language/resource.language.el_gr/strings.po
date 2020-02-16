@@ -31,3 +31,7 @@ msgstr "Καταγραφή σφαλμάτων"
 msgctxt "#32004"
 msgid "Hide duplicate channels"
 msgstr "Απόκρυψη διπλών καναλιών"
+
+msgctxt "#32005"
+msgid "Mark new show"
+msgstr "Επισήμανση νέου σόου"
