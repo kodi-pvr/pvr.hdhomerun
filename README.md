@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kodi-pvr/pvr.hdhomerun.svg?branch=master)](https://travis-ci.org/kodi-pvr/pvr.hdhomerun)
+[![Build Status](https://travis-ci.org/kodi-pvr/pvr.hdhomerun.svg?branch=Matrix)](https://travis-ci.org/kodi-pvr/pvr.hdhomerun/branches)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/5120/badge.svg)](https://scan.coverity.com/projects/5120)
 
 # HDHomeRun PVR
