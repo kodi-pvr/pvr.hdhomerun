@@ -1,4 +1,8 @@
-# HDHomeRun PVR [![Build Status](https://travis-ci.org/kodi-pvr/pvr.hdhomerun.svg?branch=master)](https://travis-ci.org/kodi-pvr/pvr.hdhomerun) [![Build status](https://ci.appveyor.com/api/projects/status/dqyxemegfoku7hue?svg=true)](https://ci.appveyor.com/project/zcsizmadia/pvr-hdhomerun) [![Coverity Scan Build Status](https://scan.coverity.com/projects/5120/badge.svg)](https://scan.coverity.com/projects/5120)
+[![Build Status](https://travis-ci.org/kodi-pvr/pvr.hdhomerun.svg?branch=master)](https://travis-ci.org/kodi-pvr/pvr.hdhomerun)
+[![Build status](https://ci.appveyor.com/api/projects/status/dqyxemegfoku7hue?svg=true)](https://ci.appveyor.com/project/zcsizmadia/pvr-hdhomerun)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/5120/badge.svg)](https://scan.coverity.com/projects/5120)
+
+# HDHomeRun PVR
 
 HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
 
