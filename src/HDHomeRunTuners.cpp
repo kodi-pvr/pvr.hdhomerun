@@ -131,7 +131,7 @@ bool HDHomeRunTuners::Update(int nMode)
 
             for (auto& jsonGuideItem : jsonGuide)
             {
-              int iSeriesNumber = 0, iEpisodeNumber = 0;
+              int iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE, iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 
               jsonGuideItem["_UID"] = PvrCalculateUniqueId(jsonGuideItem["Title"].asString() + jsonGuideItem["EpisodeNumber"].asString() + jsonGuideItem["ImageURL"].asString());
 
@@ -167,7 +167,7 @@ bool HDHomeRunTuners::Update(int nMode)
               if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "S%dE%d", &iSeriesNumber, &iEpisodeNumber) != 2)
                 if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d-%d", &iSeriesNumber, &iEpisodeNumber) != 2)
                   if (sscanf(jsonGuideItem["EpisodeNumber"].asString().c_str(), "EP%d", &iEpisodeNumber) == 1)
-                    iSeriesNumber = 0;
+                    iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 
               jsonGuideItem["_SeriesNumber"] = iSeriesNumber;
               jsonGuideItem["_EpisodeNumber"] = iEpisodeNumber;
@@ -293,6 +293,20 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
   return PVR_ERROR_NO_ERROR;
 }
 
+namespace
+{
+
+std::string ParseAsW3CDateString(time_t time)
+{
+  std::tm* tm = std::localtime(&time);
+  char buffer[16];
+  std::strftime(buffer, 16, "%Y-%m-%d", tm);
+
+  return buffer;
+}
+
+} // unnamed namespace
+
 PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
   AutoLock l(this);
@@ -314,6 +328,7 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannel
               continue;
 
             EPG_TAG tag = { 0 };
+            tag.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 
             std::string
               strTitle(jsonGuideItem["Title"].asString()),
@@ -322,12 +337,15 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannel
               strSeriesID(jsonGuideItem["SeriesID"].asString()),
               strImageURL(jsonGuideItem["ImageURL"].asString());
 
+            time_t firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
+            std::string strFirstAired((firstAired > 0) ? ParseAsW3CDateString(firstAired) : "");
+
             tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
             tag.strTitle = strTitle.c_str();
             tag.iUniqueChannelId = iChannelUid;
             tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
             tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
-            tag.firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
+            tag.strFirstAired = strFirstAired.c_str();
             tag.strPlot = strSynopsis.c_str();
             tag.strIconPath = strImageURL.c_str();
             tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
