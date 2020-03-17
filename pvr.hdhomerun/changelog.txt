@@ -1,3 +1,6 @@
+v4.1.2
+- Update PVR API 6.2.0
+
 v4.1.1
 - Replace AppVeyor with Azure for test build (better performance)
 - Add p8-platform to addon depends instead of from kodi
