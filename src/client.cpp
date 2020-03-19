@@ -86,6 +86,8 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
   if (!hdl || !props)
     return ADDON_STATUS_UNKNOWN;
 
+  PVR_PROPERTIES* pvrProps = reinterpret_cast<PVR_PROPERTIES*>(props);
+
   g.XBMC = new ADDON::CHelper_libXBMC_addon;
   if (!g.XBMC->RegisterMe(hdl))
   {
@@ -105,7 +107,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
 
   g.currentStatus = ADDON_STATUS_UNKNOWN;
 
-  g.Tuners = new HDHomeRunTuners;
+  g.Tuners = new HDHomeRunTuners(pvrProps);
   if (g.Tuners == NULL)
   {
     SAFE_DELETE(g.PVR);

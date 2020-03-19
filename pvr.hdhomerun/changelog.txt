@@ -1,3 +1,6 @@
+v4.2.0
+- Add EPG storage
+
 v4.1.2
 - Update PVR API 6.2.0
 
@@ -118,7 +121,7 @@ v2.1.0
 
 v2.0.2
 - Updated to PVR API v4.2.0
- 
+
 v2.0.1
 - Updated language files from Transifex
 

@@ -42,6 +42,8 @@ static const std::string g_strGroupFavoriteChannels("Favorite channels");
 static const std::string g_strGroupHDChannels("HD channels");
 static const std::string g_strGroupSDChannels("SD channels");
 
+HDHomeRunTuners::HDHomeRunTuners(PVR_PROPERTIES* pvrProps) : m_epgMaxDays(pvrProps->iEpgMaxDays) {}
+
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
 {
   int nHash = (int)std::hash<std::string>()(str);
@@ -269,6 +271,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
 
   AutoLock l(this);
 
+  m_epg.Clear();
+
   for (const auto& iterTuner : m_Tuners)
     for (const auto& jsonChannel : iterTuner.LineUp)
     {
@@ -288,6 +292,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetChannels(ADDON_HANDLE handle, bool bRadio)
       pvrChannel.strIconPath[sizeof(pvrChannel.strIconPath) - 1] = '\0';
 
       g.PVR->TransferChannelEntry(handle, &pvrChannel);
+
+      m_epg.AddChannel(jsonChannel["_UID"].asUInt(), jsonChannel["_ChannelName"].asString());
     }
 
   return PVR_ERROR_NO_ERROR;
@@ -318,6 +324,8 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannel
       if (jsonChannel["_UID"].asUInt() != iChannelUid)
         continue;
 
+      auto epgChannel = m_epg.GetEpgChannel(iChannelUid);
+
       for (const auto& iterGuide : iterTuner.Guide)
       {
         if (iterGuide["GuideNumber"].asString() == jsonChannel["GuideNumber"].asString())
@@ -327,37 +335,23 @@ PVR_ERROR HDHomeRunTuners::PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannel
             if (static_cast<time_t>(jsonGuideItem["EndTime"].asUInt()) <= iStart || iEnd < static_cast<time_t>(jsonGuideItem["StartTime"].asUInt()))
               continue;
 
-            EPG_TAG tag = { 0 };
-            tag.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+            std::shared_ptr<EpgEntry> entry = std::make_shared<EpgEntry>();
+            entry->UpdateFrom(jsonGuideItem, iChannelUid);
 
-            std::string
-              strTitle(jsonGuideItem["Title"].asString()),
-              strSynopsis(jsonGuideItem["Synopsis"].asString()),
-              strEpTitle(jsonGuideItem["EpisodeTitle"].asString()),
-              strSeriesID(jsonGuideItem["SeriesID"].asString()),
-              strImageURL(jsonGuideItem["ImageURL"].asString());
+            if (epgChannel->EntryIsNewOrChanged(entry))
+            {
+              epgChannel->AddEntryToMainEPG(entry);
 
-            time_t firstAired = static_cast<time_t>(jsonGuideItem["OriginalAirdate"].asUInt());
-            std::string strFirstAired((firstAired > 0) ? ParseAsW3CDateString(firstAired) : "");
-
-            tag.iUniqueBroadcastId = jsonGuideItem["_UID"].asUInt();
-            tag.strTitle = strTitle.c_str();
-            tag.iUniqueChannelId = iChannelUid;
-            tag.startTime = static_cast<time_t>(jsonGuideItem["StartTime"].asUInt());
-            tag.endTime = static_cast<time_t>(jsonGuideItem["EndTime"].asUInt());
-            tag.strFirstAired = strFirstAired.c_str();
-            tag.strPlot = strSynopsis.c_str();
-            tag.strIconPath = strImageURL.c_str();
-            tag.iSeriesNumber = jsonGuideItem["_SeriesNumber"].asInt();
-            tag.iEpisodeNumber = jsonGuideItem["_EpisodeNumber"].asInt();
-            tag.iGenreType = jsonGuideItem["_GenreType"].asUInt();
-            tag.strEpisodeName = strEpTitle.c_str();
-            tag.strSeriesLink = strSeriesID.c_str();
-
-            g.PVR->TransferEpgEntry(handle, &tag);
+              EPG_TAG broadcast = {0};
+              broadcast.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+              entry->UpdateTo(broadcast);
+              g.PVR->TransferEpgEntry(handle, &broadcast);
+            }
           }
         }
       }
+
+      m_epg.CleanEPG(iChannelUid);
     }
   }
 

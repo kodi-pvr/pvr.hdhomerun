@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "Epg.h"
+
 #include "hdhomerun.h"
 #include <json/json.h>
 #include <p8-platform/threads/mutex.h>
@@ -64,7 +66,7 @@ public:
     HDHomeRunTuners* m_p;
   };
 
-  HDHomeRunTuners() {};
+  HDHomeRunTuners(PVR_PROPERTIES* pvrProps);
   void Lock() { m_Lock.Lock(); }
   void Unlock() { m_Lock.Unlock(); }
 
@@ -79,6 +81,8 @@ public:
 
 private:
   unsigned int PvrCalculateUniqueId(const std::string& str);
+  int m_epgMaxDays;
   std::vector<Tuner> m_Tuners;
+  Epg m_epg{m_epgMaxDays};
   P8PLATFORM::CMutex m_Lock;
 };
