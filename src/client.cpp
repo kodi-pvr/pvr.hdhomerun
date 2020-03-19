@@ -45,7 +45,7 @@ public:
       for (int i = 0; i < 60*60; i++)
         if (P8PLATFORM::CThread::Sleep(1000))
           break;
-      
+
       if (IsStopped())
         break;
 
@@ -280,14 +280,14 @@ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
   return PVR_ERROR_NO_ERROR;
 }
 
-bool CanPauseStream(void) 
+bool CanPauseStream(void)
 {
-  return true; 
+  return true;
 }
 
-bool CanSeekStream(void) 
+bool CanSeekStream(void)
 {
-  return true; 
+  return true;
 }
 
 PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)

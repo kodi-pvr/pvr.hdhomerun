@@ -136,7 +136,7 @@ bool HDHomeRunTuners::Update(int nMode)
               jsonGuideItem["_UID"] = PvrCalculateUniqueId(jsonGuideItem["Title"].asString() + jsonGuideItem["EpisodeNumber"].asString() + jsonGuideItem["ImageURL"].asString());
 
               if (g.Settings.bMarkNew &&
-                  jsonGuideItem["OriginalAirdate"].asUInt() != 0 && 
+                  jsonGuideItem["OriginalAirdate"].asUInt() != 0 &&
                   jsonGuideItem["OriginalAirdate"].asUInt() + 48*60*60 > jsonGuideItem["StartTime"].asUInt())
                 jsonGuideItem["Title"] = "*" + jsonGuideItem["Title"].asString();
 
