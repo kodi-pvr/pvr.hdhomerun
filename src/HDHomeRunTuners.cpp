@@ -298,7 +298,7 @@ namespace
 
 std::string ParseAsW3CDateString(time_t time)
 {
-  std::tm* tm = std::localtime(&time);
+  std::tm* tm = std::gmtime(&time);
   char buffer[16];
   std::strftime(buffer, 16, "%Y-%m-%d", tm);
 
