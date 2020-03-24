@@ -105,5 +105,8 @@
     <description lang="zh_CN">HDHomeRun PVR 客户端</description>
     <description lang="zh_TW">HDHomeRun PVR 用戶端</description>
     <platform>@PLATFORM@</platform>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
   </extension>
 </addon>
