@@ -6,7 +6,7 @@
 
 # HDHomeRun PVR
 
-HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
+HDHomeRun PVR client addon for [Kodi](https://kodi.tv)
 
 ## Build instructions
 
@@ -18,7 +18,7 @@ HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
 4. `cmake -DADDONS_TO_BUILD=pvr.hdhomerun -DADDON_SRC_PREFIX=../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../xbmc/addons -DPACKAGE_ZIP=1 ../../xbmc/cmake/addons`
 5. `make`
 
-### Windows 
+### Windows
 
 1. `set ROOT=%CD%`
 2. `git clone --branch master https://github.com/xbmc/xbmc.git`
@@ -31,5 +31,5 @@ HDHomeRun PVR client addon for [Kodi] (http://kodi.tv)
 
 ## Useful links
 
-* [Kodi's PVR user support] (http://forum.kodi.tv/forumdisplay.php?fid=167)
-* [Kodi's PVR development support] (http://forum.kodi.tv/forumdisplay.php?fid=136)
+* [Kodi's PVR user support](https://forum.kodi.tv/forumdisplay.php?fid=167)
+* [Kodi's PVR development support](https://forum.kodi.tv/forumdisplay.php?fid=136)
