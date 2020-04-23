@@ -44,7 +44,7 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 
   if (fileHandle == NULL)
   {
-    KODI_LOG(0, "GetFileContents: %s failed\n", url.c_str());
+    KODI_LOG(LOG_ERROR, "GetFileContents: %s failed\n", url.c_str());
     return false;
   }
 

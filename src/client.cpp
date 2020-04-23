@@ -86,7 +86,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     return ADDON_STATUS_PERMANENT_FAILURE;
   }
 
-  KODI_LOG(ADDON::LOG_NOTICE, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
+  KODI_LOG(LOG_INFO, "%s - Creating the PVR HDHomeRun add-on", __FUNCTION__);
 
   g.currentStatus = ADDON_STATUS_UNKNOWN;
 

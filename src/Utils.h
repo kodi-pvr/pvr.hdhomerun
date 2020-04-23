@@ -29,8 +29,8 @@ int DbgPrintf(const char* szFormat, ...);
         DbgPrintf("%-10s: ", #level); \
         DbgPrintf(__VA_ARGS__);       \
         DbgPrintf("\n");              \
-        if (g.XBMC && (level > ADDON::LOG_DEBUG || g.Settings.bDebug))  \
-            g.XBMC->Log((ADDON::addon_log_t)level, __VA_ARGS__);        \
+        if (g.XBMC && (level > LOG_DEBUG || g.Settings.bDebug))  \
+            g.XBMC->Log(level, __VA_ARGS__);        \
   } while (0)
 
 bool GetFileContents(const std::string& url, std::string& strContent);
