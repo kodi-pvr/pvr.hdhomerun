@@ -1,25 +1,10 @@
 /*
- *      Copyright (C) 2015 Zoltan Csizmadia <zcsizmadia@gmail.com>
- *      https://github.com/zcsizmadia/pvr.hdhomerun
+ *  Copyright (C) 2015-2020 Team Kodi (https://kodi.tv)
+ *  Copyright (C) 2015 Zoltan Csizmadia (zcsizmadia@gmail.com)
+ *  Copyright (C) 2011 Pulse-Eight (https://www.pulse-eight.com)
  *
- *      Copyright (C) 2011 Pulse-Eight
- *      http://www.pulse-eight.com/
- *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
- *  http://www.gnu.org/copyleft/gpl.html
- *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSE.md for more information.
  */
 
 #include "HDHomeRunTuners.h"
@@ -59,7 +44,7 @@ bool HDHomeRunTuners::Update(int nMode)
   if (nTunerCount <= 0)
     return false;
 
-  KODI_LOG(ADDON::LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
+  KODI_LOG(LOG_DEBUG, "Found %d HDHomeRun tuners", nTunerCount);
 
   std::string strUrl, strJson, jsonReaderError;
   Json::CharReaderBuilder jsonReaderBuilder;
@@ -115,7 +100,7 @@ bool HDHomeRunTuners::Update(int nMode)
     if (nMode & UpdateGuide)
     {
       strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
-      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
+      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
@@ -174,11 +159,11 @@ bool HDHomeRunTuners::Update(int nMode)
             }
           }
 
-          KODI_LOG(ADDON::LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
+          KODI_LOG(LOG_DEBUG, "Found %u guide entries", pTuner->Guide.size());
         }
         else
         {
-          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse guide", strUrl.c_str());
+          KODI_LOG(LOG_ERROR, "Failed to parse guide", strUrl.c_str());
         }
       }
     }
@@ -190,7 +175,7 @@ bool HDHomeRunTuners::Update(int nMode)
     {
       strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
-      KODI_LOG(ADDON::LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
+      KODI_LOG(LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
       {
@@ -238,10 +223,10 @@ bool HDHomeRunTuners::Update(int nMode)
               nChannelNumber++;
             }
           }
-          KODI_LOG(ADDON::LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
+          KODI_LOG(LOG_DEBUG, "Found %u channels", pTuner->LineUp.size());
         }
         else
-          KODI_LOG(ADDON::LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
+          KODI_LOG(LOG_ERROR, "Failed to parse lineup", strUrl.c_str());
       }
     }
   }
@@ -468,19 +453,19 @@ std::string HDHomeRunTuners::GetChannelStreamURL(const PVR_CHANNEL* channel)
           }
           else if (returnCode == 403)
           {
-            KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d, All tuners in use on device", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
+            KODI_LOG(LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d, All tuners in use on device", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
           }
           else
           {
             // ToDo: Not an oversubscription error, implement a count against specific tuners. If > x non 403 failures, blacklist tuner??
             //       potentially flag date/time of last failure, move tuner to blacklist, retry blacklist device y hours after last failure (24?)
-            KODI_LOG(ADDON::LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
+            KODI_LOG(LOG_DEBUG, "Tuner ID: %d URL Unavailable: %s, Error Code: %d", channel->iUniqueId, jsonChannel["URL"].asString().c_str(), returnCode);
           }
         }
       }
     }
   }
 
-  KODI_LOG(ADDON::LOG_DEBUG, "No Tuners available");
+  KODI_LOG(LOG_DEBUG, "No Tuners available");
   return "";
 }

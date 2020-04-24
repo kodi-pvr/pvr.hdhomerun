@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="4.1.5"
+  version="4.1.6"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>@ADDON_DEPENDS@</requires>
@@ -105,8 +105,9 @@
     <description lang="zh_CN">HDHomeRun PVR 客户端</description>
     <description lang="zh_TW">HDHomeRun PVR 用戶端</description>
     <platform>@PLATFORM@</platform>
-    <license>GPL-2.0</license>
+    <license>GPL-2.0-or-later</license>
     <source>https://github.com/kodi-pvr/pvr.hdhomerun</source>
+    <forum>https://forum.kodi.tv/forumdisplay.php?fid=250</forum>
     <assets>
       <icon>icon.png</icon>
     </assets>
