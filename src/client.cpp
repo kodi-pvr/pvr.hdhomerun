@@ -177,7 +177,7 @@ void OnPowerSavingDeactivated()
 {
 }
 
-PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
+PVR_ERROR GetCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
 {
   pCapabilities->bSupportsEPG = true;
   pCapabilities->bSupportsTV = true;
@@ -253,14 +253,14 @@ PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &g
   return g.Tuners ? g.Tuners->PvrGetChannelGroupMembers(handle, group) : PVR_ERROR_SERVER_ERROR;
 }
 
-PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
+PVR_ERROR GetSignalStatus(int channelUid, PVR_SIGNAL_STATUS *signalStatus)
 {
-  strncpy(signalStatus.strAdapterName, "PVR HDHomeRun Adapter 1",
-          sizeof(signalStatus.strAdapterName) - 1);
-  signalStatus.strAdapterName[sizeof(signalStatus.strAdapterName) - 1] = '\0';
-  strncpy(signalStatus.strAdapterStatus, "OK",
-          sizeof(signalStatus.strAdapterStatus) - 1);
-  signalStatus.strAdapterStatus[sizeof(signalStatus.strAdapterStatus) - 1] = '\0';
+  strncpy(signalStatus->strAdapterName, "PVR HDHomeRun Adapter 1",
+          sizeof(signalStatus->strAdapterName) - 1);
+  signalStatus->strAdapterName[sizeof(signalStatus->strAdapterName) - 1] = '\0';
+  strncpy(signalStatus->strAdapterStatus, "OK",
+          sizeof(signalStatus->strAdapterStatus) - 1);
+  signalStatus->strAdapterStatus[sizeof(signalStatus->strAdapterStatus) - 1] = '\0';
 
   return PVR_ERROR_NO_ERROR;
 }
@@ -303,7 +303,7 @@ PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE
 
 /* UNUSED API FUNCTIONS */
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK&, const PVR_MENUHOOK_DATA&) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetDescrambleInfo(int, PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 // Channel
 PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR OpenDialogChannelSettings(const PVR_CHANNEL&) { return PVR_ERROR_NOT_IMPLEMENTED; }
