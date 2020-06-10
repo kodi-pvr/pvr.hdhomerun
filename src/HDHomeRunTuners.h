@@ -14,11 +14,15 @@
 
 #include "hdhomerun.h"
 #include <json/json.h>
+#include <kodi/addon-instance/PVR.h>
 #include <p8-platform/threads/mutex.h>
+#include <p8-platform/threads/threads.h>
 
-#include "client.h"
+class ATTRIBUTE_HIDDEN HDHomeRunTuners
+  : public kodi::addon::CAddonBase,
+    public kodi::addon::CInstancePVRClient,
+    public P8PLATFORM::CThread
 
-class HDHomeRunTuners
 {
 public:
   enum
@@ -50,20 +54,39 @@ public:
     HDHomeRunTuners* m_p;
   };
 
-  HDHomeRunTuners() {};
+  HDHomeRunTuners() = default;
+  ~HDHomeRunTuners() override;
+
   void Lock() { m_Lock.Lock(); }
   void Unlock() { m_Lock.Unlock(); }
 
+  ADDON_STATUS Create() override;
+  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue) override;
+
+  PVR_ERROR GetCapabilities(kodi::addon::PVRCapabilities& capabilities) override;
+  PVR_ERROR GetBackendName(std::string& name) override;
+  PVR_ERROR GetBackendVersion(std::string& version) override;
+  PVR_ERROR GetConnectionString(std::string& connection) override;
+  PVR_ERROR GetDriveSpace(uint64_t& total, uint64_t& used) override;
+
+  PVR_ERROR OnSystemWake() override;
+
   bool Update(int nMode = UpdateDiscover | UpdateLineUp | UpdateGuide);
-  PVR_ERROR PvrGetChannels(ADDON_HANDLE handle, bool bRadio);
-  int PvrGetChannelsAmount();
-  PVR_ERROR PvrGetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd);
-  int PvrGetChannelGroupsAmount(void);
-  PVR_ERROR PvrGetChannelGroups(ADDON_HANDLE handle, bool bRadio);
-  PVR_ERROR PvrGetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
-  std::string GetChannelStreamURL(const PVR_CHANNEL* channel);
+  PVR_ERROR GetChannels(bool radio, kodi::addon::PVRChannelsResultSet& results) override;
+  PVR_ERROR GetChannelsAmount(int& amount) override;
+  PVR_ERROR GetChannelStreamProperties(const kodi::addon::PVRChannel& channel, std::vector<kodi::addon::PVRStreamProperty>& properties) override;
+  PVR_ERROR GetSignalStatus(int channelUid, kodi::addon::PVRSignalStatus& signalStatus) override;
+  PVR_ERROR GetEPGForChannel(int channelUid, time_t start, time_t end, kodi::addon::PVREPGTagsResultSet& results) override;
+  PVR_ERROR GetChannelGroupsAmount(int& amount) override;
+  PVR_ERROR GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results) override;
+  PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group, kodi::addon::PVRChannelGroupMembersResultSet& results) override;
+
+protected:
+  void *Process() override;
 
 private:
+  std::string GetChannelStreamURL(const kodi::addon::PVRChannel& channel);
+
   unsigned int PvrCalculateUniqueId(const std::string& str);
   std::vector<Tuner> m_Tuners;
   P8PLATFORM::CMutex m_Lock;
