@@ -9,10 +9,9 @@
 
 #include "Utils.h"
 
+#include <kodi/Filesystem.h>
 #include <string>
 #include <p8-platform/util/StringUtils.h>
-
-#include "client.h"
 
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)
@@ -40,11 +39,11 @@ int DbgPrintf(const char* szFormat, ...)
 
 bool GetFileContents(const std::string& url, std::string& strContent)
 {
-  void* fileHandle = g.XBMC->OpenFile(url.c_str(), 0);
+  kodi::vfs::CFile fileHandle;
 
-  if (fileHandle == NULL)
+  if (!fileHandle.OpenFile(url))
   {
-    KODI_LOG(LOG_ERROR, "GetFileContents: %s failed\n", url.c_str());
+    KODI_LOG(ADDON_LOG_ERROR, "GetFileContents: %s failed\n", url.c_str());
     return false;
   }
 
@@ -53,13 +52,11 @@ bool GetFileContents(const std::string& url, std::string& strContent)
 
   for (;;)
   {
-    ssize_t bytesRead = g.XBMC->ReadFile(fileHandle, buffer, sizeof(buffer));
+    ssize_t bytesRead = fileHandle.Read(buffer, sizeof(buffer));
     if (bytesRead <= 0)
       break;
     strContent.append(buffer, bytesRead);
   }
-
-  g.XBMC->CloseFile(fileHandle);
 
   return true;
 }

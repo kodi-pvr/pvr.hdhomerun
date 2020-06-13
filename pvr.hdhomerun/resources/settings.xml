@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-
-  <!-- General -->
-  <category label="32001">
-    <setting id="hide_protected" type="bool" label="32002" default="true" />
-    <setting id="debug" type="bool" label="32003" default="false" />
-    <setting id="hide_duplicate" type="bool" label="32004" default="true" />
-    <setting id="mark_new" type="bool" label="32005" default="true" />
-  </category>
-
+<settings version="1">
+  <section id="addon" label="-1" help="-1">
+    <category id="main" label="32001" help="-1">
+      <group id="1" label="-1">
+        <setting id="hide_protected" type="boolean" label="32002">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
+        <setting id="debug" type="boolean" label="32003">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle"/>
+        </setting>
+        <setting id="hide_duplicate" type="boolean" label="32004">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
+        <setting id="mark_new" type="boolean" label="32005">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle"/>
+        </setting>
+      </group>
+    </category>
+  </section>
 </settings>

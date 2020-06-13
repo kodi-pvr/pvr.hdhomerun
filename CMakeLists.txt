@@ -17,12 +17,12 @@ set(DEPLIBS ${p8-platform_LIBRARIES}
             ${JSONCPP_LIBRARIES}
             ${HDHOMERUN_LIBRARIES})
 
-set(PVRHDHOMERUN_SOURCES src/client.cpp
-                         src/HDHomeRunTuners.cpp
+set(PVRHDHOMERUN_SOURCES src/HDHomeRunTuners.cpp
+                         src/Settings.cpp
                          src/Utils.cpp)
 
-set(PVRHDHOMERUN_HEADERS src/client.h
-                         src/HDHomeRunTuners.h
+set(PVRHDHOMERUN_HEADERS src/HDHomeRunTuners.h
+                         src/Settings.h
                          src/Utils.h)
 
 if(WIN32)
@@ -30,7 +30,7 @@ if(WIN32)
   list(APPEND DEPLIBS iphlpapi)
   add_compile_options(/wd4996)
   if(CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
-    # if _WIN32_WINNT isn't defined before including hdhomerun.h then 
+    # if _WIN32_WINNT isn't defined before including hdhomerun.h then
     # it's defined as _WIN32_WINNT_VISTA which breaks build on UWP
     add_definitions(-D_WIN32_WINNT=0x0A00)
   endif()
