@@ -11,8 +11,8 @@
 #include "Utils.h"
 
 #include <kodi/Filesystem.h>
+#include <kodi/tools/StringUtils.h>
 #include <set>
-#include <p8-platform/util/StringUtils.h>
 
 static const std::string g_strGroupFavoriteChannels("Favorite channels");
 static const std::string g_strGroupHDChannels("HD channels");
@@ -177,7 +177,7 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     if (nMode & UpdateGuide)
     {
-      strUrl = StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
+      strUrl = kodi::tools::StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
       KODI_LOG(ADDON_LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
@@ -251,7 +251,7 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     if (nMode & UpdateLineUp)
     {
-      strUrl = StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
+      strUrl = kodi::tools::StringUtils::Format("%s/lineup.json", pTuner->Device.base_url);
 
       KODI_LOG(ADDON_LOG_DEBUG, "Requesting HDHomeRun lineup: %s", strUrl.c_str());
 
