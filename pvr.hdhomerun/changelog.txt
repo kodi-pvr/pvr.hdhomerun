@@ -1,3 +1,9 @@
+v6.0.1:
+- Remove dependency on p8-platform
+- Update to use std::thread
+- Update to use std::mutex
+- Use kodi StringUtils
+
 v6.0.0:
 - Update PVR API 7.0.0
 - Rework addon to support new API interface
@@ -150,7 +156,7 @@ v2.1.0
 
 v2.0.2
 - Updated to PVR API v4.2.0
- 
+
 v2.0.1
 - Updated language files from Transifex
 
