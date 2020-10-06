@@ -9,13 +9,13 @@
 
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include "hdhomerun.h"
 #include <json/json.h>
 #include <kodi/addon-instance/PVR.h>
-#include <p8-platform/threads/mutex.h>
 #include <p8-platform/threads/threads.h>
 
 class ATTRIBUTE_HIDDEN HDHomeRunTuners
@@ -57,8 +57,8 @@ public:
   HDHomeRunTuners() = default;
   ~HDHomeRunTuners() override;
 
-  void Lock() { m_Lock.Lock(); }
-  void Unlock() { m_Lock.Unlock(); }
+  void Lock() { m_Lock.lock(); }
+  void Unlock() { m_Lock.unlock(); }
 
   ADDON_STATUS Create() override;
   ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue) override;
@@ -89,5 +89,5 @@ private:
 
   unsigned int PvrCalculateUniqueId(const std::string& str);
   std::vector<Tuner> m_Tuners;
-  P8PLATFORM::CMutex m_Lock;
+  std::mutex m_Lock;
 };
