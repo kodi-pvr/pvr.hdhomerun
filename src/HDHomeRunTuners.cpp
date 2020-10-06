@@ -20,7 +20,9 @@ static const std::string g_strGroupSDChannels("SD channels");
 
 HDHomeRunTuners::~HDHomeRunTuners()
 {
-  StopThread();
+  m_running = false;
+  if (m_thread.joinable())
+    m_thread.join();
 }
 
 ADDON_STATUS HDHomeRunTuners::Create()
@@ -29,8 +31,8 @@ ADDON_STATUS HDHomeRunTuners::Create()
 
   SettingsType::Get().ReadSettings();
   Update();
-  if (!CreateThread(false))
-    return ADDON_STATUS_PERMANENT_FAILURE;
+  m_running = true;
+  m_thread = std::thread([&] { Process(); });
 
   return ADDON_STATUS_OK;
 }
@@ -40,21 +42,23 @@ ADDON_STATUS HDHomeRunTuners::SetSetting(const std::string& settingName, const k
   return SettingsType::Get().SetSetting(settingName, settingValue);
 }
 
-void* HDHomeRunTuners::Process()
+void HDHomeRunTuners::Process()
 {
   for (;;)
   {
     for (int i = 0; i < 60*60; i++)
-      if (P8PLATFORM::CThread::Sleep(1000))
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      if (!m_running)
         break;
+    }
 
-    if (IsStopped())
+    if (!m_running)
       break;
 
     if (Update(HDHomeRunTuners::UpdateLineUp | HDHomeRunTuners::UpdateGuide))
       kodi::addon::CInstancePVRClient::TriggerChannelUpdate();
   }
-  return nullptr;
 }
 
 unsigned int HDHomeRunTuners::PvrCalculateUniqueId(const std::string& str)
