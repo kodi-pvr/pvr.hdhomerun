@@ -10,8 +10,8 @@
 #include "Utils.h"
 
 #include <kodi/Filesystem.h>
+#include <kodi/tools/StringUtils.h>
 #include <string>
-#include <p8-platform/util/StringUtils.h>
 
 #if defined(USE_DBG_CONSOLE) && defined(TARGET_WINDOWS)
 int DbgPrintf(const char* szFormat, ...)
@@ -70,7 +70,7 @@ std::string EncodeURL(const std::string& strUrl)
       str += c;
     else
     {
-      std::string strPercent = StringUtils::Format("%%%02X", (int)c);
+      std::string strPercent = kodi::tools::StringUtils::Format("%%%02X", (int)c);
       str += strPercent;
     }
   }

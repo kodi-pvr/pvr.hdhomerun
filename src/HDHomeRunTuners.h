@@ -9,20 +9,19 @@
 
 #pragma once
 
+#include <atomic>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "hdhomerun.h"
 #include <json/json.h>
 #include <kodi/addon-instance/PVR.h>
-#include <p8-platform/threads/mutex.h>
-#include <p8-platform/threads/threads.h>
 
 class ATTRIBUTE_HIDDEN HDHomeRunTuners
   : public kodi::addon::CAddonBase,
-    public kodi::addon::CInstancePVRClient,
-    public P8PLATFORM::CThread
-
+    public kodi::addon::CInstancePVRClient
 {
 public:
   enum
@@ -57,8 +56,8 @@ public:
   HDHomeRunTuners() = default;
   ~HDHomeRunTuners() override;
 
-  void Lock() { m_Lock.Lock(); }
-  void Unlock() { m_Lock.Unlock(); }
+  void Lock() { m_Lock.lock(); }
+  void Unlock() { m_Lock.unlock(); }
 
   ADDON_STATUS Create() override;
   ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue) override;
@@ -82,12 +81,14 @@ public:
   PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group, kodi::addon::PVRChannelGroupMembersResultSet& results) override;
 
 protected:
-  void *Process() override;
+  void Process();
 
 private:
   std::string GetChannelStreamURL(const kodi::addon::PVRChannel& channel);
 
   unsigned int PvrCalculateUniqueId(const std::string& str);
   std::vector<Tuner> m_Tuners;
-  P8PLATFORM::CMutex m_Lock;
+  std::atomic<bool> m_running = {false};
+  std::thread m_thread;
+  std::mutex m_Lock;
 };
