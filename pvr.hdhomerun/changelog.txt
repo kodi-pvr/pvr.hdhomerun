@@ -1,3 +1,6 @@
+v3.5.2
+- use https instead of http for guide data
+
 v3.5.1
 - Update build system version and cleanup
 - Fix package check for JsonCpp and HDHomerun
