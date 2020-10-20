@@ -181,7 +181,7 @@ bool HDHomeRunTuners::Update(int nMode)
     //
     if (nMode & UpdateGuide)
     {
-      strUrl = kodi::tools::StringUtils::Format("http://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
+      strUrl = kodi::tools::StringUtils::Format("https://my.hdhomerun.com/api/guide.php?DeviceAuth=%s", EncodeURL(pTuner->Device.device_auth).c_str());
       KODI_LOG(ADDON_LOG_DEBUG, "Requesting HDHomeRun guide: %s", strUrl.c_str());
 
       if (GetFileContents(strUrl.c_str(), strJson))
