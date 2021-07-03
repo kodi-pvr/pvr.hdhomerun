@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.hdhomerun"
-  version="7.1.0"
+  version="7.1.1"
   name="PVR HDHomeRun Client"
   provider-name="Zoltan Csizmadia (zcsizmadia@gmail.com)">
   <requires>@ADDON_DEPENDS@</requires>
@@ -111,5 +111,9 @@
     <assets>
       <icon>icon.png</icon>
     </assets>
+    <news>
+v7.1.1
+- Language update from Weblate
+    </news>
   </extension>
 </addon>
