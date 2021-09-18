@@ -16,6 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
+msgctxt "Addon Summary"
+msgid "HDHomeRun PVR Client"
+msgstr "HDHomeRun PVR klient"
+
+msgctxt "Addon Description"
+msgid "HDHomeRun PVR Client"
+msgstr "HDHomeRun PVR klient"
+
 msgctxt "#32001"
 msgid "General"
 msgstr "Všeobecné"

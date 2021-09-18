@@ -10,6 +10,13 @@
     needs_configuration="false"
     library_@PLATFORM@="@LIBRARY_FILENAME@"/>
   <extension point="xbmc.addon.metadata">
+    <platform>@PLATFORM@</platform>
+    <license>GPL-2.0-or-later</license>
+    <source>https://github.com/kodi-pvr/pvr.hdhomerun</source>
+    <forum>https://forum.kodi.tv/forumdisplay.php?fid=250</forum>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
     <summary lang="af_ZA">HDHomeRun PVR Kliënt</summary>
     <summary lang="be_BY">HDHomeRun PVR кліент </summary>
     <summary lang="bg_BG">Клиент за ПВР „HDHomeRun“</summary>
@@ -104,12 +111,5 @@
     <description lang="tr_TR">HDHomeRun PVR İstemcisi</description>
     <description lang="zh_CN">HDHomeRun PVR 客户端</description>
     <description lang="zh_TW">HDHomeRun PVR 用戶端</description>
-    <platform>@PLATFORM@</platform>
-    <license>GPL-2.0-or-later</license>
-    <source>https://github.com/kodi-pvr/pvr.hdhomerun</source>
-    <forum>https://forum.kodi.tv/forumdisplay.php?fid=250</forum>
-    <assets>
-      <icon>icon.png</icon>
-    </assets>
   </extension>
 </addon>
