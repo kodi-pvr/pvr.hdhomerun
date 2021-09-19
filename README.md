@@ -13,7 +13,7 @@ HDHomeRun PVR client addon for [Kodi](https://kodi.tv)
 ### Linux
 
 1. `git clone --branch Matrix https://github.com/xbmc/xbmc.git`
-2. `git clone https://github.com/kodi-pvr/pvr.hdhomerun.git`
+2. `git clone --branch Matrix https://github.com/kodi-pvr/pvr.hdhomerun.git`
 3. `cd pvr.hdhomerun && mkdir build && cd build`
 4. `cmake -DADDONS_TO_BUILD=pvr.hdhomerun -DADDON_SRC_PREFIX=../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../xbmc/addons -DPACKAGE_ZIP=1 ../../xbmc/cmake/addons`
 5. `make`
