@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2020 Team Kodi (https://kodi.tv)
+ *  Copyright (C) 2015-2021 Team Kodi (https://kodi.tv)
  *  Copyright (C) 2015 Zoltan Csizmadia (zcsizmadia@gmail.com)
  *  Copyright (C) 2011 Pulse-Eight (https://www.pulse-eight.com)
  *
