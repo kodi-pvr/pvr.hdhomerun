@@ -1,1 +1,1 @@
-hdhomerun https://github.com/Silicondust/libhdhomerun/archive/64aa1606b58e9654385333031c5d7bf02989bf49.tar.gz
+hdhomerun https://github.com/Silicondust/libhdhomerun/archive/7c54382fb681d03888b469033e50bebaf4ce6bce.tar.gz
