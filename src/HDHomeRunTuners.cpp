@@ -74,6 +74,7 @@ PVR_ERROR HDHomeRunTuners::GetCapabilities(kodi::addon::PVRCapabilities& capabil
   capabilities.SetSupportsRadio(false);
   capabilities.SetSupportsChannelGroups(true);
   capabilities.SetSupportsRecordings(false);
+  capabilities.SetSupportsRecordingsDelete(false);
   capabilities.SetSupportsRecordingsUndelete(false);
   capabilities.SetSupportsTimers(false);
   capabilities.SetSupportsRecordingsRename(false);
