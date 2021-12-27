@@ -11,13 +11,13 @@
 
 #include <kodi/AddonBase.h>
 
-class ATTRIBUTE_HIDDEN SettingsType
+class ATTR_DLL_LOCAL SettingsType
 {
 public:
   static SettingsType& Get();
 
   bool ReadSettings();
-  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue);
+  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::addon::CSettingValue& settingValue);
 
   bool GetHideProtected() const { return bHideProtected; }
   bool GetHideDuplicateChannels() const { return bHideDuplicateChannels; }

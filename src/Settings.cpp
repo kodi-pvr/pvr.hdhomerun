@@ -17,16 +17,16 @@ SettingsType& SettingsType::Get()
 
 bool SettingsType::ReadSettings()
 {
-  bHideProtected = kodi::GetSettingBoolean("hide_protected", true);
-  bHideDuplicateChannels = kodi::GetSettingBoolean("hide_duplicate", true);
-  bMarkNew = kodi::GetSettingBoolean("mark_new", true);
-  bDebug = kodi::GetSettingBoolean("debug", false);
+  bHideProtected = kodi::addon::GetSettingBoolean("hide_protected", true);
+  bHideDuplicateChannels = kodi::addon::GetSettingBoolean("hide_duplicate", true);
+  bMarkNew = kodi::addon::GetSettingBoolean("mark_new", true);
+  bDebug = kodi::addon::GetSettingBoolean("debug", false);
 
   return true;
 }
 
 ADDON_STATUS SettingsType::SetSetting(const std::string& settingName,
-                                      const kodi::CSettingValue& settingValue)
+                                      const kodi::addon::CSettingValue& settingValue)
 {
   if (settingName == "hide_protected")
   {
