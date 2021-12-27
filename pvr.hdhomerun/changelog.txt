@@ -1,3 +1,7 @@
+v19.0.2
+- Translations updates from Weblate
+	- be_by, da_dk, de_de
+
 v19.0.1
 - Add define to use legacy codepath for Android
 
