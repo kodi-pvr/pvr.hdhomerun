@@ -19,7 +19,7 @@
 #include <json/json.h>
 #include <kodi/addon-instance/PVR.h>
 
-class ATTRIBUTE_HIDDEN HDHomeRunTuners
+class ATTR_DLL_LOCAL HDHomeRunTuners
   : public kodi::addon::CAddonBase,
     public kodi::addon::CInstancePVRClient
 {
@@ -60,7 +60,7 @@ public:
   void Unlock() { m_Lock.unlock(); }
 
   ADDON_STATUS Create() override;
-  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue) override;
+  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::addon::CSettingValue& settingValue) override;
 
   PVR_ERROR GetCapabilities(kodi::addon::PVRCapabilities& capabilities) override;
   PVR_ERROR GetBackendName(std::string& name) override;

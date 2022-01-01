@@ -37,7 +37,7 @@ ADDON_STATUS HDHomeRunTuners::Create()
   return ADDON_STATUS_OK;
 }
 
-ADDON_STATUS HDHomeRunTuners::SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue)
+ADDON_STATUS HDHomeRunTuners::SetSetting(const std::string& settingName, const kodi::addon::CSettingValue& settingValue)
 {
   return SettingsType::Get().SetSetting(settingName, settingValue);
 }
