@@ -21,6 +21,7 @@ bool SettingsType::ReadSettings()
   bHideDuplicateChannels = kodi::GetSettingBoolean("hide_duplicate", true);
   bMarkNew = kodi::GetSettingBoolean("mark_new", true);
   bDebug = kodi::GetSettingBoolean("debug", false);
+  bHttpDiscovery = kodi::GetSettingBoolean("http_discovery", false);
 
   return true;
 }
@@ -42,6 +43,11 @@ ADDON_STATUS SettingsType::SetSetting(const std::string& settingName,
     bMarkNew = settingValue.GetBoolean();
   else if (settingName == "debug")
     bDebug = settingValue.GetBoolean();
+  else if (settingName == "http_discovery")
+  {
+    bHttpDiscovery = settingValue.GetBoolean();
+    return ADDON_STATUS_NEED_RESTART;
+  }
 
   return ADDON_STATUS_OK;
 }

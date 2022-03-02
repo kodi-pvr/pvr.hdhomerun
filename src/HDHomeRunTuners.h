@@ -87,6 +87,9 @@ private:
   std::string GetChannelStreamURL(const kodi::addon::PVRChannel& channel);
 
   unsigned int PvrCalculateUniqueId(const std::string& str);
+
+  int DiscoverTunersViaHttp(struct hdhomerun_discover_device_t* tuners, int maxtuners);
+
   std::vector<Tuner> m_Tuners;
   std::atomic<bool> m_running = {false};
   std::thread m_thread;

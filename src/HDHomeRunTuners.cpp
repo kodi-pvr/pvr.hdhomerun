@@ -115,13 +115,69 @@ PVR_ERROR HDHomeRunTuners::OnSystemWake()
   return PVR_ERROR_NO_ERROR;
 }
 
+int HDHomeRunTuners::DiscoverTunersViaHttp(struct hdhomerun_discover_device_t* tuners,
+                                           int maxtuners)
+{
+  int numtuners = 0;
+
+  std::string strJson, jsonReaderError;
+  Json::CharReaderBuilder jsonReaderBuilder;
+  std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
+
+  // This API may be removed by the provider in the future without notice; treat an inability
+  // to access this URL as if there were no tuners discovered.  Update() will then attempt
+  // a normal broadcast discovery and try to find the user's tuner devices that way
+  if (GetFileContents("https://api.hdhomerun.com/discover", strJson))
+  {
+    Json::Value devices;
+    if (jsonReader->parse(strJson.c_str(), strJson.c_str() + strJson.size(), &devices,
+                          &jsonReaderError) &&
+        devices.type() == Json::arrayValue)
+    {
+      for (const auto& device : devices)
+      {
+        // Tuners are identified by the presence of a DeviceID value in the JSON;
+        // this also applies to devices that have both tuners and a storage engine (DVR)
+        if (!device["DeviceID"].isNull() && !device["LocalIP"].isNull())
+        {
+          std::string ipstring = device["LocalIP"].asString();
+          if (ipstring.length() > 0)
+          {
+            uint32_t ip = ntohl(inet_addr(ipstring.c_str()));
+            numtuners += hdhomerun_discover_find_devices_custom_v2(
+                ip, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, &tuners[numtuners],
+                maxtuners - numtuners);
+          }
+        }
+
+        if (numtuners == maxtuners)
+          break;
+      }
+    }
+  }
+
+  return numtuners;
+}
+
 bool HDHomeRunTuners::Update(int nMode)
 {
   //
   // Discover
   //
   struct hdhomerun_discover_device_t foundDevices[16] = {};
-  int nTunerCount = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
+  int nTunerCount = 0;
+
+  // Attempt tuner discovery via HTTP first if the user has it enabled.  The provider may
+  // remove the ability for this method to work in the future without notice, so ensure
+  // that normal discovery is treated as a fall-through case rather than making these
+  // methods mutually exclusive
+
+  if (SettingsType::Get().GetHttpDiscovery())
+    nTunerCount = DiscoverTunersViaHttp(foundDevices, 16);
+
+  if (nTunerCount <= 0)
+    nTunerCount = hdhomerun_discover_find_devices_custom_v2(
+        0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
   if (nTunerCount <= 0)
     return false;

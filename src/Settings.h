@@ -23,6 +23,7 @@ public:
   bool GetHideDuplicateChannels() const { return bHideDuplicateChannels; }
   bool GetDebug() const { return bDebug; }
   bool GetMarkNew() const { return bMarkNew; }
+  bool GetHttpDiscovery() const { return bHttpDiscovery; }
 
 private:
   SettingsType() = default;
@@ -31,4 +32,5 @@ private:
   bool bHideDuplicateChannels = true;
   bool bDebug = false;
   bool bMarkNew = false;
+  bool bHttpDiscovery = false;
 };

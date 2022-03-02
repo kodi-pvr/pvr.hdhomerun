@@ -23,6 +23,11 @@
           <default>true</default>
           <control type="toggle"/>
         </setting>
+        <setting id="http_discovery" type="boolean" label="32006">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle"/>
+        </setting>
       </group>
     </category>
   </section>
