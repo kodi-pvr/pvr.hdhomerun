@@ -1,3 +1,7 @@
+v19.1.1
+- Translations updates from Weblate
+	- en_gb
+
 v19.1.0
 - Add Use HTTP discovery setting
 
