@@ -43,3 +43,7 @@ msgstr "Fela tvíteknar rásir"
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Merkja nýjan þátt"
+
+msgctxt "#32006"
+msgid "Use HTTP discovery"
+msgstr ""
