@@ -28,6 +28,14 @@
           <default>false</default>
           <control type="toggle"/>
         </setting>
+        <setting id="force_ip" type="string" label="32007">
+          <level>0</level>
+          <default></default>
+          <constraints>
+            <allowempty>true</allowempty>
+          </constraints>
+          <control type="edit" format="string" />
+        </setting>
       </group>
     </category>
   </section>
