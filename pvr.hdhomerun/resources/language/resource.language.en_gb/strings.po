@@ -47,3 +47,7 @@ msgstr ""
 msgctxt "#32006"
 msgid "Use HTTP discovery"
 msgstr ""
+
+msgctxt "#32007"
+msgid "Set IP of device to use"
+msgstr ""

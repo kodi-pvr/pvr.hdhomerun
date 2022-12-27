@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <kodi/AddonBase.h>
 
 class ATTR_DLL_LOCAL SettingsType
@@ -24,6 +26,7 @@ public:
   bool GetDebug() const { return bDebug; }
   bool GetMarkNew() const { return bMarkNew; }
   bool GetHttpDiscovery() const { return bHttpDiscovery; }
+  std::string GetForcedIP() const { return strForcedIP; }
 
 private:
   SettingsType() = default;
@@ -33,4 +36,5 @@ private:
   bool bDebug = false;
   bool bMarkNew = false;
   bool bHttpDiscovery = false;
+  std::string strForcedIP;
 };
