@@ -43,3 +43,7 @@ msgstr "Yinelenen kanalları gizle"
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Yeni programı işaretle"
+
+msgctxt "#32006"
+msgid "Use HTTP discovery"
+msgstr ""
