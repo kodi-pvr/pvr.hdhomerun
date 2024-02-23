@@ -23,10 +23,20 @@
           <default>true</default>
           <control type="toggle"/>
         </setting>
-        <setting id="http_discovery" type="boolean" label="32006">
+      </group>
+      <group id="2" label="32008">
+        <setting id="http_discovery" type="boolean" label="32006" help="32100">
           <level>0</level>
           <default>false</default>
           <control type="toggle"/>
+        </setting>
+        <setting id="force_ip" type="string" label="32007" help="32101">
+          <level>0</level>
+          <default></default>
+          <constraints>
+            <allowempty>true</allowempty>
+          </constraints>
+          <control type="edit" format="string" />
         </setting>
       </group>
     </category>

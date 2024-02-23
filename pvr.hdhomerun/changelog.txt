@@ -1,3 +1,7 @@
+v20.5.0
+- Add some help labels to some settings and group discovery related settings
+- Allow a user to specifically set IP address of HDHomerun device to search for if other discovery methods dont work.
+
 v20.4.0
 - Kodi inputstream API update to version 3.2.0
 - Kodi PVR API update to version 8.0.2

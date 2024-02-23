@@ -180,6 +180,28 @@ bool HDHomeRunTuners::Update(int nMode)
     nTunerCount = hdhomerun_discover_find_devices_custom_v2(
         0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
 
+  // If neither HTTPDiscovery or normal broadcast discovery do not find a device, if a
+  // user has entered an IP address in settings for a forced IP, do a search based on that
+  // specific IP. We only accomodate IPv4 addresses currently.
+  if (nTunerCount <= 0)
+  {
+    std::string strUserForcedIP = SettingsType::Get().GetForcedIP();
+    if (!strUserForcedIP.empty())
+    {
+      unsigned char addressbuf[sizeof(struct in6_addr)];
+
+      int s = inet_pton(AF_INET, strUserForcedIP.c_str(), addressbuf);
+      if (s > 0)
+      {
+        uint32_t ipaddress =  (addressbuf[0] << 24) + (addressbuf[1] << 16) + (addressbuf[2] << 8) +  addressbuf[3];
+        nTunerCount = hdhomerun_discover_find_devices_custom_v2(
+            ipaddress, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, foundDevices, 16);
+
+        KODI_LOG(ADDON_LOG_DEBUG, "Found %d HDHomeRun tuners on IP %s", nTunerCount, strUserForcedIP.c_str());
+      }
+    }
+  }
+
   if (nTunerCount <= 0)
     return false;
 
