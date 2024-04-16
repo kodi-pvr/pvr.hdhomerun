@@ -34,7 +34,7 @@
     <summary lang="es_MX">Cliente PVR HDHomeRun</summary>
     <summary lang="et_EE">HDHomeRun PVR&apos;i klient</summary>
     <summary lang="eu_ES">HDHomeRun PVR Bezeroa</summary>
-    <summary lang="fi_FI">Kodin HDHomeRun-asiakasohjelma</summary>
+    <summary lang="fi_FI">HDHomeRun PVR-pääte.</summary>
     <summary lang="fr_CA">Client de numériscope HDHomeRun</summary>
     <summary lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</summary>
     <summary lang="gl_ES">Cliente PVR HDHomeRun</summary>
@@ -81,7 +81,7 @@
     <description lang="es_MX">Cliente PVR HDHomeRun</description>
     <description lang="et_EE">HDHomeRun PVR&apos;i klient</description>
     <description lang="eu_ES">HDHomeRun PVR Bezeroa</description>
-    <description lang="fi_FI">HDHomeRun-asiakasohjelma</description>
+    <description lang="fi_FI">HDHomeRun PVR-pääte</description>
     <description lang="fr_CA">Client de numériscope HDHomeRun</description>
     <description lang="fr_FR">Client enregistreur vidéo (PVR) HDHomeRun</description>
     <description lang="gl_ES">Cliente PVR HDHomeRun</description>
