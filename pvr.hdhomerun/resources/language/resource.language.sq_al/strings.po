@@ -43,3 +43,7 @@ msgstr "Fsheh kanale dublikatë"
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Shëno shfaqjen e re"
+
+msgctxt "#32006"
+msgid "Use HTTP discovery"
+msgstr ""

@@ -43,3 +43,7 @@ msgstr "Slėpti pasikartojančius kanalus"
 msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Pažymėti naujas laidas"
+
+msgctxt "#32006"
+msgid "Use HTTP discovery"
+msgstr ""
