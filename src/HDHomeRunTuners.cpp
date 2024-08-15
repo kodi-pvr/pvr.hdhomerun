@@ -413,7 +413,7 @@ PVR_ERROR HDHomeRunTuners::GetChannels(bool radio, kodi::addon::PVRChannelsResul
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR HDHomeRunTuners::GetChannelStreamProperties(const kodi::addon::PVRChannel& channel, std::vector<kodi::addon::PVRStreamProperty>& properties)
+PVR_ERROR HDHomeRunTuners::GetChannelStreamProperties(const kodi::addon::PVRChannel& channel, PVR_SOURCE source, std::vector<kodi::addon::PVRStreamProperty>& properties)
 {
   std::string strUrl = GetChannelStreamURL(channel);
   if (strUrl.empty())
