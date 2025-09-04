@@ -24,6 +24,7 @@ msgctxt "Addon Description"
 msgid "HDHomeRun PVR Client"
 msgstr ""
 
+#. label-category: general
 msgctxt "#32001"
 msgid "General"
 msgstr ""
@@ -44,6 +45,35 @@ msgctxt "#32005"
 msgid "Mark new show"
 msgstr ""
 
+#. label: Device Discovery - http_discovery
 msgctxt "#32006"
 msgid "Use HTTP discovery"
+msgstr ""
+
+#. label: Device Discovery - force_ip
+msgctxt "#32007"
+msgid "Set IP of device to use"
+msgstr ""
+
+#. label-group: General - Device Discovery
+msgctxt "#32008"
+msgid "Device Discovery"
+msgstr ""
+
+#empty strings from id 32009 to 320099
+
+#. ############
+#. help info #
+#. ############
+
+#. help info - General
+
+#. help: Device Discovery - http_discovery
+msgctxt "#32100"
+msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
+msgstr ""
+
+#. help: Device Discovery - force_ip
+msgctxt "#32101"
+msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
 msgstr ""
