@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: 2025-07-28 01:27+0000\n"
 "Last-Translator: Havok Dan <havokdan@yahoo.com.br>\n"
@@ -25,6 +25,7 @@ msgctxt "Addon Description"
 msgid "HDHomeRun PVR Client"
 msgstr "HDHomeRun PVR Cliente"
 
+#. label-category: general
 msgctxt "#32001"
 msgid "General"
 msgstr "Geral"
@@ -45,6 +46,32 @@ msgctxt "#32005"
 msgid "Mark new show"
 msgstr "Marcar novo show"
 
+#. label: Device Discovery - http_discovery
 msgctxt "#32006"
 msgid "Use HTTP discovery"
 msgstr "Usar descoberta HTTP"
+
+#. label: Device Discovery - force_ip
+msgctxt "#32007"
+msgid "Set IP of device to use"
+msgstr ""
+
+#. label-group: General - Device Discovery
+msgctxt "#32008"
+msgid "Device Discovery"
+msgstr ""
+
+# empty strings from id 32009 to 320099
+#. ############
+#. help info #
+#. ############
+#. help info - General
+#. help: Device Discovery - http_discovery
+msgctxt "#32100"
+msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
+msgstr ""
+
+#. help: Device Discovery - force_ip
+msgctxt "#32101"
+msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
+msgstr ""
