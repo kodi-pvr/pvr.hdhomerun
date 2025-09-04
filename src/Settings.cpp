@@ -22,6 +22,7 @@ bool SettingsType::ReadSettings()
   bMarkNew = kodi::addon::GetSettingBoolean("mark_new", true);
   bDebug = kodi::addon::GetSettingBoolean("debug", false);
   bHttpDiscovery = kodi::addon::GetSettingBoolean("http_discovery", false);
+  strForcedIP = kodi::addon::GetSettingString("force_ip", "");
 
   return true;
 }
@@ -46,6 +47,11 @@ ADDON_STATUS SettingsType::SetSetting(const std::string& settingName,
   else if (settingName == "http_discovery")
   {
     bHttpDiscovery = settingValue.GetBoolean();
+    return ADDON_STATUS_NEED_RESTART;
+  }
+  else if (settingName == "force_ip")
+  {
+    strForcedIP = settingValue.GetString();
     return ADDON_STATUS_NEED_RESTART;
   }
 
