@@ -5,63 +5,63 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-09-13 10:29+0000\n"
-"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
-"Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/es_es/>\n"
-"Language: es_es\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fil\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"Plural-Forms: nplurals=2; plural=n != 1 && n != 2 && n != 3 && (n % 10 == 4 "
+"|| n % 10 == 6 || n % 10 == 9);\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
-msgstr "Cliente PVR HDHomeRun"
+msgstr ""
 
 msgctxt "Addon Description"
 msgid "HDHomeRun PVR Client"
-msgstr "Cliente PVR HDHomeRun"
+msgstr ""
 
 #. label-category: general
 msgctxt "#32001"
 msgid "General"
-msgstr "General"
+msgstr ""
 
 msgctxt "#32002"
 msgid "Hide protected channels"
-msgstr "Ocultar canales protegidos"
+msgstr ""
 
 msgctxt "#32003"
 msgid "Enable debug logging"
-msgstr "Habilitar el registro de depuración"
+msgstr ""
 
 msgctxt "#32004"
 msgid "Hide duplicate channels"
-msgstr "Ocultar canales duplicados"
+msgstr ""
 
 msgctxt "#32005"
 msgid "Mark new show"
-msgstr "Marcar nuevo programa"
+msgstr ""
 
 #. label: Device Discovery - http_discovery
 msgctxt "#32006"
 msgid "Use HTTP discovery"
-msgstr "Usar descubrimiento HTTP"
+msgstr ""
 
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr "IP del dispositivo a usar"
+msgstr ""
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr "Descubrimiento de Dispositivo"
+msgstr ""
 
-# empty strings from id 32009 to 320099
+#empty strings from id 32009 to 320099
 #. ############
 #. help info #
 #. ############
@@ -69,9 +69,9 @@ msgstr "Descubrimiento de Dispositivo"
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr "Usa la web API Silicondust para obtener dispositivos HDHomeRun conectados con la misma dirección IP"
+msgstr ""
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr "Cuando no funciona ningun método de descubrimiento, introduce la dirección [B]IPv4[/B] del dispositivo HDHomeRun para que busque explícitamente en esa IP. Esto funciona cuando hay diferencias en la LAN/WAN del Cliente/Sintonizador. Reinicia el Addon Desactivándolo y Activándolo cuando se cambie."
+msgstr ""

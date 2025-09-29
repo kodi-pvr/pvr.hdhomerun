@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-07-28 19:47+0000\n"
+"PO-Revision-Date: 2025-09-05 20:33+0000\n"
 "Last-Translator: Daniel Nylander <daniel@danielnylander.se>\n"
 "Language-Team: Swedish <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/sv_se/>\n"
 "Language: sv_se\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.13.1\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
@@ -54,12 +54,12 @@ msgstr "Använd HTTP-upptäckt"
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr ""
+msgstr "Ställ in IP för enheten att använda"
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr ""
+msgstr "Enhetsupptäckt"
 
 # empty strings from id 32009 to 320099
 #. ############
@@ -69,9 +69,9 @@ msgstr ""
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr ""
+msgstr "Detta använder Silicondusts webb-API för att returnera HDHomeRun-enheter som är anslutna till samma internet-IP-adress"
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr ""
+msgstr "När andra sökmetoder inte fungerar, ange en [B]IPv4[/B]-adress för en HDHomeRun-enhet för att uttryckligen söka endast efter den IP-adressen. Detta fungerar när Broadcast- och HTTP-sökningen inte hittar enheter på grund av LAN/WAN-skillnader i klient/tuner. Starta om tillägget genom att inaktiverat och aktivera det när ändringen har gjorts."
