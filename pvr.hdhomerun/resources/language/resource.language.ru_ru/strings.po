@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-07-28 01:27+0000\n"
+"PO-Revision-Date: 2025-09-29 07:29+0000\n"
 "Last-Translator: Alexey <signfinder@gmail.com>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/ru_ru/>\n"
 "Language: ru_ru\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.13.3\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
@@ -49,17 +49,17 @@ msgstr "Отметить новый сериал"
 #. label: Device Discovery - http_discovery
 msgctxt "#32006"
 msgid "Use HTTP discovery"
-msgstr "Использовать HTTP-обнаружения"
+msgstr "Использовать HTTP-обнаружение"
 
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr ""
+msgstr "Установите IP используемого устройства"
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr ""
+msgstr "Обнаружение устройств"
 
 # empty strings from id 32009 to 320099
 #. ############
@@ -69,9 +69,9 @@ msgstr ""
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr ""
+msgstr "Использовать веб-API Silicondust для возврата устройств HDHomeRun, подключенных к тому же IP в Интернете"
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr ""
+msgstr "Если другие методы обнаружения не работают, введите [B]IPv4[/B]-адрес устройства HDHomeRun, чтобы явно искать только этот IP-адрес. Это работает, когда широковещательное и HTTP-обнаружение не находят устройства из-за различий в LAN/WAN в клиенте/тюнере. Перезапустите Addon, отключив и включив его после изменения."

@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-07-28 01:26+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2025-09-13 10:29+0000\n"
+"Last-Translator: Elvis Gallegos <elvis.gallegos@gmail.com>\n"
 "Language-Team: Catalan (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/ca_es/>\n"
 "Language: ca_es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.13.3\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
@@ -54,12 +54,12 @@ msgstr ""
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr ""
+msgstr "Estableix la IP del dispositiu que s'utilitzarà"
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr ""
+msgstr "Detecció de Dispositius"
 
 # empty strings from id 32009 to 320099
 #. ############
@@ -69,9 +69,9 @@ msgstr ""
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr ""
+msgstr "Utilitza l'API web de Silicondust per retornar els dispositius HDHomeRun connectats amb la mateixa adreça IP d'Internet"
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr ""
+msgstr "Quan altres mètodes de descobriment no funcionin, introduïu una adreça [B]IPv4[/B] d'un dispositiu HDHomeRun per cercar explícitament només aquesta IP. Això funciona quan hi ha diferències a la LAN/WAN del Client/Sintonitzador. Reinicieu el Complement Desactivant-lo i Activant-lo quan es canviï."
