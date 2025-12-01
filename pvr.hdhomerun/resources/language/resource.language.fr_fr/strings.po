@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-07-28 01:26+0000\n"
+"PO-Revision-Date: 2025-12-01 15:31+0000\n"
 "Last-Translator: skypichat <skypichat@hotmail.fr>\n"
 "Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/fr_fr/>\n"
 "Language: fr_fr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.14.3\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
@@ -54,12 +54,12 @@ msgstr "Utiliser la découverte HTTP"
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr ""
+msgstr "Définir l'adresse IP du périphérique à utiliser"
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr ""
+msgstr "Découverte des appareils"
 
 # empty strings from id 32009 to 320099
 #. ############
@@ -69,9 +69,9 @@ msgstr ""
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr ""
+msgstr "Cette fonction utilise l'API web de Silicondust pour renvoyer les appareils HDHomeRun connectés à la même adresse IP Internet"
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr ""
+msgstr "Lorsque les autres méthodes de découverte ne fonctionnent pas, saisir l'adresse IPv4 d'un appareil HDHomeRun pour effectuer une recherche spécifique à cette adresse. Cette méthode est efficace lorsque la découverte par diffusion et HTTP ne trouve pas d'appareils en raison de différences de réseau local/étendu (LAN/WAN) entre le client et le tuner. Redémarrer l'extension en la désactivant puis en la réactivant après chaque modification."
