@@ -1,3 +1,7 @@
+v22.2.5
+- Translations updates from Weblate
+	- fr_fr
+
 v22.2.4
 - Fixed API URL (thanks mooninite!)
 - Allow a user to specifically set IP address of HDHomerun device to search for if other discovery methods dont work.
