@@ -5,25 +5,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KODI Main\n"
-"Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2025-07-28 01:26+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-07-06 15:50+0000\n"
+"Last-Translator: Michal Várady <miko.vaji@gmail.com>\n"
 "Language-Team: Czech <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-hdhomerun/cs_cz/>\n"
 "Language: cs_cz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.7\n"
 
 msgctxt "Addon Summary"
 msgid "HDHomeRun PVR Client"
-msgstr "Klient HDHomeRun PVR"
+msgstr "Klient PVR pro HDHomeRun"
 
 msgctxt "Addon Description"
 msgid "HDHomeRun PVR Client"
-msgstr "Klient HDHomeRun PVR"
+msgstr "Klient PVR pro HDHomeRun"
 
 #. label-category: general
 msgctxt "#32001"
@@ -44,22 +44,22 @@ msgstr "Skrýt duplicitní kanály"
 
 msgctxt "#32005"
 msgid "Mark new show"
-msgstr "Označit nový seriál"
+msgstr "Označit nový pořad"
 
 #. label: Device Discovery - http_discovery
 msgctxt "#32006"
 msgid "Use HTTP discovery"
-msgstr ""
+msgstr "Použít vyhledávání přes HTTP"
 
 #. label: Device Discovery - force_ip
 msgctxt "#32007"
 msgid "Set IP of device to use"
-msgstr ""
+msgstr "Nastavit IP adresu zařízení, které se má použít"
 
 #. label-group: General - Device Discovery
 msgctxt "#32008"
 msgid "Device Discovery"
-msgstr ""
+msgstr "Vyhledávání zařízení"
 
 # empty strings from id 32009 to 320099
 #. ############
@@ -69,9 +69,9 @@ msgstr ""
 #. help: Device Discovery - http_discovery
 msgctxt "#32100"
 msgid "This uses Silicondust web API to return HDHomeRun devices connected with the same internet IP address"
-msgstr ""
+msgstr "Pomocí webového API Silicondust vyhledá zařízení HDHomeRun připojená ze stejné veřejné IP adresy"
 
 #. help: Device Discovery - force_ip
 msgctxt "#32101"
 msgid "When other discovery methods do not work, enter an [B]IPv4[/B] address of a HDHomeRun device to explicitly search only that IP. This works when Broadcast and HTTP discovery do not find devices due to LAN/WAN differences in Client/Tuner. Restart Addon by Disabling and Enabling when changed."
-msgstr ""
+msgstr "Pokud jiné metody vyhledávání nefungují, zadejte [B]IPv4[/B] adresu zařízení HDHomeRun, aby se explicitně hledala pouze tato IP adresa. Funguje to v případech, kdy vyhledávání pomocí Broadcast a HTTP nenajde zařízení kvůli rozdílům LAN/WAN mezi klientem a tunerem. Po změně doplněk restartujte jeho zakázáním a opětovným povolením."
