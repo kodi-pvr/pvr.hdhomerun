@@ -22,7 +22,7 @@
     <summary lang="bg_BG">Клиент за ПВР „HDHomeRun“</summary>
     <summary lang="bs_BA">HDHomeRun PVR klijent</summary>
     <summary lang="ca_ES">Client PVR de HDHomeRun</summary>
-    <summary lang="cs_CZ">Klient HDHomeRun PVR</summary>
+    <summary lang="cs_CZ">Klient PVR pro HDHomeRun</summary>
     <summary lang="cy_GB">Cleiant PVR HDHomeRun</summary>
     <summary lang="da_DK">HDHomeRun PVR-klient</summary>
     <summary lang="de_DE">HDHomeRun-PVR-Client</summary>
@@ -70,7 +70,7 @@
     <description lang="bg_BG">Клиент за ПВР „HDHomeRun“</description>
     <description lang="bs_BA">HDHomeRun PVR klijent</description>
     <description lang="ca_ES">Client PVR de HDHomeRun</description>
-    <description lang="cs_CZ">Klient HDHomeRun PVR</description>
+    <description lang="cs_CZ">Klient PVR pro HDHomeRun</description>
     <description lang="cy_GB">Cleiant PVR HDHomeRun</description>
     <description lang="da_DK">HDHomeRun PVR-klient</description>
     <description lang="de_DE">HDHomeRun-PVR-Client</description>
