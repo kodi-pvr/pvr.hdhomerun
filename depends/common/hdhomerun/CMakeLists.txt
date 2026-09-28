@@ -6,10 +6,8 @@ set(SOURCES hdhomerun_channels.c
             hdhomerun_control.c
             hdhomerun_debug.c
             hdhomerun_device.c
-            hdhomerun_device_selector.c
             hdhomerun_discover.c
             hdhomerun_pkt.c
-            hdhomerun_sock.c
             hdhomerun_video.c)
 
 set(HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun.h
@@ -34,25 +32,19 @@ else()
   LIST(APPEND SOURCES hdhomerun_os_posix.c)
   LIST(APPEND SOURCES hdhomerun_sock_posix.c)
   LIST(APPEND HEADERS ${PROJECT_SOURCE_DIR}/hdhomerun_os_posix.h)
-  if(CORE_SYSTEM_NAME STREQUAL android OR ANDROID)
-    # Preserve Android's ioctl-based interface discovery.
-    list(APPEND SOURCES hdhomerun_sock_netdevice.c)
-  elseif(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    list(APPEND SOURCES hdhomerun_sock_netlink.c)
-  else()
-    list(APPEND SOURCES hdhomerun_sock_getifaddrs.c)
-  endif()
 endif()
 
 if(MSVC)
   set_source_files_properties( ${SOURCES} PROPERTIES LANGUAGE "CXX" )
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
   if(CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
     add_definitions(-D_WIN32_WINNT=0x0A00 -D_WINRT)
   endif()
+elseif(CORE_SYSTEM_NAME STREQUAL android)
+  add_definitions(-DLIBHDHOMERUN_USE_SIOCGIFCONF)
 endif()
 
-add_library(hdhomerun STATIC ${SOURCES})
-set_target_properties(hdhomerun PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_library(hdhomerun ${SOURCES})
 
 include_directories(${PROJECT_SOURCE_DIR})
 

@@ -1,1 +1,1 @@
-hdhomerun https://download.silicondust.com/hdhomerun/libhdhomerun_20260313.tgz
+hdhomerun https://github.com/Silicondust/libhdhomerun/archive/7c54382fb681d03888b469033e50bebaf4ce6bce.tar.gz
